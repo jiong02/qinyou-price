@@ -1,0 +1,27 @@
+<!-- 添加交通 -->
+<div class="add_traffic">
+     <div class="add_tra_header">
+          <span>添加交通</span>
+          <ul>
+             <li>单个交通</li>
+             <li class="active">添加模板</li>
+             <li>新建交通</li>
+          </ul>
+     </div>
+     <!-- 添加模板 -->
+     <div class="add_template">
+        <?php foreach($data as $key => $value){ ;?>
+         <div class="circuit" <?php echo "data-id='.$value->id.'" ;?>>
+            <p>所需时间: <?php echo $value->waste_day."日".$value->waste_night."夜" ;?></p>
+            <p><?php echo $value->content_new ;?></p>
+         </div>
+         <?php };?>
+     </div>
+     <div class="add_tra_foot">
+             <div>
+                <button class="all active">应用于所有行程</button>
+                <button class="sin">应用于该行程</button>
+             </div>
+             <button>确认</button>
+     </div>
+</div>

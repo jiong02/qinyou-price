@@ -1,0 +1,74 @@
+<!-- 添加交通 -->
+<div class="add_traffic">
+     <div class="add_tra_header">
+          <span>添加交通</span>
+          <ul>
+             <li class="active">单个交通</li>
+             <li>添加模板</li>
+             <li>新建交通</li>
+          </ul>
+     </div>
+     <!-- 单个交通 -->
+     <div class="single_tra">
+         <div class="sin_tar_header">
+              <ul>
+                 <li class="active">
+                    定期交通
+                    <span>/</span>
+                 </li>
+                 <li>
+                    接驳交通
+                    <span>/</span>
+                 </li>
+                 <li>
+                    联程交通
+                 </li>
+              </ul>
+              <select>
+                 <option>交通方式</option>
+              </select>
+         </div>
+         <ul class="sin_tar_body">
+                <!-- 定期 -->
+                <?php foreach($data as $v){ ;?>
+                <li <?php echo "data-id='.$v->id.'" ;?>>
+                    <a href="#" target="_blank">
+                        <div class="left">
+                            <div class="left">
+                                <p><?php echo $v->method;?></p>
+                                <p><?php echo $v->num;?></p>
+                            </div>
+                        </div>
+                        <div class="right">
+                            <p><?php echo $v->start_city.'/'.$v->start_name.'('.$v->start_ename.')';?>&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;<?php echo $v->end_city.'/'.$v->end_name.'('.$v->end_ename.')';?></p>
+                            <p class="time">
+                                时间点:
+                                <span><?php echo $v->in_time;?>(<?php echo $v->in_time_day;?>)</span>
+                                &nbsp;&nbsp;-&nbsp;&nbsp;
+                                <?php echo $v->start_time;?>
+                                &nbsp;&nbsp;-&nbsp;&nbsp;
+                                <?php echo $v->end_time;?>(<?php echo $v->end_time_day;?>)
+                                &nbsp;&nbsp;-&nbsp;&nbsp;
+                                <span><?php echo $v->out_time;?>(<?php echo $v->out_time_day;?>)</span>
+                            </p>
+                            <p class="time">
+                                耗时：<span><?php echo $v->waste_in;?></span>
+                                &nbsp;+&nbsp;
+                                <?php echo $v->waste_all;?>
+                                &nbsp;+&nbsp;
+                                <span><?php echo $v->waste_out;?></span>
+                            </p>
+                        </div>
+                    </a>
+                </li>
+                <?php } ;?>
+         </ul>
+     </div>
+     <div class="add_tra_foot">
+             <div>
+                <button class="all active">应用于所有行程</button>
+                <button class="sin">应用于该行程</button>
+             </div>
+             <button>确认</button>
+     </div>
+</div>

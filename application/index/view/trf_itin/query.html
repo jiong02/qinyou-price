@@ -1,0 +1,112 @@
+<?php foreach($public as $k => $v){ ;?>
+<div class="item1">
+    <p><span><?php echo "公共交通".$k.$v->trf_type == '联程交通' ? '(联程)' : '' ;?></span><label>×</label></p>
+    <div class="body">
+        <div class="body_l">
+            <p><?php echo $v->start_city . "-" .$v->end_city  ."(". $v->method. $v->num == 0 ? '' : $v->num  .$v->in_time . "-" . $v->out_time .")" ;?></p>
+            <p class="orange">待完善</p>
+        </div>
+        <div class="body_r">
+            <div class="switch has-switch" data-on="success" data-off="warning">
+                <div class="switch-off switch-animate">
+                    <input type="checkbox" checked>
+                    <span class="switch-left switch-success">OFF</span><label>&nbsp;</label>
+                    <span class="switch-right switch-warning">ON</span>
+                </div>
+            </div>
+            <p>不代订</p>
+        </div>
+    </div>
+    <!-- 流程图 -->
+    <div class="flow">
+        <div class="hovertree-tracklist">
+            <ul>
+                <li class="first">
+                    <i class="node-icon"></i>
+                    <span class="time"><?php echo $v->in_time ;?></span>
+                    <span class="txt">等待</span>
+                </li>
+                <li>
+                    <i class="node-icon"></i>
+                    <span class="time"><?php echo $v->start_time ;?></span>
+                    <span class="txt"><?php echo $v->start_city. $v->start_name ;?></span>
+                </li>
+                <li>
+                    <i class="node-icon"></i>
+                    <span class="time"><?php echo $v->end_time ;?></span>
+                    <span class="txt"><?php echo $v->start_city. $v->end_name ;?></span>
+                </li>
+                <li>
+                    <i class="node-icon"></i>
+                    <span class="time"><?php echo $v->out_time ;?></span>
+                    <span class="txt">后续等待</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div>
+        <p>
+            交通工具1:  车载 3 人.    交通工具2:  车载 3 人.
+        </p>
+        <p>
+            交通工具3:  车载 4 人.
+        </p>
+    </div>
+</div>
+<?php };?>
+<?php foreach($public as $k => $v){ ;?>
+<div class="item1">
+    <p><span><?php echo "单独交通".$k.$v->trf_type == '联程交通' ? '(联程)' : '' ;?></span><label>×</label></p>
+    <div class="body">
+        <div class="body_l">
+            <p><?php echo $v->start_city . "-" .$v->end_city  ."(". $v->method. $v->num == 0 ? '' : $v->num  .$v->in_time . "-" . $v->out_time .")" ;?></p>
+            <p class="orange">待完善</p>
+        </div>
+        <div class="body_r">
+            <div class="switch has-switch" data-on="success" data-off="warning">
+                <div class="switch-off switch-animate">
+                    <input type="checkbox" checked>
+                    <span class="switch-left switch-success">OFF</span><label>&nbsp;</label>
+                    <span class="switch-right switch-warning">ON</span>
+                </div>
+            </div>
+            <p>不代订</p>
+        </div>
+    </div>
+    <!-- 流程图 -->
+    <div class="flow">
+        <div class="hovertree-tracklist">
+            <ul>
+                <li class="first">
+                    <i class="node-icon"></i>
+                    <span class="time"><?php echo $v->in_time ;?></span>
+                    <span class="txt">等待</span>
+                </li>
+                <li>
+                    <i class="node-icon"></i>
+                    <span class="time"><?php echo $v->start_time ;?></span>
+                    <span class="txt"><?php echo $v->start_city. $v->start_name ;?></span>
+                </li>
+                <li>
+                    <i class="node-icon"></i>
+                    <span class="time"><?php echo $v->end_time ;?></span>
+                    <span class="txt"><?php echo $v->start_city. $v->end_name ;?></span>
+                </li>
+                <li>
+                    <i class="node-icon"></i>
+                    <span class="time"><?php echo $v->out_time ;?></span>
+                    <span class="txt">后续等待</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div>
+        <p>
+            交通工具1:  车载 3 人.    交通工具2:  车载 3 人.
+        </p>
+        <p>
+            交通工具3:  车载 4 人.
+        </p>
+    </div>
+</div>
+<?php };?>

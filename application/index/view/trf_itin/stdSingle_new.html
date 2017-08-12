@@ -1,0 +1,51 @@
+<div class="vehicle_info" style="display: block;">
+   <div class="sum">交通工具满载人数 <span>1</span> 人.</div>
+   <!-- 添加交通工具详情1 -->
+   <div class="vehicle_main">
+       <div class="vehicle_box">
+            <div class="warehouse_info">
+                <div>仓位:<span>?</span></div><div>人员:<span>?</span></div><div class="add_btn" data-modal="veh_people">点击添加</div>
+                <p>黄测试  男  38岁   ;   红测试  女  18岁  ;   红红红  女  19岁  ;   红蓝红  女  19岁</p>
+            </div>
+            <ul>
+                <li>
+                    <p>仓位</p>
+                    <input type="text" value="" />
+                </li>
+                <li>
+                    <p>成人价格</p>
+                    <input type="text" value="<?php echo $data->adult_price[0]; ?>" />
+                </li>
+                <li>
+                    <p>成人差价</p>
+                    <input type="text" value="<?php echo $data->adult_diff[0]; ?>" />
+                </li>
+                <li>
+                    <p>儿童价格</p>
+                    <input type="text" value="<?php echo $data->kids_price[0]; ?>" />
+                </li>
+                <li>
+                    <p>儿童差价</p>
+                    <input type="text" value="<?php echo $data->kids_diff[0]; ?>" />
+                </li>
+                <li>
+                    <p>婴儿价格</p>
+                    <input type="text" value="<?php echo $data->baby_price[0]; ?>" />
+                </li>
+                <li>
+                    <p>婴儿差价</p>
+                    <input type="text" value="<?php echo $data->baby_diff[0]; ?>" />
+                </li>
+            </ul>
+       </div>
+   </div>
+   <!-- 添加交通工具详情1end -->
+   <div class="add_vehicle">添加其他仓位</div>
+    <div class="vehicle_foot">
+        <div>
+            <p>仓位  K  :   1344.30 * 3 = 5372.90 </p>
+            <p>仓位  K  :   1344.30 * 3 = 5372.90 </p>
+        </div>
+        <button>确认</button>
+    </div>
+</div>

@@ -1,0 +1,50 @@
+/*
+* @Author: kiwi
+* @Date:   2017-02-03 18:21:21
+* @Last Modified by:   kiwi
+* @Last Modified time: 2017-02-03 20:22:15
+*/
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td {
+  margin: 0;
+  padding: 0;
+}
+html {
+  height: 100%;
+}
+body {
+   width: 100%;
+   height:100%;
+  font-family: Microsoft Yahei;
+}
+ul {
+  list-style-type: none;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0;
+}
+* {
+  box-sizing: border-box;
+}
+
+.peoInfo {
+  width: 210px;
+  min-height: 230px;
+  padding: 15px;
+}
+.peoInfo h3{
+  margin:10px 0;
+}
+.peoInfo div{
+  font-size: 14px;
+  color:#7f8fa4;
+  margin-bottom: 10px;
+}
+.peoInfo .peoInfo_top{
+  height: 50px;
+  line-height: 50px;
+  width: 100%;
+  color: #fff;
+  margin:0;
+}

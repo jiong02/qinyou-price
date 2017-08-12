@@ -1,0 +1,93 @@
+<!-- 交通工具详情 -->
+<div class="vehicle_info">
+    <div class="sum">交通工具满载人数 <span>1</span> 人</div>
+    <!-- 添加交通工具详情2 -->
+    <div class="vehicle_main2" style="display: block;">
+        <ul class="price">
+            <?php foreach($data as $k => $v){ ;?>
+            <li>
+                <p>成人价钱</p>
+                <input type="text" value="<?php echo $v->adult_price ;?>" />
+            </li>
+            <li>
+                <p>成人差价</p>
+                <!-- 下拉框start -->
+                <div class="input_unit" id="a_spread">
+                    <input class="input_change" type="text" value="" placeholder="返回地">
+                    <button class="btn_change" type="button">
+                        <div class="btn_triangle triangle-down"></div>
+                    </button>
+                    <div class="check_unit display_none" style="display: none;">
+                    <ul class="check_unit_list">
+                        <?php foreach(json_decode($v->adult_diff) as $key => $value){ ;?>
+                      <li><span><?php echo $key+1 ;?>人差</span><span><?php echo $value ;?></span></li>
+                        <?php };?>
+                        </ul>
+                    </div>
+                </div>
+                <!-- 下拉框end -->
+            </li>
+            <li>
+                <p>儿童价钱</p>
+                <input type="text" value="<?php echo $v->kids_price ;?>" />
+            </li>
+            <li>
+                <p>儿童差价</p>
+                <!-- 下拉框start -->
+                <div class="input_unit" id="b_spread">
+                    <input class="input_change" type="text" value="广州" placeholder="返回地">
+                    <button class="btn_change" type="button">
+                        <div class="btn_triangle triangle-down"></div>
+                    </button>
+                    <div class="check_unit display_none" style="display: none;">
+                        <ul class="check_unit_list">
+                        <?php foreach(json_decode($v->kids_diff) as $key => $value){ ;?>
+                          <li><span><?php echo $key+1 ;?>人差</span><span><?php echo $value ;?></span></li>
+                        <?php };?>
+                        </ul>
+                    </div>
+                </div>
+                <!-- 下拉框end -->
+            </li>
+            <li>
+                <p>婴儿价钱</p>
+                <input type="text" value="<?php echo $v->baby_price ;?>" />
+            </li>
+            <li>
+                <p>婴儿差价</p>
+                <!-- 下拉框start -->
+                <div class="input_unit" id="c_spread">
+                    <input class="input_change" type="text" value="广州" placeholder="返回地">
+                    <button class="btn_change" type="button">
+                        <div class="btn_triangle triangle-down"></div>
+                    </button>
+                    <div class="check_unit display_none" style="display: none;">
+                        <ul class="check_unit_list">
+                        <?php foreach(json_decode($v->baby_diff) as $key => $value){ ;?>
+                          <li><span><?php echo $key+1 ;?>人差</span><span><?php echo $value ;?></span></li>
+                        <?php };?>
+                        </ul>
+                    </div>
+                </div>
+                <!-- 下拉框end -->
+            </li>
+        </ul>
+        <div class="vehicle_num">交通工具数量 <div><span class="sub">-</span><input type="text" value="5"><span class="add">+</span></div></div>
+        <ul class="vehicle_double">
+            <!-- <li><input type="text"><span>*</span><input type="text" class="text"></li>
+            <li><input type="text"><span>*</span><input type="text" class="text"></li>
+            <li><input type="text"><span>*</span><input type="text" class="text"></li>
+            <li><input type="text"><span>*</span><input type="text" class="text"></li> -->
+        </ul>
+    </div>
+    <!-- 添加交通工具详情2end -->
+    <div class="add_vehicle">添加其他仓位</div>
+    <div class="vehicle_foot">
+        <div>
+            <p>仓位  K  :   1344.30 * 3 = 5372.90 </p>
+            <p>仓位  K  :   1344.30 * 3 = 5372.90 </p>
+        </div>
+        <button>确认</button>
+    </div>
+</div>
+<!-- 交通工具详情end -->
