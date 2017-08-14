@@ -25,8 +25,13 @@ class BaseController extends Controller
         if(empty($data)){
             return false;
         }
-
         return json_decode(json_encode($data),true);
+
+    }
+
+    public function formatData($data)
+    {
+        return $data;
 
     }
 

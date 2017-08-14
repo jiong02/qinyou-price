@@ -6,7 +6,7 @@
  * Time: 10:38
  */
 
-namespace app\common\components;
+namespace app\components;
 
 use app\ims\model\HotelRoomModel;
 use app\ims\model\RoomModel;

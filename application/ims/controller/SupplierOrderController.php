@@ -503,15 +503,14 @@ halt($defVehicleInfo);*/
 
         $accountDataModel = new SupplierAccountDataModel();
 
-        $accDataInfo = $this->formateData($accountDataModel->where('account_id',$accountId)->find());
+        $accDataInfo = $this->formatData($accountDataModel->where('account_id',$accountId)->find());
 //halt($accDataInfo);
         if(empty($accDataInfo)){
             return getErr('请登录系统');
         }
 
         $accountGradeModel = new SupplierGradeModel();
-        $accountGradeInfo = $this->formateData($accountGradeModel->where('id',$accDataInfo['grade'])->find());
-
+        $accountGradeInfo = $this->formatData($accountGradeModel->where('id',$accDataInfo['grade'])->find());
         if(!empty($accountGradeInfo['ratio'])){
             $ratio = $accountGradeInfo['ratio'];
         }else{
@@ -532,7 +531,6 @@ halt($defVehicleInfo);*/
         }
 
         $pricingInfo = $pricingController->getPackageFareByCheckInDate($roomId,$night,$date);
-
         if(empty($pricingInfo)){
             return getError('该日期不可用');
         }
