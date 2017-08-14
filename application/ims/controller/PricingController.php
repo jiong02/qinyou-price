@@ -44,8 +44,6 @@ class PricingController extends BasePricingController
     {
         $stayingNights = 3;
         $hotelModel = HotelModel::get($hotelId);
-        dump(isset($hotelModel->place));
-        dump($hotelModel->country);
         if (!$hotelModel->place || !$hotelModel->country) {
             return false;
         }
@@ -54,11 +52,11 @@ class PricingController extends BasePricingController
         $data['place_name'] = $countryName . '/' . $placeName;
         $data['exchange_rate'] = $placeName = $hotelModel->exchange->exchange_rate;
         $contractModel = new ContractModel();
-        $contractData = $contractModel->where('hotel_id',$hotelId)->where('date_type','可用')->order('contract_start_date')->select()->toArray();
+        $contractData = $contractModel->where('hotel_id',$hotelId)->where('date_type','可用')->order('contract_start_date')->select();
         foreach ($contractData as $key => $contractDatum) {
         $data['expired_date'] =  $contractDatum['contract_start_date'].'~'.$contractDatum['contract_end_date'];
         $contractSeasonModel = new ContractSeasonModel();
-        $contractSeasonData = $contractSeasonModel->where('contract_id',$contractDatum['id'])->group('season_unqid')->select()->toArray();
+        $contractSeasonData = $contractSeasonModel->where('contract_id',$contractDatum['id'])->group('season_unqid')->select();
             if (count($contractSeasonData) !== 0) {
                 foreach ($contractSeasonData as $index => $contractSeasonDatum) {
                     $seasonData['season_name'] = $contractSeasonDatum['season_name'];
