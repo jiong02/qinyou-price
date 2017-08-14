@@ -503,14 +503,15 @@ halt($defVehicleInfo);*/
 
         $accountDataModel = new SupplierAccountDataModel();
 
-        $accDataInfo = $this->formatData($accountDataModel->where('account_id',$accountId)->find());
+        $accDataInfo = $accountDataModel->where('account_id',$accountId)->find();
 //halt($accDataInfo);
         if(empty($accDataInfo)){
             return getErr('请登录系统');
         }
 
         $accountGradeModel = new SupplierGradeModel();
-        $accountGradeInfo = $this->formatData($accountGradeModel->where('id',$accDataInfo['grade'])->find());
+        $accountGradeInfo = $accountGradeModel->where('id',$accDataInfo['grade'])->find();
+
         if(!empty($accountGradeInfo['ratio'])){
             $ratio = $accountGradeInfo['ratio'];
         }else{
@@ -518,7 +519,6 @@ halt($defVehicleInfo);*/
         }
 
         //】】】账号等级优惠结束
-
 
         $night = substr($packName,2,1);
         //byJepson
@@ -530,12 +530,40 @@ halt($defVehicleInfo);*/
             return getErr('缺少参数');
         }
 
-        $pricingInfo = $pricingController->getPackageFareByCheckInDate($roomId,$night,$date);
+        $start = date('Y-m-d',strtotime('- 3 day',time()));
+
+        $forNumber = 15;
+
+        $pricingInfo = array();
+
+        $priceList = array();
+
+        for($i=0;$i<$forNumber;$i++){
+
+            if($i == 0){
+                $priceList = $pricingController->getPackageFareByCheckInDate($roomId,$night,$start);
+            }else{
+                /*$start = date('Y-m-d',strtotime('+ 1 day',strtotime($start)));
+                echo $start.'<br>';*/
+                $priceList = $pricingController->getPackageFareByCheckInDate($roomId,$night,$start);
+//                var_dump($priceList['adult_fare']);
+            }
+
+            if(!empty($priceList)){
+                $pricingInfo['adult_price'][] = $priceList['adult_fare'];
+            }else{
+                $pricingInfo['adult_price'][] = 0;
+            }
+        }
+
+//        $pricingInfo = $pricingController->getPackageFareByCheckInDate($roomId,$night,$date);
+
         if(empty($pricingInfo)){
             return getError('该日期不可用');
         }
 
         $pricingInfo['grade_info'] = $ratio;
+        $pricingInfo['time'] = time();
 
         return getSucc($pricingInfo);
 
