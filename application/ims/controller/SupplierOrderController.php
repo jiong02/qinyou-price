@@ -546,11 +546,12 @@ halt($defVehicleInfo);*/
                 /*$start = date('Y-m-d',strtotime('+ 1 day',strtotime($start)));
                 echo $start.'<br>';*/
                 $priceList = $pricingController->getPackageFareByCheckInDate($roomId,$night,$start);
-//                var_dump($priceList['adult_fare']);
+//                var_dump($priceList['child_fare']);
             }
 
             if(!empty($priceList)){
                 $pricingInfo['adult_price'][] = $priceList['adult_fare'];
+                $pricingInfo['child_price'][] = $priceList['child_fare'];
             }else{
                 $pricingInfo['adult_price'][] = 0;
             }
