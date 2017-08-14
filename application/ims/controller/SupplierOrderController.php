@@ -532,6 +532,8 @@ halt($defVehicleInfo);*/
 
         $start = date('Y-m-d',strtotime('- 3 day',time()));
 
+        $nowTime = date('Y-m-d',time());
+
         $forNumber = 15;
 
         $pricingInfo = array();
@@ -543,17 +545,25 @@ halt($defVehicleInfo);*/
             if($i == 0){
                 $priceList = $pricingController->getPackageFareByCheckInDate($roomId,$night,$start);
             }else{
-                /*$start = date('Y-m-d',strtotime('+ 1 day',strtotime($start)));
-                echo $start.'<br>';*/
+                $start = date('Y-m-d',strtotime('+ 1 day',strtotime($start)));
+/*                echo $start.'<br>';*/
                 $priceList = $pricingController->getPackageFareByCheckInDate($roomId,$night,$start);
 //                var_dump($priceList['child_fare']);
+
             }
 
             if(!empty($priceList)){
                 $pricingInfo['adult_price'][] = $priceList['adult_fare'];
                 $pricingInfo['child_price'][] = $priceList['child_fare'];
+
+                if($start == $nowTime){
+                    $pricingInfo['today_adult_price'] = $priceList['adult_fare'];
+                    $pricingInfo['today_child_price'] = $priceList['child_fare'];
+                }
             }else{
                 $pricingInfo['adult_price'][] = 0;
+                $pricingInfo['today_adult_price'] = 0;
+                $pricingInfo['today_child_price'] = 0;
             }
         }
 
