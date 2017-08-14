@@ -2,7 +2,7 @@
 
 namespace app\ims\controller;
 
-use app\common\components\Excel;
+use app\components\Excel;
 use app\ims\model\ContractModel;
 use app\ims\model\ContractSeasonModel;
 use app\ims\model\HotelDefaultVehicleModel;
