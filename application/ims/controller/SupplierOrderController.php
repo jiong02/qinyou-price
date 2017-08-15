@@ -143,10 +143,6 @@ class SupplierOrderController extends BaseController
             return getErr('没有房型信息');
         }
 
-        //优惠信息
-
-
-
         //查询房型下的费用信息
         $strRoomList = '';
 
