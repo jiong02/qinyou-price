@@ -1,5 +1,7 @@
 <?php
 namespace app\test\model;
+use app\test\model\BaseModel;
+
 
 class OrderModel extends BaseModel
 {
@@ -7,8 +9,9 @@ class OrderModel extends BaseModel
 
 
     public $rules = [
+        'id|订单' => 'number',
         'order_name|订单名称' => 'require',
-        'order_id|订单' => 'require|number',
+        'route_id|线路' => 'require|number',
         'trip_date|出行日期' => 'require|date',
         'room_number|房间数量' => 'require|number',
         'adult_number|成人数量' => 'require|number',

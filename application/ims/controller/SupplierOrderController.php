@@ -10,6 +10,7 @@ use app\ims\model\CountryModel;
 use app\ims\model\HotelRoomModel;
 use app\ims\model\PlaceModel;
 use app\ims\model\SupplierAccountModel;
+use app\ims\model\SupplierAccountDataModel;
 use app\ims\model\SupplierGradeModel;
 use app\ims\model\SupplierOrderModel;
 use app\ims\model\SupplierOrderTripModel;
@@ -25,7 +26,7 @@ use app\ims\controller\SupplierOrderTripController;
 use app\ims\model\ImageModel;
 use app\ims\model\RoomModel;
 use app\ims\model\HotelDefaultVehicleModel;
-use app\ims\model\SupplierAccountDataModel;
+
 use app\ims\model\HotelFacilityModel;
 
 
@@ -95,6 +96,7 @@ class SupplierOrderController extends BaseController
         $imageModel = new ImageModel();
         $roomModel = new HotelRoomModel();
         $packageModel = new ContractPackageModel();
+        $hotelModel = new HotelModel();
 
         foreach($roomList as $k=>$v){
             if(!empty($v['image_uniqid'])){
@@ -123,6 +125,15 @@ class SupplierOrderController extends BaseController
                 $newRoomList[$k]['package_uniqid'] = '';
             }
 
+            $hotelInfo = $hotelModel->field('exchange_id,exchange_rate')->where('ims_hotel.id',$v['hotel_id'])->join('ims_exchange','exchange_id = ims_exchange.id')->find();
+
+            if(!empty($hotelInfo)){
+                $newRoomList[$k]['exchange'] = $hotelInfo['exchange_rate'];
+            }else{
+                $newRoomList[$k]['exchange'] = 1;
+            }
+
+
             $packageInfo = array();
             $imageInfo = array();
             $roomInfo = array();
@@ -131,6 +142,10 @@ class SupplierOrderController extends BaseController
         if(empty($roomModel)){
             return getErr('没有房型信息');
         }
+
+        //优惠信息
+
+
 
         //查询房型下的费用信息
         $strRoomList = '';
