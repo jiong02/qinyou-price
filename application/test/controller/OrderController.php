@@ -3,6 +3,7 @@ namespace app\test\controller;
 use think\Request;
 use app\test\model\OrderModel;
 use think\Validate;
+use app\test\model\OrderCustomerModel;
 
 class OrderController extends BaseController
 {
@@ -22,8 +23,8 @@ class OrderController extends BaseController
             return '请输入订单数据';
         }
 
-        $validateClass = new Validate();
-        $validateRes = $validateClass->check($orderInfo);
+        $validateClass = new Validate($orderModel->rules);
+        $validateRes = $validateClass->scene($orderModel->scene['create_order'])->check($orderInfo);
 
         if(empty($validateRes)){
             return $validateClass->getError();
@@ -39,8 +40,41 @@ class OrderController extends BaseController
         }else{
             return '修改失败';
         }
+    }
+
+    /**
+     * @name 修改联系人信息
+     * @auth Sam
+     * @param Request $request
+     * @return array|string
+     */
+    public function updateLinkmanInfo(Request $request)
+    {
+        $orderModel = new OrderModel();
+
+        $linkmanInfo = $request->param('linkman_info/a',array());
+
+        if(empty($linkmanInfo) || !is_array($linkmanInfo)){
+            return '请输入联系人数据';
+        }
+
+        $validateClass = new Validate($orderModel->rules);
+        $validateRes = $validateClass->scene($orderModel->scene['linkman'])->check($linkmanInfo);
+
+        if(empty($validateRes)){
+            return $validateClass->getError();
+        }
+
+        $result = $orderModel->save($linkmanInfo);
+
+        if(!empty($result)){
+            return '修改成功';
+        }else{
+            return '修改失败';
+        }
 
     }
+
 
     /**
      * @name 获取订单（联系人）
@@ -67,8 +101,75 @@ class OrderController extends BaseController
         return '没有订单信息';
     }
 
+    /**
+     * @name 获取客户资料
+     * @auth Sam
+     * @param Request $request
+     * @return array|string
+     */
+    public function getTripPersonList(Request $request)
+    {
+        $orderId = $request->param('order_id',0);
 
+        if(empty($orderId) || !is_numeric($orderId)){
+            return '订单不存在';
+        }
 
+        $orderModel = new OrderModel();
+
+        $orderInfo = $orderModel->where('id',$orderId)->find();
+
+        if(empty($orderInfo)){
+            return '订单不存在';
+        }
+
+        if($orderInfo['order_status'] > 3){
+            return '流程不正确';
+        }
+
+        $customerModel = new OrderCustomerModel();
+
+        $customerList = $customerModel->where('order_id',$orderId)->select();
+
+        if(!empty($customerList)){
+            return $customerList->toArray();
+        }
+
+        return '没有客户信息';
+    }
+
+    /**
+     * @name 修改客户信息
+     * @auth Sam
+     * @param Request $request
+     * @return string
+     */
+    public function updateCustomerInfo(Request $request)
+    {
+        $customerInfo = $request->param('customer_info/a',array());
+
+        if(empty($customerInfo) || !is_array($customerInfo)){
+            return '请输入客户信息';
+        }
+
+        $customerModel = new OrderCustomerModel();
+
+        $validateClass = new Validate($customerModel->rules);
+
+        $validateResult = $validateClass->check($customerInfo);
+
+        if(empty($validateResult)){
+            return $validateClass->getError();
+        }
+
+        $customerResult = $customerModel->save($customerInfo);
+
+        if(!empty($customerResult)){
+            return '修改成功';
+        }
+
+        return '修改失败';
+    }
 
 
 

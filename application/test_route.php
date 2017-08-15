@@ -118,11 +118,16 @@ Route::domain('test', function(){
     Route::any('/Search/getPlacePage','test/Search/getPlacePage');
     //前端页面搜索海岛线路信息
     Route::any('/Search/webSearchRoute','test/Search/webSearchRoute');
-    //修改订单（联系人）
+    //修改订单
     Route::any('/Order/updateOrder','test/Order/updateOrder');
     //获取订单（联系人）
     Route::any('/Order/getOrderLinkmanInfo','test/Order/getOrderLinkmanInfo');
-
+    //修改联系人信息
+    Route::any('/Order/updateLinkmanInfo','test/Order/updateLinkmanInfo');
+    //获取客户信息
+    Route::any('/Order/getTripPersonList','test/Order/getTripPersonList');
+    //修改客户信息
+    Route::any('/Order/updateCustomerInfo','test/Order/updateCustomerInfo');
 
 
 

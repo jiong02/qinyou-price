@@ -25,12 +25,10 @@ class OrderModel extends BaseModel
         'linkman_phone|联系人电话' => 'require|number',
     ];
 
-    /*protected $scene = [
-        'order_linkman' => ['order_name','order_id','trip_date','room_number','adult_number','child_number','adult_price','child_price','create_order_people_id'],
-
-
-
-    ];*/
+    public $scene = [
+        'create_order' =>['id','route_name','route_id','trip_date','room_number','adult_number','child_number','adult_price','child_price','total_price','create_order_people_id'],
+        'linkman' => ['linkman_name','linkman_phone'],
+    ];
 
 
 
