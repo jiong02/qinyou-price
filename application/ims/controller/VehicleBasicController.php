@@ -95,8 +95,7 @@ class VehicleBasicController extends PrivilegeController
         $type = $this->vehicleType;
         $where['hotel_id'] = $this->hotelId;
         $where['vehicle_category'] = $category;
-        $return = [];
-        $ret = [];
+        $return = $ret = [];
         if($category == '联程交通'){
             $where['connect_journey_type'] = $journeyType;
             $vehicleBaseModel = new VehicleBaseModel();
