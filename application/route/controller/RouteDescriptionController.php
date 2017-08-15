@@ -717,7 +717,8 @@ class RouteDescriptionController extends Controller
         $routeInfo = $this->formateData(RouteModel::get($this->routeId));
 
         if(!empty($routeInfo) && !empty($routeInfo['image_uniqid'])){
-            $routeImage = controller('RouteController')->getImageInfo($routeInfo['image_uniqid']);
+            $routeClass = new RouteController();
+            $routeImage = $routeClass->getImageInfo($routeInfo['image_uniqid']);
             $routeInfo['route_image'] = $routeImage;
         }else{
             $routeInfo = !empty($routeInfo)?$routeInfo:array();
@@ -916,7 +917,8 @@ class RouteDescriptionController extends Controller
 
         foreach($data as $k=>$v){
             if(!empty($v['image_uniqid'])){
-                $imageInfo = controller('RouteController')->getImageInfo($v['image_uniqid']);
+                $routeClass = new RouteController();
+                $imageInfo = $routeClass->getImageInfo($v['image_uniqid']);
             }
 
             if(empty($imageInfo)){
