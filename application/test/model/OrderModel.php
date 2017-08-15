@@ -10,7 +10,7 @@ class OrderModel extends BaseModel
 
     public $rules = [
         'id|订单' => 'number',
-        'order_name|订单名称' => 'require',
+        'route_name|线路名称' => 'require',
         'route_id|线路' => 'require|number',
         'trip_date|出行日期' => 'require|date',
         'room_number|房间数量' => 'require|number',
