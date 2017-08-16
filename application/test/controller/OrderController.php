@@ -60,7 +60,7 @@ class OrderController extends BaseController
             return '请输入联系人数据';
         }
 
-        $validateClass = new Validate($orderModel->rules);
+        $validateClass = new Validate($orderModel->linkman);
         $validateRes = $validateClass->scene($orderModel->scene['linkman'])->check($linkmanInfo);
 
         if(empty($validateRes)){
