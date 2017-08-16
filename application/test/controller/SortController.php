@@ -18,7 +18,7 @@ class SortController extends BaseController
     {
         $countryModel = new ImsCountryModel();
 
-        $countryList = $countryModel->field("ims_country.id,ims_country.country_name,IFNULL(country_sort,0) as country_sort,ims_country.image_uniqid,image_category,image_path")->join('test.cheeru_country_sort','ims_country.id = test.cheeru_country_sort.country_id','LEFT')->join('ims_image','ims_country.image_uniqid = ims_image.image_uniqid','LEFT')->order('country_sort asc')->select();
+        $countryList = $countryModel->field("ims_country.id,ims_country.country_name,IFNULL(country_sort,0) as country_sort,ims_country.image_uniqid,image_category,image_path")->join('cheeru_test.cheeru_country_sort','ims_country.id = cheeru_test.cheeru_country_sort.country_id','LEFT')->join('ims_image','ims_country.image_uniqid = ims_image.image_uniqid','LEFT')->order('country_sort asc')->select();
 
         if(!empty($countryList)){
             return $this->formateData($countryList);

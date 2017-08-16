@@ -1,12 +1,16 @@
 <?php
 namespace app\test\model;
 use app\test\model\BaseModel;
+use think\Model;
 
-
-class OrderModel extends BaseModel
+class OrderModel extends Model
 {
     public $table = 'cheeru_order';
 
+
+    protected $connection  = [
+        'datetime_format' => false,
+    ];
 
     public $createOrder = [
         'id|订单' => 'number',

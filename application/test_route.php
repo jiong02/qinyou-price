@@ -130,6 +130,10 @@ Route::domain('test', function(){
     Route::any('/Order/updateCustomerInfo','test/Order/updateCustomerInfo');
     //修改订单状态
     Route::any('/Order/updateOrderStatus','test/Order/updateOrderStatus');
+    //后台获取订单列表
+    Route::any('/Order/getBackOrderList','test/Order/getBackOrderList');
+
+
 
 
 });

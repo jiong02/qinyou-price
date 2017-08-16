@@ -4,6 +4,7 @@ use think\Request;
 use app\test\model\OrderModel;
 use think\Validate;
 use app\test\model\OrderCustomerModel;
+use think\config;
 
 class OrderController extends BaseController
 {
@@ -250,6 +251,28 @@ class OrderController extends BaseController
 
         return '修改失败';
     }
+
+    /**
+     * @name 获取后台订单列表
+     * @auth Sam
+     * @return array|string
+     */
+    public function getBackOrderList()
+    {
+        config('datetime_format',false);
+
+        $orderModel = new OrderModel();
+
+        $orderList = $orderModel->field('cheeru_order.id,cheeru_order.order_name,cheeru_order.create_time,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.total_price,cheeru_order.take_charge_people_id,cheeru_order.order_status,cheeru_order.route_id,ims_route.ims_route.route_code')->join('ims_route.ims_route','route_id = ims_route.ims_route.id ','LEFT')->select();
+
+        if(!empty($orderList)){
+            return $orderList->toArray();
+        }
+
+        return '没有订单列表';
+
+    }
+
 
 
 
