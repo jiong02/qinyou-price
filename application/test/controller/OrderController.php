@@ -67,6 +67,8 @@ class OrderController extends BaseController
             return $validateClass->getError();
         }
 
+        $linkmanInfo['order_status'] = 2;
+
         if(!empty($linkmanInfo['id'])){
             $result = $orderModel->update($linkmanInfo);
         }else{
