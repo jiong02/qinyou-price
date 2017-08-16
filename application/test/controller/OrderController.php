@@ -187,6 +187,13 @@ class OrderController extends BaseController
 
         if($tripNumber == $custNumber){
             $orderInfo->order_status = 4;
+
+            $dateNow = date('Y-m-d',time());
+
+            if($orderInfo->create_date == $dateNow){
+                $orderInfo->is_same_date = 1;
+            }
+
             $orderInfo->save();
         }
 
