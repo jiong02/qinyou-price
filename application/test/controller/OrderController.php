@@ -61,7 +61,7 @@ class OrderController extends BaseController
         }
 
         $validateClass = new Validate($orderModel->linkman);
-        $validateRes = $validateClass->scene($orderModel->scene['linkman'])->check($linkmanInfo);
+        $validateRes = $validateClass->check($linkmanInfo);
 
         if(empty($validateRes)){
             return $validateClass->getError();
