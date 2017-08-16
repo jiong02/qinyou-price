@@ -18,7 +18,10 @@ class OrderCustomerModel extends BaseModel
     ];
 
 
-
+    public $linkman = [
+        'linkman_name|联系人' => 'require',
+        'linkman_phone|联系人电话' => 'require|number',
+    ];
 
 
 }

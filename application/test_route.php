@@ -128,7 +128,8 @@ Route::domain('test', function(){
     Route::any('/Order/getTripPersonList','test/Order/getTripPersonList');
     //修改客户信息
     Route::any('/Order/updateCustomerInfo','test/Order/updateCustomerInfo');
-
+    //修改订单状态
+    Route::any('/Order/updateOrderStatus','test/Order/updateOrderStatus');
 
 
 });
