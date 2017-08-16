@@ -67,7 +67,11 @@ class OrderController extends BaseController
             return $validateClass->getError();
         }
 
-        $result = $orderModel->save($linkmanInfo);
+        if(!empty($linkmanInfo['id'])){
+            $result = $orderModel->update($linkmanInfo);
+        }else{
+            $result = $orderModel->save($linkmanInfo);
+        }
 
         if(!empty($result)){
             return '修改成功';
