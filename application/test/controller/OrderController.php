@@ -23,8 +23,10 @@ class OrderController extends BaseController
             return '请输入订单数据';
         }
 
-        $validateClass = new Validate($orderModel->rules);
-        $validateRes = $validateClass->scene($orderModel->scene['create_order'])->check($orderInfo);
+//        halt($orderModel->scene['create_order']);
+
+        $validateClass = new Validate($orderModel->createOrder);
+        $validateRes = $validateClass->check($orderInfo);
 
         if(empty($validateRes)){
             return $validateClass->getError();
@@ -154,7 +156,7 @@ class OrderController extends BaseController
 
         $customerModel = new OrderCustomerModel();
 
-        $validateClass = new Validate($customerModel->rules);
+        $validateClass = new Validate($customerModel->linkman);
 
         $validateResult = $validateClass->check($customerInfo);
 

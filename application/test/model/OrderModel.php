@@ -8,7 +8,7 @@ class OrderModel extends BaseModel
     public $table = 'cheeru_order';
 
 
-    public $rules = [
+    public $createOrder = [
         'id|订单' => 'number',
         'route_name|线路名称' => 'require',
         'route_id|线路' => 'require|number',
@@ -21,6 +21,9 @@ class OrderModel extends BaseModel
         'total_price|总价格' => 'require|number',
         'create_order_people_id|创建人' => 'require|number',
         'take_charge_people_id|跟单人' => 'number',
+    ];
+
+    public $linkman = [
         'linkman_name|联系人' => 'require',
         'linkman_phone|联系人电话' => 'require|number',
     ];
