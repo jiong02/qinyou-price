@@ -164,7 +164,7 @@ class OrderController extends BaseController
 
         $customerModel = new OrderCustomerModel();
 
-        $validateClass = new Validate($customerModel->linkman);
+        $validateClass = new Validate($customerModel->rules);
 
         $validateResult = $validateClass->check($customerInfo);
 
