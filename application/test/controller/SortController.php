@@ -44,7 +44,7 @@ class SortController extends BaseController
 
         $placeModel = new ImsPlaceModel();
 
-        $placeList = $placeModel->field("ims_place.id,ims_place.country_id,ims_place.place_name,IFNULL(place_sort,0) as place_sort,cheeru_place_sort.id as sort_id")->join('test.cheeru_place_sort','ims_place.id = place_id','LEFT')->where('ims_place.country_id',$countryId)->order('place_sort asc')->select();
+        $placeList = $placeModel->field("ims_place.id,ims_place.country_id,ims_place.place_name,IFNULL(place_sort,0) as place_sort,cheeru_place_sort.id as sort_id")->join('cheeru_test.cheeru_place_sort','ims_place.id = place_id','LEFT')->where('ims_place.country_id',$countryId)->order('place_sort asc')->select();
 
         if(!empty($placeList)){
             return $this->formateData($placeList);

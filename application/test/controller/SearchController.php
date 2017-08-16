@@ -26,7 +26,7 @@ class SearchController extends BaseController
            //查询海岛信息
            if(!empty($countryId)){
 
-               $placeList = $placeModel->field("ims_place.id,ims_place.country_id,ims_place.place_name,IFNULL(place_sort,0) as place_sort,cheeru_place_sort.id as sort_id")->join('test.cheeru_place_sort','ims_place.id = place_id','LEFT')->where('ims_place.country_id',$countryId)->order('place_sort asc')->limit($page,$limit)->select();
+               $placeList = $placeModel->field("ims_place.id,ims_place.country_id,ims_place.place_name,IFNULL(place_sort,0) as place_sort,cheeru_place_sort.id as sort_id")->join('cheeru_test.cheeru_place_sort','ims_place.id = place_id','LEFT')->where('ims_place.country_id',$countryId)->order('place_sort asc')->limit($page,$limit)->select();
 
                if(!empty($placeList)){
                    return $this->formateData($placeList);
@@ -35,7 +35,7 @@ class SearchController extends BaseController
                }
 
            }else{//查询热门海岛信息
-               $countryList = $countryModel->field("ims_country.id,ims_country.country_name,IFNULL(country_sort,0) as country_sort,ims_country.image_uniqid,image_category,image_path")->join('test.cheeru_country_sort','ims_country.id = test.cheeru_country_sort.country_id','LEFT')->join('ims_image','ims_country.image_uniqid = ims_image.image_uniqid','LEFT')->order('country_sort = 0 desc,country_sort asc')->select();
+               $countryList = $countryModel->field("ims_country.id,ims_country.country_name,IFNULL(country_sort,0) as country_sort,ims_country.image_uniqid,image_category,image_path")->join('cheeru_test.cheeru_country_sort','ims_country.id = cheeru_test.cheeru_country_sort.country_id','LEFT')->join('ims_image','ims_country.image_uniqid = ims_image.image_uniqid','LEFT')->order('country_sort = 0 desc,country_sort asc')->select();
 
                $countryString = '';
 
@@ -45,7 +45,7 @@ class SearchController extends BaseController
 
                $countryString = trim($countryString,',');
 
-               $placeList = $placeModel->field("ims_place.id,ims_place.country_id,ims_place.place_name,IFNULL(place_sort,0) as place_sort,cheeru_place_sort.id as sort_id")->join('test.cheeru_place_sort','ims_place.id = place_id','LEFT')->where("ims_place.country_id in ($countryString)")->order('place_sort = 0 desc,place_sort asc')->limit($page,$limit)->select();
+               $placeList = $placeModel->field("ims_place.id,ims_place.country_id,ims_place.place_name,IFNULL(place_sort,0) as place_sort,cheeru_place_sort.id as sort_id")->join('cheeru_test.cheeru_place_sort','ims_place.id = place_id','LEFT')->where("ims_place.country_id in ($countryString)")->order('place_sort = 0 desc,place_sort asc')->limit($page,$limit)->select();
 
                 if(!empty($placeList)){
                     return $this->formateData($placeList);
