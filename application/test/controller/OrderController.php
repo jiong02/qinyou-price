@@ -259,8 +259,6 @@ class OrderController extends BaseController
      */
     public function getBackOrderList()
     {
-        config('datetime_format',false);
-
         $orderModel = new OrderModel();
 
         $orderList = $orderModel->field('cheeru_order.id,cheeru_order.order_name,cheeru_order.create_time,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.total_price,cheeru_order.take_charge_people_id,cheeru_order.order_status,cheeru_order.route_id,ims_route.ims_route.route_code')->join('ims_route.ims_route','route_id = ims_route.ims_route.id ','LEFT')->select();
