@@ -38,7 +38,7 @@ class OrderController extends BaseController
         $result = $orderModel->save($orderInfo);
 
         if(!empty($result)){
-            return '修改成功';
+            return $orderModel->id;
         }else{
             return '修改失败';
         }
