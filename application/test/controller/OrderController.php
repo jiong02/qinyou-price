@@ -162,6 +162,29 @@ class OrderController extends BaseController
             return $validateClass->getError();
         }
 
+        //判断是否填写完整客户资料
+        $orderModel = new OrderModel();
+
+        $orderInfo = $orderModel->where('id',$customerInfo['order_id'])->find();
+
+        if(empty($orderInfo)){
+            return '订单不存在';
+        }
+
+        $tripNumber = $orderInfo->adult_number + $orderInfo->child_number;
+
+        if($tripNumber <= 0){
+            return '客户数量错误';
+        }
+
+        $custNumber = $customerModel->where('order_id',$customerInfo['order_id'])->count();
+
+        if($tripNumber == $custNumber){
+            $orderInfo->order_status = 4;
+            $orderInfo->save();
+        }
+
+        //保存客户信息
         $customerResult = $customerModel->save($customerInfo);
 
         if(!empty($customerResult)){
