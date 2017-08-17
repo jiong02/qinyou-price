@@ -6,6 +6,7 @@ use think\Validate;
 use app\test\model\OrderCustomerModel;
 use think\config;
 use app\components\Excel;
+use app\test\model\TestAccount;
 
 class OrderController extends BaseController
 {
@@ -315,6 +316,22 @@ class OrderController extends BaseController
             $customerList = $customerList->toArray();
         }else{
             $customerList = '';
+        }
+
+        $accountModel = new TestAccount();
+
+        $accountInfo = $accountModel->field('id,user_name,call_phone')->where('id',$orderInfo['create_order_people_id'])->find();
+
+        if(!empty($accountInfo['user_name'])){
+            $orderInfo['user_name'] = $accountInfo['user_name'];
+        }else{
+            $orderInfo['user_name'] = '';
+        }
+
+        if(!empty($accountInfo['call_phone'])){
+            $orderInfo['call_phone'] = $accountInfo['call_phone'];
+        }else{
+            $orderInfo['call_phone'] = '';
         }
 
         $orderInfo['customer_list'] = $customerList;
