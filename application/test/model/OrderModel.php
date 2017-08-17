@@ -22,7 +22,7 @@ class OrderModel extends Model
         'child_number|儿童数量' => 'require|number',
         'adult_price|成人价格' => 'require|number',
         'child_price|儿童价格' => 'require|number',
-        'total_price|总价格' => 'require|number',
+        'update_total_price|总价格' => 'require|number',
         'create_order_people_id|创建人' => 'require|number',
         'take_charge_people_id|跟单人' => 'number',
     ];
@@ -33,7 +33,7 @@ class OrderModel extends Model
     ];
 
     public $scene = [
-        'create_order' =>['id','route_name','route_id','trip_date','room_number','adult_number','child_number','adult_price','child_price','total_price','create_order_people_id'],
+        'create_order' =>['id','route_name','route_id','trip_date','room_number','adult_number','child_number','adult_price','child_price','update_total_price','create_order_people_id'],
         'linkman' => ['linkman_name','linkman_phone'],
     ];
 
