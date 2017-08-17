@@ -132,7 +132,8 @@ Route::domain('test', function(){
     Route::any('/Order/updateOrderStatus','test/Order/updateOrderStatus');
     //后台获取订单列表
     Route::any('/Order/getBackOrderList','test/Order/getBackOrderList');
-
+    //后台获取订单信息
+    Route::any('/Order/getBackOrderInfo','test/Order/getBackOrderInfo');
 
 
 

@@ -5,6 +5,7 @@ use app\test\model\OrderModel;
 use think\Validate;
 use app\test\model\OrderCustomerModel;
 use think\config;
+use app\components\Excel;
 
 class OrderController extends BaseController
 {
@@ -257,20 +258,79 @@ class OrderController extends BaseController
      * @auth Sam
      * @return array|string
      */
-    public function getBackOrderList()
+    public function getBackOrderList(Request $request)
     {
+        $page = $request->param('page',0);
+        $limit = $request->param('limit',10);
+
         $orderModel = new OrderModel();
 
-        $orderList = $orderModel->field('cheeru_order.id,cheeru_order.order_name,cheeru_order.create_time,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.total_price,cheeru_order.take_charge_people_id,cheeru_order.order_status,cheeru_order.route_id,ims_route.ims_route.route_code')->join('ims_route.ims_route','route_id = ims_route.ims_route.id ','LEFT')->select();
+        $orderList = $orderModel->field('cheeru_order.id,cheeru_order.order_name,cheeru_order.create_time,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.total_price,cheeru_order.take_charge_people_id,cheeru_order.order_status,cheeru_order.route_id,ims_route.ims_route.route_code')->join('ims_route.ims_route','route_id = ims_route.ims_route.id ','LEFT')->limit($page,$limit)->select();
+
+        $orderCount = $orderModel->field('cheeru_order.id,cheeru_order.order_name,cheeru_order.create_time,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.total_price,cheeru_order.take_charge_people_id,cheeru_order.order_status,cheeru_order.route_id,ims_route.ims_route.route_code')->join('ims_route.ims_route','route_id = ims_route.ims_route.id ','LEFT')->count();
+
+        $orderCount = ceil($orderCount / 10);
 
         if(!empty($orderList)){
-            return $orderList->toArray();
+            $return['total_page'] = $orderCount;
+            $return['order_list'] = $orderList->toArray();
+
+            return $return;
         }
 
         return '没有订单列表';
 
     }
 
+    /**
+     * @name 获取订单信息
+     * @auth Sam
+     * @param Request $request
+     * @return array|false|\PDOStatement|string|\think\Model
+     */
+    public function getBackOrderInfo(Request $request)
+    {
+        $orderId = $request->param('order_id',0);
+
+        if(empty($orderId) || !is_numeric($orderId)){
+            return '请输入订单ID';
+        }
+
+        $orderModel = new OrderModel();
+
+        $orderInfo = $orderModel->field('cheeru_order.*,ims_route.ims_route.route_code')->join('ims_route.ims_route','route_id = ims_route.ims_route.id ','LEFT')->where('cheeru_order.id',$orderId)->find();
+
+        if(empty($orderInfo)){
+            return '订单不存在';
+        }
+
+        $orderInfo = $orderInfo->toArray();
+
+        $customerModel = new OrderCustomerModel();
+
+        $customerList = $customerModel->where('order_id',$orderId)->select();
+
+        if(!empty($customerList)){
+            $customerList = $customerList->toArray();
+        }else{
+            $customerList = '';
+        }
+
+        $orderInfo['customer_list'] = $customerList;
+
+        return $orderInfo;
+
+    }
+
+
+    public function outputOrderInfo()
+    {
+
+
+
+
+
+    }
 
 
 
