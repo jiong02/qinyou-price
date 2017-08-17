@@ -266,7 +266,7 @@ class OrderController extends BaseController
 
         $orderModel = new OrderModel();
 
-        $orderList = $orderModel->field('cheeru_order.id,cheeru_order.order_name,cheeru_order.create_time,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.update_total_price,cheeru_order.take_charge_people_id,cheeru_order.order_status,cheeru_order.route_id,ims_route.ims_route.route_code')->join('ims_route.ims_route','route_id = ims_route.ims_route.id ','LEFT')->limit($page,$limit)->select();
+        $orderList = $orderModel->field('cheeru_order.id,cheeru_order.order_name,cheeru_order.create_time,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.update_total_price,cheeru_order.take_charge_people_id,cheeru_order.order_status,cheeru_order.route_id,ims_route.ims_route.route_code')->join('ims_route.ims_route','route_id = ims_route.ims_route.id ','LEFT')->limit($page,$limit)->order('id desc')->select();
 
         $orderCount = $orderModel->field('cheeru_order.id,cheeru_order.order_name,cheeru_order.create_time,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.update_total_price,cheeru_order.take_charge_people_id,cheeru_order.order_status,cheeru_order.route_id,ims_route.ims_route.route_code')->join('ims_route.ims_route','route_id = ims_route.ims_route.id ','LEFT')->count();
 
@@ -309,7 +309,7 @@ class OrderController extends BaseController
 
         $customerModel = new OrderCustomerModel();
 
-        $customerList = $customerModel->where('order_id',$orderId)->select();
+        $customerList = $customerModel->field("cheeru_order_customer.*,'false' as ispull")->where('order_id',$orderId)->select();
 
         if(!empty($customerList)){
             $customerList = $customerList->toArray();
