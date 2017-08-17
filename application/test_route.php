@@ -134,6 +134,12 @@ Route::domain('test', function(){
     Route::any('/Order/getBackOrderList','test/Order/getBackOrderList');
     //后台获取订单信息
     Route::any('/Order/getBackOrderInfo','test/Order/getBackOrderInfo');
+    //订单信息Excel文件导出
+    Route::any('/Order/outputOrderInfo','test/Order/outputOrderInfo');
+    //修改订单价格
+    Route::any('/Order/updateOrderPrice','test/Order/updateOrderPrice');
+
+
 
 
 

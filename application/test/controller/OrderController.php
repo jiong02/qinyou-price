@@ -36,6 +36,7 @@ class OrderController extends BaseController
 
         $orderInfo['order_status'] = 1;
         $orderInfo['create_date'] = date('Y-m-d',time());
+        $orderInfo['total_price'] = $orderInfo['update_total_price'];
 
         $result = $orderModel->save($orderInfo);
 
@@ -265,9 +266,9 @@ class OrderController extends BaseController
 
         $orderModel = new OrderModel();
 
-        $orderList = $orderModel->field('cheeru_order.id,cheeru_order.order_name,cheeru_order.create_time,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.total_price,cheeru_order.take_charge_people_id,cheeru_order.order_status,cheeru_order.route_id,ims_route.ims_route.route_code')->join('ims_route.ims_route','route_id = ims_route.ims_route.id ','LEFT')->limit($page,$limit)->select();
+        $orderList = $orderModel->field('cheeru_order.id,cheeru_order.order_name,cheeru_order.create_time,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.update_total_price,cheeru_order.take_charge_people_id,cheeru_order.order_status,cheeru_order.route_id,ims_route.ims_route.route_code')->join('ims_route.ims_route','route_id = ims_route.ims_route.id ','LEFT')->limit($page,$limit)->select();
 
-        $orderCount = $orderModel->field('cheeru_order.id,cheeru_order.order_name,cheeru_order.create_time,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.total_price,cheeru_order.take_charge_people_id,cheeru_order.order_status,cheeru_order.route_id,ims_route.ims_route.route_code')->join('ims_route.ims_route','route_id = ims_route.ims_route.id ','LEFT')->count();
+        $orderCount = $orderModel->field('cheeru_order.id,cheeru_order.order_name,cheeru_order.create_time,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.update_total_price,cheeru_order.take_charge_people_id,cheeru_order.order_status,cheeru_order.route_id,ims_route.ims_route.route_code')->join('ims_route.ims_route','route_id = ims_route.ims_route.id ','LEFT')->count();
 
         $orderCount = ceil($orderCount / 10);
 
@@ -322,12 +323,51 @@ class OrderController extends BaseController
 
     }
 
+    /**
+     * @name 修改后台订单
+     * @auth Sam
+     * @param Request $request
+     * @return string
+     */
+    public function updateOrderPrice(Request $request)
+    {
+        $orderId = $request->param('order_id',0);
+
+        $price = $request->param('price',0);
+
+        if(empty($orderId) || !is_numeric($orderId)){
+            return '订单不存在';
+        }
+
+        if(empty($price) || !is_numeric($price)){
+            return '价格不正确';
+        }
+
+        $orderModel = new OrderModel();
+
+        $orderInfo = $orderModel->where('id',$orderId)->find();
+
+        if(empty($orderInfo)){
+            return '订单不存在';
+        }
+
+        $orderInfo->update_total_price = $price;
+
+        if($orderInfo->save()){
+            return '修改订单成功';
+        }
+
+        return '修改订单失败';
+    }
+
 
     public function outputOrderInfo()
     {
+        $excClass = new Excel();
 
+        $excClass->init();
 
-
+        $excClass->export();
 
 
     }
