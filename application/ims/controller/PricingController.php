@@ -2,7 +2,7 @@
 
 namespace app\ims\controller;
 
-use app\components\Excel;
+use app\common\components\Excel;
 use app\ims\model\ContractModel;
 use app\ims\model\ContractSeasonModel;
 use app\ims\model\HotelDefaultVehicleModel;
@@ -25,49 +25,45 @@ class PricingController extends BasePricingController
     public $minPassengers;
     public $error;
 
-    public function testPricingSeasonFare()
-    {
-        $hotelModel = new HotelModel();
-        $hotelIdSet = $hotelModel->column('id');
-        foreach ($hotelIdSet as $hotelId) {
-            dump($hotelId);
-            $this->pricingSeasonFare($hotelId);
-        }
-    }
+    public $quantityOfRoom;
 
-    public function testPricingSeasonFareByHotelId($hotelId)
+    public function testPricingSeasonFareByHotelId($hotelId = 15)
     {
         $this->pricingSeasonFare($hotelId);
+    }
+
+    public function formatDate($date)
+    {
+        $result = date('Y.m.d',strtotime($date));
+        return $result;
     }
 
     public function pricingSeasonFare($hotelId)
     {
         $stayingNights = 3;
         $hotelModel = HotelModel::get($hotelId);
-        if (!$hotelModel->place || !$hotelModel->country) {
+        if (!$hotelModel || !$hotelModel->place || !$hotelModel->country) {
             return false;
         }
         $countryName = $hotelModel->country->country_name;
         $placeName = $hotelModel->place->place_name;
-        $data['place_name'] = $countryName . '/' . $placeName;
+        $data['country_name'] = $countryName;
+        $data['place_name'] = $placeName;
         $data['exchange_rate'] = $placeName = $hotelModel->exchange->exchange_rate;
         $contractModel = new ContractModel();
-        $contractData = $contractModel->where('hotel_id',$hotelId)->where('date_type','可用')->order('contract_start_date')->select();
+        $contractData = $contractModel->where('hotel_id',$hotelId)->where('date_type','可用')->order('contract_start_date')->select()->toArray();
         foreach ($contractData as $key => $contractDatum) {
-        $data['expired_date'] =  $contractDatum['contract_start_date'].'~'.$contractDatum['contract_end_date'];
-        $contractSeasonModel = new ContractSeasonModel();
-        $contractSeasonData = $contractSeasonModel->where('contract_id',$contractDatum['id'])->group('season_unqid')->select();
+            $data['expired_date'][] =  $this->formatDate($contractDatum['contract_start_date']).'-'.$this->formatDate($contractDatum['contract_end_date']);
+            $contractSeasonModel = new ContractSeasonModel();
+            $contractSeasonData = $contractSeasonModel->where('contract_id',$contractDatum['id'])->group('season_unqid')->select()->toArray();
             if (count($contractSeasonData) !== 0) {
                 foreach ($contractSeasonData as $index => $contractSeasonDatum) {
-                    $seasonData['season_name'] = $contractSeasonDatum['season_name'];
-                    $seasonData['season_date'] = $contractSeasonDatum['season_start_date'] . '~' . $contractSeasonDatum['season_end_date'];
-                    $seasonDataSet[] = $seasonData;
+                    $fareDataSet[$key]['season_data'][$index]['season_name'] = $contractSeasonDatum['season_name'];
+                    $fareDataSet[$key]['season_data'][$index]['season_date'] = $this->formatDate($contractSeasonDatum['season_start_date']).'-'.$this->formatDate($contractSeasonDatum['season_end_date']);
                     $date = $contractSeasonDatum['season_start_date'];
                     $roomData = $hotelModel->room;
+                    $this->quantityOfRoom = count($roomData);
                     foreach ($roomData as $i => $roomDatum) {
-                        if ($index === 0){
-                            $roomNameSet[] = $roomDatum['room_name'];
-                        }
                         $result = $this->getPackageFareByCheckInDate($roomDatum['id'], $stayingNights,$date);
                         if ($result !== false){
                             $fareData['adult_fare'] = $result['adult_fare'];
@@ -86,61 +82,134 @@ class PricingController extends BasePricingController
                                 $fareData['extra_adult_fare'] = '无';
                                 $fareData['extra_adult_extension_night_fare'] = '无';
                             }
-                            $fareDataSet[$index][] = $fareData;
+                            if ($index === 0){
+                                if ($i == 0) {
+                                    $roomNameSet[$key][] = '';
+                                }
+                                $roomNameSet[$key][] = $roomDatum['room_name'];
+                            }
                         }
+                    $fareDataSet[$key]['fare_data'][$index][] = $fareData;
                     }
                 }
-                    if (isset($fareDataSet)) {
-                        $this->exportSeasonFare($data, $seasonDataSet, $roomNameSet, $fareDataSet);
-                    }else{
-                        return false;
-                    }
-                }
+            }
+        }
+        if (isset($fareDataSet) && isset($fareData)) {
+            $this->exportSeasonFare($data, $roomNameSet, $fareDataSet);
+        }else{
+            return false;
         }
     }
 
-    public function exportSeasonFare($data, $seasonData, $roomNameSet, $fareDataSet)
+    public function exportSeasonFare($data, $roomNameSet, $fareDataSet)
     {
         $excel =  new Excel();
+        $hotelModel = HotelModel::get($this->hotelId);
         $excel->init();
         $excel->getActiveSheet()->setCellValue('A1', '国家海岛');
         $excel->getActiveSheet()->setCellValue('A2', '报价有效期');
         $excel->getActiveSheet()->setCellValue('A3', '汇率');
-        $excel->getActiveSheet()->setCellValue('B1', $data['place_name']);
-        $excel->getActiveSheet()->setCellValue('B2', $data['expired_date']);
-        $excel->getActiveSheet()->setCellValue('B3', $data['exchange_rate']);
+        $excel->getActiveSheet()->setCellValue('A4', '酒店');
+        $excel->getActiveSheet()->setCellValue('B1', $data['country_name'] . '/' . $data['place_name']);
+        $excel->fileName = $data['country_name'] . '-' . $data['place_name'] . '-' . $hotelModel->hotel_name . '(4D3N)';
+        if (count($data['expired_date']) > 1) {
+            foreach ($data['expired_date'] as $key => $value) {
+                $letter = get_letter(2 + $key);
+                $order = 2;
+                $excel->getActiveSheet()->setCellValue($letter . $order, $value);
+            }
+        }else{
+            $excel->getActiveSheet()->setCellValue('B2', $data['expired_date'][0]);
+        }
+        $excel->getActiveSheet()->setCellValue('B3', '1人民币 = ' . $data['exchange_rate'] . $this->currencyUnit);
+        $excel->getActiveSheet()->setCellValue('B4', $hotelModel->hotel_name . '(4D3N)');
         $excel->getActiveSheet()->getColumnDimension('A')->setWidth(20);
         $excel->getActiveSheet()->getColumnDimension('B')->setWidth(25);
-        foreach ($roomNameSet as $roomNameOrder => $roomName) {
-            $letter = 'A';
-            $index = 7 + $roomNameOrder * 3;
-            $excel->getActiveSheet()->setCellValue($letter . $index, $roomName);
-        }
-        foreach ($seasonData as $seasonOrder => $seasonDatum) {
-            $firstOrder = 5;
-            $secondOrder = 6;
-            $firstLetter = get_letter(2 + $seasonOrder * 3);
-            $excel->getActiveSheet()->setCellValue($firstLetter . $firstOrder, $seasonDatum['season_name']);
-            $excel->getActiveSheet()->setCellValue($firstLetter . $secondOrder, $seasonDatum['season_date']);
-        }
-        foreach ($fareDataSet as $seasonOrder => $fareData) {
-            $firstLetter = get_letter(2 + $seasonOrder * 3);
-            $secondLetter = get_letter(3 + $seasonOrder * 3);
-            $thirdLetter = get_letter(4 + $seasonOrder * 3);
-            foreach ($fareData as $index => $fareDatum) {
-                $order = 7 + $index * 3;
-                $excel->getActiveSheet()->setCellValue($firstLetter . ($order + 0), '成人价格');
-                $excel->getActiveSheet()->setCellValue($firstLetter . ($order + 1), '儿童价格');
-                $excel->getActiveSheet()->setCellValue($firstLetter . ($order + 2), '额外成人');
-                $excel->getActiveSheet()->setCellValue($secondLetter . ($order + 0), $fareDatum['adult_fare']);
-                $excel->getActiveSheet()->setCellValue($secondLetter . ($order + 1), $fareDatum['child_fare']);
-                $excel->getActiveSheet()->setCellValue($secondLetter . ($order + 2), $fareDatum['extra_adult_fare']);
-                $excel->getActiveSheet()->setCellValue($thirdLetter . ($order + 0), $fareDatum['adult_extension_night_fare']);
-                $excel->getActiveSheet()->setCellValue($thirdLetter . ($order + 1), $fareDatum['child_extension_night_fare']);
-                $excel->getActiveSheet()->setCellValue($thirdLetter . ($order + 2), $fareDatum['extra_adult_extension_night_fare']);
+        $order = 2;
+        foreach ($roomNameSet as $roomNameContractOrder => $roomNameData) {
+            $firstLetter = 'A';
+            $secondLetter = 'B';
+            foreach ($roomNameData as $roomNameOrder => $roomName) {
+                $order += 3;
+                $excel->getActiveSheet()->setCellValue($firstLetter . $order, $roomName);
+                if ($roomName != '') {
+                    $excel->getActiveSheet()->setCellValue($secondLetter . ($order + 0), '成人价格');
+                    $excel->getActiveSheet()->setCellValue($secondLetter . ($order + 1), '儿童价格');
+                    $excel->getActiveSheet()->setCellValue($secondLetter . ($order + 2), '额外成人');
+                }
             }
-
         }
+        $order = 0;
+        foreach ($fareDataSet as $contractOrder => $seasonFareData) {
+            foreach ($seasonFareData['season_data'] as $seasonDataOrder => $seasonData) {
+                $medium = 3;
+                if ($contractOrder == 0) {
+                    $medium = 0;
+                }
+                $letter = get_letter(3 + $seasonDataOrder * 2);
+                $firstOrder = 5 + $medium + $this->quantityOfRoom * $contractOrder * 3;
+                $secondOrder = 6 + $medium + $this->quantityOfRoom * $contractOrder * 3;
+                $excel->getActiveSheet()->getColumnDimension($letter)->setWidth(25);
+                $excel->getActiveSheet()->setCellValue($letter . $firstOrder, $seasonData['season_name']);
+                $excel->getActiveSheet()->setCellValue($letter . $secondOrder, $seasonData['season_date']);
+            }
+            foreach ($seasonFareData['fare_data'] as $seasonOrder => $fareData) {
+                $medium = 3;
+                if ($contractOrder == 0) {
+                    $medium = 0;
+                }
+                $firstLetter = get_letter(3 + $seasonOrder * 2);
+                $secondLetter = get_letter(4 + $seasonOrder * 2);
+                foreach ($fareData as $fareOrder => $fareDatum) {
+                    $firstOrder = (8 + $medium + $this->quantityOfRoom * $contractOrder * 3) + $fareOrder * 3;
+                    $secondOrder = (9 + $medium + $this->quantityOfRoom * $contractOrder * 3) + $fareOrder * 3;
+                    $thirdOrder = (10 + $medium + $this->quantityOfRoom * $contractOrder * 3) + $fareOrder * 3;
+                    $excel->getActiveSheet()->setCellValue($firstLetter . $firstOrder, $fareDatum['adult_fare']);
+                    $excel->getActiveSheet()->setCellValue($firstLetter . $secondOrder, $fareDatum['child_fare']);
+                    $excel->getActiveSheet()->setCellValue($firstLetter . $thirdOrder, $fareDatum['extra_adult_fare']);
+                    $excel->getActiveSheet()->setCellValue($secondLetter . $firstOrder, $fareDatum['adult_extension_night_fare']);
+                    $excel->getActiveSheet()->setCellValue($secondLetter . $secondOrder, $fareDatum['child_extension_night_fare']);
+                    $excel->getActiveSheet()->setCellValue($secondLetter . $thirdOrder, $fareDatum['extra_adult_extension_night_fare']);
+                    if ($fareOrder == 0) {
+                        $excel->getActiveSheet()->setCellValue($firstLetter . ($firstOrder - 1), '报价');
+                        $excel->getActiveSheet()->setCellValue($secondLetter . ($firstOrder - 1),  '延住一晚');
+                    }
+                }
+            }
+            $hotelDefaulVehicleModel = new HotelDefaultVehicleModel();
+            $vehicleData = $hotelDefaulVehicleModel->where('hotel_id',$this->hotelId)->find();
+            if ($vehicleData) {
+                if (!isset($fareDataSet[$contractOrder + 1])) {
+                    $letter = 'A';
+                    $order = $thirdOrder + 1;
+                    $excel->getActiveSheet()->setCellValue($letter . $order, '去程：');
+                    $excel->getActiveSheet()->setCellValue($letter . ($order + 1), '返程：');
+                    foreach (json_decode($vehicleData->default_go_vehicle,true) as $key => $value) {
+                        $letter = get_letter(2 + $key);
+                        $excel->getActiveSheet()->setCellValue($letter . $order, $value['name']);
+                    }
+                    foreach (json_decode($vehicleData->default_back_vehicle,true) as $key => $value) {
+                        $letter = get_letter(2 + $key);
+                        $excel->getActiveSheet()->setCellValue($letter . ($order + 1), $value['name']);
+                    }
+                }
+            }else{
+                $letter = 'A';
+                $order = $thirdOrder + 1;
+                $excel->getActiveSheet()->setCellValue($letter . $order, '没有默认交通');
+            }
+        }
+        if ($this->adultPackageData) {
+            $letter = 'A';
+            $order = $thirdOrder + 3;
+            $excel->getActiveSheet()->setCellValue($letter . $order, '活动：');
+            $icludeActivityData = json_decode($this->adultPackageData->include_activity, true);
+            foreach ($icludeActivityData as $key => $value) {
+                $letter = get_letter(2 + $key);
+                $excel->getActiveSheet()->setCellValue($letter . $order, $value['activity_name']);
+            }
+        }
+        // halt(1);
         $excel->export();
     }
 
@@ -398,24 +467,24 @@ class PricingController extends BasePricingController
             $countryName = $hotelModel->country->country_name;
             $placeName = $hotelModel->place->place_name;
             $hotelName = $hotelModel->hotel_name;
-                $totalFare = $this->getPackageFareByCheckInDate($roomDatum->id,$night,$date);
-                if ($totalFare){
-                    $data[]= $countryName;
-                    $data[] = $placeName;
-                    $data[] = $hotelName;
-                    $data[] = $roomDatum->room_name;
-                    $data[] = $date;
-                    $data[] = $totalFare['adult_fare'];
-                    if (isset($totalFare['child_fare'])){
-                        $data[] = $totalFare['child_fare'];
-                    }else{
-                        $data[] = '不允许儿童入住';
-                    }
-                    $bodyData[] = $data;
-                    unset($data);
+            $totalFare = $this->getPackageFareByCheckInDate($roomDatum->id,$night,$date);
+            if ($totalFare){
+                $data[]= $countryName;
+                $data[] = $placeName;
+                $data[] = $hotelName;
+                $data[] = $roomDatum->room_name;
+                $data[] = $date;
+                $data[] = $totalFare['adult_fare'];
+                if (isset($totalFare['child_fare'])){
+                    $data[] = $totalFare['child_fare'];
+                }else{
+                    $data[] = '不允许儿童入住';
                 }
+                $bodyData[] = $data;
+                unset($data);
             }
-            $excel->defaultExport($headerData, $bodyData);
+        }
+        $excel->defaultExport($headerData, $bodyData);
     }
 
     public function checkFareList($date = '2017-08-15', $night = 3)
@@ -538,6 +607,8 @@ class PricingController extends BasePricingController
 
     public function extensionNightFare($fare)
     {
+        $fare = $fare / $this->exchangeRate;
+        $fare = ceil($fare / 10) * 10;
         $totalFare = round($fare / 0.7, -1);$totalFare = round($fare / 0.7, -1);
         return $totalFare;
     }
@@ -565,7 +636,7 @@ class PricingController extends BasePricingController
         $adultItemFare = $this->pricingItemFare();
         $this->totalFare['adult_fare_detail']['item_detail'] = $this->itemFareDetail;
         $this->totalFare['adult_fare'] = $this->getAdultTotalFare($adultRoomFare, $adultVehicleFare, $adultItemFare);
-        $this->totalFare['adult_extension_night_fare'] = $this->extensionNightFare($adultRoomFare);
+        $this->totalFare['adult_extension_night_fare'] = $this->extensionNightFare($this->extensionFare);
 
         if ($this->quantityOfChild >= 1){
             $childRoomFare = $this->pricingRoomFare('额外儿童');
@@ -578,7 +649,7 @@ class PricingController extends BasePricingController
             $childItemFare = $this->pricingItemFare();
             $this->totalFare['child_fare_detail']['item_detail'] = $this->itemFareDetail;
             $this->totalFare['child_fare'] = $this->getChildTotalFare($childRoomFare,$childVehicleFare, $childItemFare);
-            $this->totalFare['child_extension_night_fare'] = $this->extensionNightFare($childRoomFare);
+            $this->totalFare['child_extension_night_fare'] = $this->extensionNightFare($this->extensionFare);
         }
         if ($this->quantityOfExtraAdult >= 1){
             $extraAdultRoomFare = $this->pricingRoomFare('额外成人');
@@ -591,7 +662,7 @@ class PricingController extends BasePricingController
             $extraChildItemFare = $this->pricingItemFare();
             $this->totalFare['child_fare_detail']['item_detail'] = $this->itemFareDetail;
             $this->totalFare['extra_adult_fare'] = $this->getExtraAdultTotalFare($extraAdultRoomFare,$extraAdultVehicleFare, $extraChildItemFare);
-            $this->totalFare['extra_adult_extension_night_fare'] = $this->extensionNightFare($extraAdultRoomFare);
+            $this->totalFare['extra_adult_extension_night_fare'] = $this->extensionNightFare($this->extensionFare);
         }
         $this->totalFare['exchange_data'] = $this->exchangeData;
         return (boolean)$this->totalFare ? $this->totalFare : false;

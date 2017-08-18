@@ -28,29 +28,6 @@ class Excel extends PHPExcel
         $this->setDefaultProperty();
     }
 
-    /**
-     * @auth Sam
-     */
-    public function init2($fileName='',$sheetName='')
-    {
-        if(!empty($fileName)){
-            $this->fileName = $fileName;
-        }else{
-            $this->fileName = uniqid();
-        }
-
-        if(!empty($sheetName)){
-            $this->sheetName = $sheetName;
-        }else{
-            $this->sheetName = 'sheet';
-        }
-        $this->setFileProperty();
-        $this->setDefaultProperty();
-
-
-
-    }
-
     protected function setFileProperty()
     {
         $this->getProperties()

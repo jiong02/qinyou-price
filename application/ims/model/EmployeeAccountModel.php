@@ -23,4 +23,14 @@ class EmployeeAccountModel extends BaseModel
     {
         return $this->belongsTo('EmployeeModel','account_id');
     }
+
+    public function checkAccountName($accountName)
+    {
+        $result = $this->get(['account_name'=>$accountName]);
+        if ($result == null){
+            return false;
+        }else{
+            return true;
+        }
+    }
 }

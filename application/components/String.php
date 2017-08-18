@@ -24,24 +24,6 @@ class String
         return $string;
     }
 
-    static public function generateNonceStringWithNoSymbol($length = 8, $string = "")
-    {
-        $chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        for ($i = 0; $i < $length; $i++) {
-            $string .= substr($chars, mt_rand(0, strlen($chars) - 1), 1);
-        }
-        return $string;
-    }
-
-    static public function generateNonceStringWithNoCapital($length = 8, $string = "")
-    {
-        $chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-        for ($i = 0; $i < $length; $i++) {
-            $string .= substr($chars, mt_rand(0, strlen($chars) - 1), 1);
-        }
-        return $string;
-    }
-
     /**
      * 格式化参数格式化成url参数
      */

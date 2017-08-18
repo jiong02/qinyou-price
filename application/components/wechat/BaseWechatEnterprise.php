@@ -16,7 +16,7 @@ class BaseWechatEnterprise
 {
     const CORPID ='wx8765c2c8e7cb87b5';
     const SECRET = 'yjodPBYc8xv3rB43txmWxwDVU7paNh7MgAgruLuz2Hc';
-    const AGENTID = '1000002';
+    protected $agentId = '1000002';
 
     public function getAccessToken()
     {

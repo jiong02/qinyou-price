@@ -44,7 +44,7 @@ class CaseController extends BaseController
         $caseTitle = $request->param('title');
         $caseDescription = $request->param('description');
         $caseContent = $request->param('content');
-        $headImageSrc = $request->param('image_src');
+        $headImageSrc = $request->param('image_src'); 
         $params = [
             'case_id'=>[$caseId , 'require'],
             'title'=>[$caseTitle , 'require'],
