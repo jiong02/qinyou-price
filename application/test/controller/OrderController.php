@@ -206,7 +206,12 @@ class OrderController extends BaseController
         }
 
         //保存客户信息
-        $customerResult = $customerModel->save($customerInfo);
+        if(!empty($customerInfo['id'])){
+            $customerResult = $customerModel->update($customerInfo);
+        }else{
+            $customerResult = $customerModel->save($customerInfo);
+        }
+
 
         if(!empty($customerResult)){
             return '修改成功';
