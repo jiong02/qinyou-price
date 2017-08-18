@@ -2,7 +2,7 @@
 
 namespace app\ims\controller;
 
-use app\common\components\Excel;
+use app\components\Excel;
 use app\ims\model\ContractModel;
 use app\ims\model\ContractSeasonModel;
 use app\ims\model\HotelDefaultVehicleModel;
@@ -51,11 +51,12 @@ class PricingController extends BasePricingController
         $data['place_name'] = $placeName;
         $data['exchange_rate'] = $placeName = $hotelModel->exchange->exchange_rate;
         $contractModel = new ContractModel();
-        $contractData = $contractModel->where('hotel_id',$hotelId)->where('date_type','可用')->order('contract_start_date')->select()->toArray();
+        $contractData = $contractModel->where('hotel_id',$hotelId)->where('date_type','可用')->order('contract_start_date')->select();
+        halt($contractData);
         foreach ($contractData as $key => $contractDatum) {
             $data['expired_date'][] =  $this->formatDate($contractDatum['contract_start_date']).'-'.$this->formatDate($contractDatum['contract_end_date']);
             $contractSeasonModel = new ContractSeasonModel();
-            $contractSeasonData = $contractSeasonModel->where('contract_id',$contractDatum['id'])->group('season_unqid')->select()->toArray();
+            $contractSeasonData = $contractSeasonModel->where('contract_id',$contractDatum['id'])->group('season_unqid')->select();
             if (count($contractSeasonData) !== 0) {
                 foreach ($contractSeasonData as $index => $contractSeasonDatum) {
                     $fareDataSet[$key]['season_data'][$index]['season_name'] = $contractSeasonDatum['season_name'];

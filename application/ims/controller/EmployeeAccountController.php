@@ -13,8 +13,9 @@ use think\Request;
 class EmployeeAccountController extends BaseController
 {
     public $verifyCodeExpireTime = 15*3600;
+    public $verifyCodeLength = 4;
 
-    public function login(Request $request)
+    /*public function login(Request $request)
     {
         $accountName = $request->post('account_name','');
         $verifyCode = $request->post('verify_code','');
@@ -51,7 +52,7 @@ class EmployeeAccountController extends BaseController
         $employeeAccount = new EmployeeAccountModel();
         $result = $employeeAccount->checkAccountName($accountName);
         if($result){
-            $verifyCode = Math::generateRandomNumber();
+            $verifyCode = Math::generateRandomNumber($this->verifyCodeLength);
             $sendMessage = new SendMessageWechatEnterprise();
             $sendMessage->setUserId($accountName);
             $sendMessage->setTextContent($verifyCode);
@@ -72,11 +73,40 @@ class EmployeeAccountController extends BaseController
         }else{
             return getError('当前账号不存在');
         }
-    }
+    }*/
 
-    public function testVerify()
+    public function login(Request $request)
     {
-        $accountName = 'Jepson80036';
-        return $this->sendVerifyCode($accountName);
+        $name = $request->post('username','');
+        $pwd = $request->post('password','');
+
+        $account = EmployeeAccountModel::get(['account_name'=>$name]);
+        if ($account == null) {
+            return json('当前账号不存在!');
+        }
+
+        $employeeController = new EmployeeController();
+        $encryptedPassword =  $employeeController->getPassword($account->account_salt,$pwd);
+        if ($encryptedPassword === $account->account_password) {
+            date_default_timezone_set('PRC');
+            $info['login_ip'] = $request->ip();
+            $info['login_times'] = $account->login_times + 1 ;
+            $info['login_time'] = date('Y-m-d H:i:s');
+            if ($account->save($info)) {
+                $empModel = EmployeeModel::get(['account_id'=>$account->id]);
+                $return['id']    = $account->account_name;
+                $return['employee_id']    = $empModel->id;
+                $return['department_name'] = $empModel->department->department_name;
+                $return['superior_department_name'] = DepartmentModel::get($empModel->department->superior_id)->department_name;
+                $return['employee_name'] = $empModel->employee_name;
+                $return['title'] = $empModel->title->title;
+                $return['employee_avatar']  = $empModel->employee_avatar;
+                $return['account_id'] = $empModel->account_id;
+                return json($return);
+            }else{
+                return json('登录失败');
+            }
+        }
+        return json('密码错误!');
     }
 }

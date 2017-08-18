@@ -34,6 +34,8 @@ class BasePricingController extends BaseController
     public $packageName;
     public $packageData;
     public $packageRoomData;
+    public $adultPackageData;
+    public $extensionFare;
 
     public $exchangeRate;
     public $currencyUnit;
@@ -243,9 +245,10 @@ class BasePricingController extends BaseController
                 $type = $type == 'adult_fare' ? 'room_price' : $type;
                 $roomFare = $this->packageRoomData->$type;
                 $roomFare = json_decode($roomFare, true);
-                $packageRoomFare = $roomFare[0]['standard_price'];
-                $roomExtensionFare =  $roomFare[0]['extension_price'];
-                $roomFare = ($packageRoomFare +  $this->extensionNight * $roomExtensionFare) / $this->quantityOfPassenger;
+                $packageRoomFare = (int)$roomFare[0]['standard_price'];
+                $roomExtensionFare =  (int)$roomFare[0]['extension_price'] / $this->quantityOfPassenger;
+                $this->extensionFare = $roomExtensionFare;
+                $roomFare = ((int)$packageRoomFare +  $this->extensionNight * (int)$roomExtensionFare) / $this->quantityOfPassenger;
                 if ($roomFare !== 0){
                     if ($this->extensionNight > 1){
                         $fareDetail = $packageRoomFare . $this->currencyUnit . "+  $this->extensionNight * $roomExtensionFare";
@@ -274,8 +277,9 @@ class BasePricingController extends BaseController
                 }
 
                 $packageRoomFare = $roomFare['standard_price'];
-                $roomExtensionFare = $roomFare['extension_price'];
+                $roomExtensionFare = $roomFare['extension_price'] / $this->quantityOfPassenger;
                 $extensionNightDetail =  $this->extensionNight > 1 ? '' : "+  $this->extensionNight * $roomExtensionFare";
+                $this->extensionFare = $roomExtensionFare;
                 $roomFare = $packageRoomFare +  $this->extensionNight * $roomExtensionFare;
                 $fareDetail = $packageRoomFare . $this->currencyUnit . $extensionNightDetail;
             }
@@ -314,7 +318,8 @@ class BasePricingController extends BaseController
                 $roomFare = $this->packageRoomData->$type;
                 $roomFare = json_decode($roomFare, true);
                 $packageRoomFare = $roomFare[0]['standard_price'];
-                $roomFare = ($packageRoomFare * $this->stayingNights) / $this->quantityOfPassenger;
+                $this->extensionFare = (int)$packageRoomFare / $this->quantityOfPassenger;
+                $roomFare = ((int)$packageRoomFare * $this->stayingNights) / (int)$this->quantityOfPassenger;
                 $fareDetail = $packageRoomFare . "*" . $this->stayingNights;
                 if ( $this->quantityOfPassenger > 1){
                     $fareDetail = $fareDetail . "/" . $this->quantityOfPassenger;
@@ -331,6 +336,7 @@ class BasePricingController extends BaseController
                         $packageRoomFare = $roomFare[0]['standard_price'];
                     }
                 }
+                $this->extensionFare = $packageRoomFare / $this->quantityOfPassenger;
                 $roomFare = $packageRoomFare * $this->stayingNights;
                 $fareDetail = $packageRoomFare . $this->currencyUnit . "*" . $this->stayingNights;
             }
@@ -365,7 +371,9 @@ class BasePricingController extends BaseController
             $fareData = $vehicleModel->singleBase;
         }else{
             $vehicleName = $vehicleCategory;
+            $vehicleModel = new VehicleModel();
             $fareData = VehicleBaseModel::get($vehicleId);
+            $data = $vehicleModel->where('vehicle_base_id', $vehicleId)->select();
             if (is_null($fareData)){
                 $vehicleFare = 0;
                 $this->vehicleFareDetail[$itineraryType][] = [
@@ -402,7 +410,6 @@ class BasePricingController extends BaseController
             }else{
                 $vehicleFare = $fareData->child_fare;
             }
-
             $this->vehicleFareDetail[$itineraryType][] = [$vehicleName=>$vehicleFare.$currencyUnit];
         }
         $vehicleFare = $vehicleFare / $exchangeRate;
@@ -496,6 +503,9 @@ class BasePricingController extends BaseController
         $where['package_type'] = $this->packageType;
         $packageData = $contractPackageModel->where($where)->find();
         if ($packageData){
+            if ($this->packageType == '标准成人') {
+                $this->adultPackageData = $packageData;
+            };
             $packageRoomData = $contractRoomModel
                 ->where('room_id',$this->roomId)
                 ->where('package_unqid',$packageData->package_unqid)
