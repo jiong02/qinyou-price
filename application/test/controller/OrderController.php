@@ -385,11 +385,8 @@ class OrderController extends BaseController
         $excClass->init2('Sam 订单','666');
 
         $excArr['ID'] = [1,2,3,4,5,6];
-//        $excArr['ID'] = '1';
         $excArr['name'] = ['what','the','fuck'];
-//        $excArr['name'] = 'what';
         $excArr['good'] = ['订单','电脑','号码'];
-//        $excArr['good'] = '订单';
         $excKey = ['ID','name','good'];
         $excClass->setHeader($excKey);
 
