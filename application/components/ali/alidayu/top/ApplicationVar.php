@@ -9,7 +9,7 @@ class ApplicationVar
 
 	function __construct()
  	{
-    $this->save_file = __DIR__.'/httpdns.conf' ;
+    $this->save_file = __DIR__ . '/httpdns.conf';
  		$this->application = array();
  	}
 
