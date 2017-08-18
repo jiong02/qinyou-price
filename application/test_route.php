@@ -110,8 +110,10 @@ Route::domain('test', function(){
     Route::any('/Sort/searchCountrySortInfo','test/Sort/searchCountrySortInfo');
     //修改海岛排序
     Route::any('/Sort/updatePlaceSort','test/Sort/updatePlaceSort');
-    //添加PV数据
-    Route::any('/Flux/addPvFlux','test/TemplateFlux/addPvFlux');
+    //添加PV数据（测试数据）
+    Route::any('/Flux/addTestPvFlux','test/TemplateFlux/addTestPvFlux');
+    //添加PV UV数据
+    Route::any('/Flux/addPvUvFlux','test/TemplateFlux/addPvUvFlux');
     //获得板块流量数据
     Route::any('/Flux/getTempInfo','test/TemplateFlux/getTempInfo');
     //获得海岛分页信息
