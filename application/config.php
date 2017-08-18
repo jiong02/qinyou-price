@@ -258,8 +258,6 @@ return [
         'charset'  => 'utf8',
         // 数据库表前缀
         'prefix'   => '',
-        // 数据集返回类型
-        'resultset_type'  => 'collection',
     ],
     'employee_account_token' => 'aDMShFarYMMIv7*h',
 
@@ -283,8 +281,6 @@ return [
         'charset'  => 'utf8',
         // 数据库表前缀
         'prefix'   => '',
-        // 数据集返回类型
-        'resultset_type'  => 'collection',
     ],
 
     //ims_new数据表
@@ -307,8 +303,6 @@ return [
         'charset'  => 'utf8',
         // 数据库表前缀
         'prefix'   => '',
-        // 数据集返回类型
-        'resultset_type'  => 'collection',
     ],
 
 
@@ -332,7 +326,5 @@ return [
         'charset'  => 'utf8',
         // 数据库表前缀
         'prefix'   => '',
-        // 数据集返回类型
-        'resultset_type'  => 'collection',
     ],
 ];
