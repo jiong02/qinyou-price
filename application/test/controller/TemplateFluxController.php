@@ -55,11 +55,16 @@ class TemplateFluxController extends BaseController
     {
         $tempId = $request->param('temp_id',0);
         $routeId = $request->param('route_id',0);
+        $tmpRouteId = $request->param('temp_route_id',0);
         $ip = $request->ip();
         $hisTime = date('Y-m-d H:i:s',time());
         $dateTime = date('Y-m-d',time());
 
         if(empty($tempId) || !is_numeric($tempId)){
+            return false;
+        }
+
+        if(empty($tmpRouteId) || !is_numeric($tmpRouteId)){
             return false;
         }
 
@@ -78,6 +83,7 @@ class TemplateFluxController extends BaseController
         $pvModel->route_id = $routeId;
         $pvModel->ip = $ip;
         $pvModel->click_time = $hisTime;
+        $pvModel->template_route_id = $tmpRouteId;
 
         $pvModel->save();
 
@@ -88,6 +94,7 @@ class TemplateFluxController extends BaseController
             $uvModel->route_id = $routeId;
             $uvModel->ip = $ip;
             $uvModel->click_time = $hisTime;
+            $uvModel->template_route_id = $tmpRouteId;
 
             $uvModel->save();
         }
