@@ -378,22 +378,31 @@ class OrderController extends BaseController
     }
 
 
-    public function outputOrderInfo()
+    public function outputOrderInfo(Request $request)
     {
+        $orderId = $request->param('order_id',0);
+
+        if(empty($orderId)){
+            return '订单ID不存在';
+        }
+
+        $orderModel = new OrderModel();
+
+        $orderInfo = $orderModel->where('id',$orderId)->find();
+
+        if(empty($orderInfo)){
+            return '订单不存在';
+        }
+
+
+
         $excClass = new Excel();
 
         $excClass->init2('Sam 订单','666');
 
-        /*$excArr['ID'] = [1,2,3,4,5,6];
-        $excArr['name'] = ['what','the','fuck'];
-        $excArr['good'] = ['订单','电脑','号码'];*/
-        $excKey = ['ID','name','good','class'];
-        $excValue = ['1','商品','电脑','班级'];
-        $excClass->setHeader($excKey);
-        $excClass->setContent($excValue);
-        /*foreach($excArr as $k=>$v){
-            $excClass->setContent($v);
-        }*/
+        $excClass->setHeader();
+        $excClass->setContent();
+
 
 
         $excClass->export();
