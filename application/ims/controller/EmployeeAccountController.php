@@ -36,6 +36,7 @@ class EmployeeAccountController extends BaseController
                     $return['employee_id'] = $employeeModel->id;
                     $return['employee_token'] = $employeeModel->employee_token;
                     $return['department_name'] = $employeeModel->department_name;
+                    $return['department_id'] = $employeeModel->department_id;
                     $return['employee_name'] = $employeeModel->employee_name;
                     $return['title'] = $employeeModel->title;
                     $return['employee_avatar']  = $employeeModel->employee_avatar;
