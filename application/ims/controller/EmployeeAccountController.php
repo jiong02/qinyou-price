@@ -41,6 +41,8 @@ class EmployeeAccountController extends BaseController
                 }else{
                     return getError('登录失败');
                 }
+            }else{
+                return getError('验证码不正确');
             }
         }else{
             return getError('当前账号不存在');
