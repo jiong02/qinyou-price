@@ -71,8 +71,8 @@ Route::domain('test', function(){
    /**
     * 后台功能组
     */
-    Route::any('department/getAllDepartmentNameByDepartmentId','price/Department/getAllDepartmentNameByDepartmentId');
-    Route::any('employee/getAllEmployeeDataByDepartmentId','price/Employee/getAllEmployeeDataByDepartmentId');
+    Route::any('department/getAllDepartmentNameByDepartmentId','ims/Department/getAllDepartmentNameByDepartmentId');
+    Route::any('employee/getAllEmployeeDataByDepartmentId','ims/Employee/getAllEmployeeDataByDepartmentId');
 
     /**
      * 微信支付功能组
