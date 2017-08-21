@@ -142,7 +142,6 @@ class TemplateFluxController extends BaseController
      */
     public function getTodayToLastweekTemp($tempId)
     {
-        header("Content-type: text/html; charset=utf-8");
         $nowTime = time();
         $nowTime = mktime(23,59,59,date('m',$nowTime),date('d',$nowTime),date('Y',$nowTime));
 
@@ -325,6 +324,7 @@ class TemplateFluxController extends BaseController
 
         $pvModel = new RoutePvFluxModel();
         $uvModel = new RouteUvFluxModel();
+        $orderModel = new OrderModel();
 
         $pvInfo = array();
         $uvInfo = array();
@@ -346,11 +346,72 @@ class TemplateFluxController extends BaseController
             $ymdTimeEnd = date('Y-m-d H:i:s',$timeEnd);
             $dateTimeEnd = date('Y-m-d',$timeEnd);
 
-            $pvInfo['y'][] = $pvModel->where("template_id = $tempId AND click_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->count();
+            //PV 访问量
+            $pvCount = $pvModel->where("template_id = $tempId AND click_time BETWEEN '$ymdTimeStart' AND '$ymdTimeEnd'")->count();
+
+            $pvInfo['y'][] = $pvCount;
+
+            //PV 模板 点击量
+            $pvTmpClick = $pvModel->field('count(*) as count')->where("template_id = $tempId AND click_time BETWEEN '$ymdTimeStart' AND '$ymdTimeEnd'")->find();
+
+            $pvInfo['temp_click_count'][] = $pvTmpClick['count'];
+            $uvInfo['temp_click_count'][] = $pvTmpClick['count'];
+
+            //PV 模板 订单数
+            $pvTmpOrder = $orderModel->field('count(*) as count')->where("temp_id = $tempId AND create_time BETWEEN '$ymdTimeStart' AND '$ymdTimeEnd'")->find();
+
+            $pvInfo['temp_order_count'][] = $pvTmpOrder['count'];
+            $uvInfo['temp_order_count'][] = $pvTmpOrder['count'];
+
+            //PV 支付数
+            $pvTmpOrderOk = $orderModel->field('count(*) as count')->where("temp_id = $tempId AND create_time BETWEEN '$ymdTimeStart' AND '$ymdTimeEnd' AND order_status >= 3")->find();
+            $pvInfo['temp_create_order'][] = $pvTmpOrderOk['count'];
+            $uvInfo['temp_create_order'][] = $pvTmpOrderOk['count'];
+
+            //PV 转化率
+            if(empty($pvTmpOrderOk['count']) && empty($pvCount)){
+                $change = 0;
+            }else{
+                if(empty($pvCount)){
+                    $pvCount = 1;
+                }
+
+                if(empty($pvTmpOrderOk['count'])){
+                    $change = 0;
+                }else{
+                    $change = round(($pvTmpOrderOk['count'] / $pvCount) * 100);
+                }
+
+            }
+
+            $pvInfo['change'][] = $change;
+
+
+
 
             $pvInfo['x'][] = $dateTimeEnd;
 
-            $uvInfo['y'][] = $uvModel->where("template_id = $tempId AND click_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->count();
+            //UV 访问量
+            $uvInfo['y'][] = $uvModel->where("template_id = $tempId AND click_time BETWEEN '$ymdTimeStart' AND '$ymdTimeEnd'")->count();
+
+            //UV 转化率
+            if(empty($pvTmpOrderOk['count']) && empty($uvCount)){
+                $change = 0;
+            }else{
+                if(empty($uvCount)){
+                    $uvCount = 1;
+                }
+
+                if(empty($pvTmpOrderOk['count'])){
+                    $change = 0;
+                }else{
+                    $change = round(($pvTmpOrderOk['count'] / $uvCount) * 100);
+                }
+
+            }
+
+            $uvInfo['change'][] = $change;
+
 
             $uvInfo['x'][] = $dateTimeEnd;
 
@@ -358,6 +419,8 @@ class TemplateFluxController extends BaseController
 
         $returnData['pv_data'] = $pvInfo;
         $returnData['uv_data'] = $uvInfo;
+
+
 
         return $returnData;
     }
