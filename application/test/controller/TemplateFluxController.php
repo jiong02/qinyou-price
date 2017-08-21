@@ -194,15 +194,18 @@ class TemplateFluxController extends BaseController
             $pvTmpClick = $pvModel->field('count(*) as count')->where("template_id = $tempId AND click_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->find();
 
             $pvInfo['temp_click_count'][] = $pvTmpClick['count'];
+            $uvInfo['temp_click_count'][] = $pvTmpClick['count'];
 
             //PV 模板 订单数
             $pvTmpOrder = $orderModel->field('count(*) as count')->where("temp_id = $tempId AND create_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->find();
 
             $pvInfo['temp_order_count'][] = $pvTmpOrder['count'];
+            $uvInfo['temp_order_count'][] = $pvTmpOrder['count'];
 
             //PV 支付数
             $pvTmpOrderOk = $orderModel->field('count(*) as count')->where("temp_id = $tempId AND create_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart' AND order_status >= 3")->find();
             $pvInfo['temp_create_order'][] = $pvTmpOrderOk['count'];
+            $uvInfo['temp_create_order'][] = $pvTmpOrderOk['count'];
 
             //PV 转化率
             if(empty($pvTmpOrderOk['count']) && empty($pvCount)){
@@ -220,14 +223,7 @@ class TemplateFluxController extends BaseController
 
             }
 
-
             $pvInfo['change'][] = $change;
-
-            $pvCount = 0;
-            $pvTmpClick['count'] = 0;
-            $pvTmpOrder['count'] = 0;
-            $pvTmpOrderOk['count'] = 0;
-            $chage = 0;
 
             $pvInfo['x'][] = $dateTimeEnd;
 
@@ -242,10 +238,31 @@ class TemplateFluxController extends BaseController
 
             $uvTmpClick['count'] = 0;
 
+            //UV 转化率
+            if(empty($pvTmpOrderOk['count']) && empty($uvCount)){
+                $change = 0;
+            }else{
+                if(empty($uvCount)){
+                    $uvCount = 1;
+                }
 
+                if(empty($pvTmpOrderOk['count'])){
+                    $change = 0;
+                }else{
+                    $change = round(($pvTmpOrderOk['count'] / $uvCount) * 100);
+                }
 
+            }
+
+            $uvInfo['change'][] = $change;
 
             $uvInfo['x'][] = $dateTimeEnd;
+
+            $pvCount = 0;
+            $pvTmpClick['count'] = 0;
+            $pvTmpOrder['count'] = 0;
+            $pvTmpOrderOk['count'] = 0;
+            $chage = 0;
         }
 
         $pvInfo['x'] = array_reverse($pvInfo['x']);
@@ -262,6 +279,15 @@ class TemplateFluxController extends BaseController
         $pvInfo['temp_create_order'] = array_reverse($pvInfo['temp_create_order']);
         //PV模板转化率
         $pvInfo['change'] = array_reverse($pvInfo['change']);
+
+        //UV模板 点击量总数
+        $uvInfo['temp_click_count'] = array_reverse($uvInfo['temp_click_count']);
+        //UV模板订单数
+        $uvInfo['temp_order_count'] = array_reverse($uvInfo['temp_order_count']);
+        //UV模板 下单书
+        $uvInfo['temp_create_order'] = array_reverse($uvInfo['temp_create_order']);
+        //PV模板转化率
+        $uvInfo['change'] = array_reverse($uvInfo['change']);
 
         $returnData['pv_data'] = $pvInfo;
         $returnData['uv_data'] = $uvInfo;
@@ -321,19 +347,14 @@ class TemplateFluxController extends BaseController
             $dateTimeEnd = date('Y-m-d',$timeEnd);
 
             $pvInfo['y'][] = $pvModel->where("template_id = $tempId AND click_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->count();
-//            echo $pvModel->where("template_id = $tempId AND click_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->buildSql();
-//            echo '<br>';
+
             $pvInfo['x'][] = $dateTimeEnd;
 
             $uvInfo['y'][] = $uvModel->where("template_id = $tempId AND click_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->count();
-//            echo $uvModel->where("template_id = $tempId AND click_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->buildSql();
-//            echo '<br>';
+
             $uvInfo['x'][] = $dateTimeEnd;
 
-//        echo '开始时间 '. $ymdTimeStart.' 结束时间 '.$ymdTimeEnd.'<br>';
-
         }
-//exit;
 
         $returnData['pv_data'] = $pvInfo;
         $returnData['uv_data'] = $uvInfo;
