@@ -33,6 +33,7 @@ class EmployeeController extends PrivilegeController
         return getErr('用户信息删除失败!');
 
     }
+
     public function getAllEmployeeDataByDepartmentName(Request $request)
     {
         $departmentName = $request->param('department_name');
@@ -55,8 +56,9 @@ class EmployeeController extends PrivilegeController
         return getSucc($result);
     }
 
-    public function getAllEmployeeDataByDepartmentId($departmentId)
+    public function getAllEmployeeDataByDepartmentId(Request $request)
     {
+        $departmentId = $request->param('department_id');
         $employeeModel = new EmployeeModel();
         $result = $employeeModel->view('ims_employee','id,employee_name')
             ->view('ims_title','title','ims_title.id = ims_employee.title_id')

@@ -56,7 +56,8 @@ Route::domain('test', function(){
     Route::any('customer/addCustomerData','test/CustomTailor/addCustomerData');
     Route::any('customer/getCustomerData','test/CustomTailor/getCustomerData');
     Route::any('customer/getCustomerDataByCustomerId','test/CustomTailor/getCustomerDataByCustomerId');
-
+    Route::any('customer/modifyFollowUpRecordByCustomerId','test/CustomTailor/modifyFollowUpRecordByCustomerId');
+    Route::any('customer/modifyFollowUpEmployeeIdByCustomerId','test/CustomTailor/modifyFollowUpEmployeeIdByCustomerId');
 
    /**
     *  图片功能路由组合
@@ -67,18 +68,11 @@ Route::domain('test', function(){
     Route::any('image/modifyCaseImageData','test/ImageSetting/modifyCaseImageData');
     Route::any('image/getCaseImageData','test/ImageSetting/getCaseImageData');
 
-
-   /**
-    * 微信功能组合
-    */
-    Route::any('wechat/WechatLoginEnterprise','WechatLoginEnterprise/testCurl');
-    Route::any('wechat/WechatLoginEnterprise','SendMessageWechatEnterprise/testCurl');
-
    /**
     * 后台功能组
     */
-    Route::any('Admin/login','test/WechatLoginEnterprise/login');
-    Route::any('Admin/sendMessage','test/WechatLoginEnterprise/sendMessage');
+    Route::any('department/getAllDepartmentNameByDepartmentId','price/Department/getAllDepartmentNameByDepartmentId');
+    Route::any('employee/getAllEmployeeDataByDepartmentId','price/Employee/getAllEmployeeDataByDepartmentId');
 
     /**
      * 微信支付功能组
@@ -90,6 +84,11 @@ Route::domain('test', function(){
      */
     Route::any('wechatEnterpriseLogin','ims/EmployeeAccount/wechatEnterpriseLogin');
     Route::any('sendVerifyCode','ims/EmployeeAccount/sendVerifyCode');
+
+    /*
+     * 测试
+     */
+    Route::any('ceshi','ims/Index/index');
 });
 
 

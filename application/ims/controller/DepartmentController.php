@@ -7,15 +7,19 @@ use think\Request;
 
 class DepartmentController extends PrivilegeController
 {
-    public function getAllDepartmentNameByDepartmentId($departmentId)
+    public function getAllDepartmentNameByDepartmentId(Request $request)
     {
+        $departmentId = $request->param('department_id');
         $departmentModel = new DepartmentModel();
         $allDepartmentName = $departmentModel->field('id, superior_id, department_name')->select();
         $departmentNameSet = $this->tree($allDepartmentName,$departmentId);
         if (count($departmentNameSet) == 0){
             $departmentNameSet = $departmentModel->get($departmentId);
+            if (!$departmentNameSet) {
+                return getError('部门列表获取失败!');
+            }
         }
-        return $departmentNameSet;
+        return getSuccess($departmentNameSet);
     }
 
     public function tree($data, $pid)

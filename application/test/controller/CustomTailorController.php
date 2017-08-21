@@ -106,7 +106,7 @@ class CustomTailorController extends BaseController
                     }
                     return getError('跟进记录修改失败');
                 }
-                return getError('您没有修改权限！');
+                return getError('请将改定制表的跟进人修改为您！');
             }
             return getError('当前定制列表不存在！');
         }
