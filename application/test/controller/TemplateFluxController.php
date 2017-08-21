@@ -5,6 +5,9 @@ use app\test\model\PlaceSortModel;
 use app\test\model\RoutePvFluxModel;
 use app\test\model\RouteUvFluxModel;
 use think\Request;
+use app\test\model\TemplateRouteModel;
+use app\test\model\OrderModel;
+
 
 class TemplateFluxController extends BaseController
 {
@@ -139,11 +142,29 @@ class TemplateFluxController extends BaseController
      */
     public function getTodayToLastweekTemp($tempId)
     {
+        header("Content-type: text/html; charset=utf-8");
         $nowTime = time();
         $nowTime = mktime(23,59,59,date('m',$nowTime),date('d',$nowTime),date('Y',$nowTime));
 
+        //获取模板下的线路信息
+        $tmpRouteModel = new TemplateRouteModel();
+
+        $tmpRouteList = $tmpRouteModel->where('temp_id',$tempId)->select();
+        $tmpRouteStr = '';
+
+        if(!empty($tmpRouteList)){
+            foreach($tmpRouteList as $k=>$v){
+                $tmpRouteStr .= $v['id'].',';
+            }
+
+            $tmpRouteStr = trim($tmpRouteStr,',');
+        }else{
+            $tmpRouteStr = 0;
+        }
+
         $pvModel = new RoutePvFluxModel();
         $uvModel = new RouteUvFluxModel();
+        $orderModel = new OrderModel();
 
         $pvInfo = array();
         $uvInfo = array();
@@ -165,15 +186,83 @@ class TemplateFluxController extends BaseController
             $ymdTimeEnd = date('Y-m-d H:i:s',$timeEnd);
             $dateTimeEnd = date('Y-m-d',$timeEnd);
 
-            $pvInfo['y'][] = $pvModel->where("template_id = $tempId AND click_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->count();
-/*            echo $pvModel->where("template_id = $tempId AND click_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->buildSql();
-            echo '<br>';*/
+            $pvCount = $pvModel->where("template_id = $tempId AND click_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->count();
+
+            $pvInfo['y'][] = $pvCount;
+
+            //PV 模板 点击量
+            $pvTmpClick = $pvModel->field('count(*) as count')->where("template_id = $tempId AND click_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->find();
+
+            $pvInfo['temp_click_count'][] = $pvTmpClick['count'];
+            $uvInfo['temp_click_count'][] = $pvTmpClick['count'];
+
+            //PV 模板 订单数
+            $pvTmpOrder = $orderModel->field('count(*) as count')->where("temp_id = $tempId AND create_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->find();
+
+            $pvInfo['temp_order_count'][] = $pvTmpOrder['count'];
+            $uvInfo['temp_order_count'][] = $pvTmpOrder['count'];
+
+            //PV 支付数
+            $pvTmpOrderOk = $orderModel->field('count(*) as count')->where("temp_id = $tempId AND create_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart' AND order_status >= 3")->find();
+            $pvInfo['temp_create_order'][] = $pvTmpOrderOk['count'];
+            $uvInfo['temp_create_order'][] = $pvTmpOrderOk['count'];
+
+            //PV 转化率
+            if(empty($pvTmpOrderOk['count']) && empty($pvCount)){
+                $change = 0;
+            }else{
+                if(empty($pvCount)){
+                    $pvCount = 1;
+                }
+
+                if(empty($pvTmpOrderOk['count'])){
+                    $change = 0;
+                }else{
+                    $change = round(($pvTmpOrderOk['count'] / $pvCount) * 100);
+                }
+
+            }
+
+            $pvInfo['change'][] = $change;
+
             $pvInfo['x'][] = $dateTimeEnd;
 
-            $uvInfo['y'][] = $uvModel->where("template_id = $tempId AND click_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->count();
-/*            echo $uvModel->where("template_id = $tempId AND click_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->buildSql();
-            echo '<br>';*/
+            $uvCount = $uvModel->where("template_id = $tempId AND click_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->count();
+
+            $uvInfo['y'][] = $uvCount;
+
+            //UV 模板点击量
+            $uvTmpClick = $uvModel->field('count(*) as count')->where("template_id = $tempId AND click_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->find();
+
+            $uvInfo['temp_click_count'][] = $uvTmpClick['count'];
+
+            $uvTmpClick['count'] = 0;
+
+            //UV 转化率
+            if(empty($pvTmpOrderOk['count']) && empty($uvCount)){
+                $change = 0;
+            }else{
+                if(empty($uvCount)){
+                    $uvCount = 1;
+                }
+
+                if(empty($pvTmpOrderOk['count'])){
+                    $change = 0;
+                }else{
+                    $change = round(($pvTmpOrderOk['count'] / $uvCount) * 100);
+                }
+
+            }
+
+            $uvInfo['change'][] = $change;
+
             $uvInfo['x'][] = $dateTimeEnd;
+
+            $pvCount = 0;
+            $pvTmpClick['count'] = 0;
+            $pvTmpOrder['count'] = 0;
+            $pvTmpOrderOk['count'] = 0;
+            $chage = 0;
         }
 
         $pvInfo['x'] = array_reverse($pvInfo['x']);
@@ -181,6 +270,24 @@ class TemplateFluxController extends BaseController
 
         $uvInfo['x'] = array_reverse($uvInfo['x']);
         $uvInfo['y'] = array_reverse($uvInfo['y']);
+
+        //PV模板 点击量总数
+        $pvInfo['temp_click_count'] = array_reverse($pvInfo['temp_click_count']);
+        //PV模板订单数
+        $pvInfo['temp_order_count'] = array_reverse($pvInfo['temp_order_count']);
+        //PV模板 下单书
+        $pvInfo['temp_create_order'] = array_reverse($pvInfo['temp_create_order']);
+        //PV模板转化率
+        $pvInfo['change'] = array_reverse($pvInfo['change']);
+
+        //UV模板 点击量总数
+        $uvInfo['temp_click_count'] = array_reverse($uvInfo['temp_click_count']);
+        //UV模板订单数
+        $uvInfo['temp_order_count'] = array_reverse($uvInfo['temp_order_count']);
+        //UV模板 下单书
+        $uvInfo['temp_create_order'] = array_reverse($uvInfo['temp_create_order']);
+        //PV模板转化率
+        $uvInfo['change'] = array_reverse($uvInfo['change']);
 
         $returnData['pv_data'] = $pvInfo;
         $returnData['uv_data'] = $uvInfo;
@@ -240,19 +347,14 @@ class TemplateFluxController extends BaseController
             $dateTimeEnd = date('Y-m-d',$timeEnd);
 
             $pvInfo['y'][] = $pvModel->where("template_id = $tempId AND click_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->count();
-//            echo $pvModel->where("template_id = $tempId AND click_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->buildSql();
-//            echo '<br>';
+
             $pvInfo['x'][] = $dateTimeEnd;
 
             $uvInfo['y'][] = $uvModel->where("template_id = $tempId AND click_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->count();
-//            echo $uvModel->where("template_id = $tempId AND click_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->buildSql();
-//            echo '<br>';
+
             $uvInfo['x'][] = $dateTimeEnd;
 
-//        echo '开始时间 '. $ymdTimeStart.' 结束时间 '.$ymdTimeEnd.'<br>';
-
         }
-//exit;
 
         $returnData['pv_data'] = $pvInfo;
         $returnData['uv_data'] = $uvInfo;
