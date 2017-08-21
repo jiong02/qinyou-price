@@ -164,8 +164,6 @@ class OrderController extends BaseController
             return '请输入客户信息';
         }
 
-
-
         $customerModel = new OrderCustomerModel();
 
         $validateClass = new Validate($customerModel->rules);
