@@ -29,7 +29,7 @@ class EmployeeModel extends BaseModel
 
     public function account()
     {
-        return $this->belongsTo('EmployeeAccountModel','account_id');
+        return $this->hasOne('EmployeeAccountModel');
     }
 
     public function title()

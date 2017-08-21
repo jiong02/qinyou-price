@@ -17,26 +17,28 @@ class EmployeeAccountController extends BaseController
 
     public function wechatEnterpriseLogin(Request $request)
     {
-        $accountName = $request->post('account_name','');
-        $verifyCode = $request->post('verify_code','');
-        $employeeAccount = new EmployeeAccountModel();
-        if(!$employeeAccount->checkAccountName($accountName)){
-            $cacheVerifyCode  = Cache::get($accountName);
-            if ($verifyCode === $cacheVerifyCode){
+        $accountName = $request->param('account_name','');
+        $verifyCode = $request->param('verify_code','');
+        $employeeAccountModel = new EmployeeAccountModel();
+        $result = $employeeAccountModel->checkAccountName($accountName);
+        $employeeAccountModel = $employeeAccountModel->where('account_name',$accountName)->find();
+        if($result){
+            $cacheVerifyCode = Cache::get($accountName);
+            if ($verifyCode == $cacheVerifyCode){
                 date_default_timezone_set('PRC');
                 $info['login_ip'] = $request->ip();
-                $info['login_times'] = $employeeAccount->login_times + 1 ;
+                $info['login_times'] = $employeeAccountModel->login_times + 1 ;
                 $info['login_time'] = date('Y-m-d H:i:s');
-                if ($employeeAccount->save($info)) {
-                    $empModel = EmployeeModel::get(['account_id'=>$employeeAccount->id]);
-                    $return['id']    = $employeeAccount->account_name;
-                    $return['employee_id']    = $empModel->id;
-                    $return['department_name'] = $empModel->department->department_name;
-                    $return['superior_department_name'] = DepartmentModel::get($empModel->department->superior_id)->department_name;
-                    $return['employee_name'] = $empModel->employee_name;
-                    $return['title'] = $empModel->title->title;
-                    $return['employee_avatar']  = $empModel->employee_avatar;
-                    $return['account_id'] = $empModel->account_id;
+                if ($employeeAccountModel->save($info)) {
+                    $employeeModel = new EmployeeModel();
+                    $employeeModel = $employeeModel->where('account_name',$accountName)->find();
+                    $return['id'] = $employeeAccountModel->id;
+                    $return['employee_id']    = $employeeModel->id;
+                    $return['department_name'] = $employeeModel->department_name;
+                    $return['employee_name'] = $employeeModel->employee_name;
+                    $return['title'] = $employeeModel->title;
+                    $return['employee_avatar']  = $employeeModel->employee_avatar;
+                    $return['employee_sn'] = $employeeModel->employee_sn;
                     return getSuccess($return);
                 }else{
                     return getError('登录失败');
