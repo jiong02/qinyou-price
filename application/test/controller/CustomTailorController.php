@@ -62,7 +62,7 @@ class CustomTailorController extends BaseController
         ];
         $this->checkAllParam($params);
         $customerModel = new CustomTailorModel();
-        $customerData = $customerModel->limit($offset, $length)->field('remark, customer_name as name, customer_gender as sex, customer_phone as phone, itinerary_days as days, departure_of_date as date')->select();
+        $customerData = $customerModel->limit($offset, $length)->field('id, remark, customer_name as name, customer_gender as sex, customer_phone as phone, itinerary_days as days, departure_of_date as date')->select();
         if ($customerData){
             if (!$customerData->isEmpty()){
                 return Response::Success('定制信息获取成功',$customerData->toArray());
