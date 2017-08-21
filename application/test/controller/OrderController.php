@@ -206,7 +206,12 @@ class OrderController extends BaseController
         }
 
         //保存客户信息
-        $customerResult = $customerModel->save($customerInfo);
+        if(!empty($customerInfo['id'])){
+            $customerResult = $customerModel->update($customerInfo);
+        }else{
+            $customerResult = $customerModel->save($customerInfo);
+        }
+
 
         if(!empty($customerResult)){
             return '修改成功';
@@ -377,7 +382,12 @@ class OrderController extends BaseController
         return '修改订单失败';
     }
 
-
+    /**
+     * @name Excel输出订单信息
+     * @auth Sam
+     * @param Request $request
+     * @return string
+     */
     public function outputOrderInfo(Request $request)
     {
         $orderId = $request->param('order_id',0);
@@ -388,28 +398,42 @@ class OrderController extends BaseController
 
         $orderModel = new OrderModel();
 
-        $orderInfo = $orderModel->where('id',$orderId)->find();
+        $orderField = "
+            order_name as '订单名称',
+            trip_date as '出行日期',
+            room_number as '房间数量',
+            adult_number as '成人数量',
+            child_number as '儿童数量',
+            update_total_price as '总价格',
+            linkman_name as '联系人',
+            linkman_phone as '联系人电话',
+            linkman_wechat as '联系人微信'
+        ";
+
+        $orderInfo = $orderModel->field($orderField)->where('cheeru_order.id',$orderId)->find();
 
         if(empty($orderInfo)){
             return '订单不存在';
         }
 
+        $orderInfo = $orderInfo->toArray();
 
+        $excKey = [];
+        $excValue = [];
+
+        foreach($orderInfo as $k=>$v){
+            $excKey[] = $k;
+            $excValue[] = $v;
+        }
 
         $excClass = new Excel();
 
-        $excClass->init2('Sam 订单','666');
+        $excClass->init2('行程确认单','订单信息');
 
-        $excClass->setHeader();
-        $excClass->setContent();
-
-
+        $excClass->setHeader($excKey);
+        $excClass->setContent($excValue);
 
         $excClass->export();
-
-
-
-
 
     }
 

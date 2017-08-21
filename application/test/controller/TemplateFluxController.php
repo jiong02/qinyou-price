@@ -8,7 +8,12 @@ use think\Request;
 
 class TemplateFluxController extends BaseController
 {
-    public function addPvFlux()
+    /**
+     * @name 添加数据
+     * @auth Sam
+     * @return string
+     */
+    public function addTestPvFlux()
     {
         $tempArr[] = 1;
         $tempArr[] = 2;
@@ -38,10 +43,73 @@ class TemplateFluxController extends BaseController
         }
 
         return '添加成功';
+    }
+
+    /**
+     * @name 点击线路记录流量
+     * @auth Sam
+     * @param Request $request
+     * @return bool
+     */
+    public function addPvUvFlux(Request $request)
+    {
+        $tempId = $request->param('temp_id',0);
+        $routeId = $request->param('route_id',0);
+        $tmpRouteId = $request->param('temp_route_id',0);
+        $ip = $request->ip();
+        $hisTime = date('Y-m-d H:i:s',time());
+        $dateTime = date('Y-m-d',time());
+
+        if(empty($tempId) || !is_numeric($tempId)){
+            return false;
+        }
+
+        if(empty($tmpRouteId) || !is_numeric($tmpRouteId)){
+            return false;
+        }
+
+        if(empty($routeId) || !is_numeric($routeId)){
+            return false;
+        }
+
+        if(empty($ip)){
+            return false;
+        }
+
+        $pvModel = new RoutePvFluxModel();
+        $uvModel = new RouteUvFluxModel();
+
+        $pvModel->template_id = $tempId;
+        $pvModel->route_id = $routeId;
+        $pvModel->ip = $ip;
+        $pvModel->click_time = $hisTime;
+        $pvModel->template_route_id = $tmpRouteId;
+
+        $pvModel->save();
+
+        $uvInfo = $uvModel->where(['template_id'=>$tempId,'route_id'=>$routeId,'ip'=>$ip])->where("click_time like '$dateTime%'")->find();
+
+        if(empty($uvInfo)){
+            $uvModel->template_id = $tempId;
+            $uvModel->route_id = $routeId;
+            $uvModel->ip = $ip;
+            $uvModel->click_time = $hisTime;
+            $uvModel->template_route_id = $tmpRouteId;
+
+            $uvModel->save();
+        }
 
     }
 
 
+
+
+    /**
+     * @name 获取模板信息
+     * @auth Sam
+     * @param Request $request
+     * @return string
+     */
     public function getTempInfo(Request $request)
     {
         $timeStart = $request->param('start_time','');
