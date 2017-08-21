@@ -32,13 +32,14 @@ class EmployeeAccountController extends BaseController
                 if ($employeeAccountModel->save($info)) {
                     $employeeModel = new EmployeeModel();
                     $employeeModel = $employeeModel->where('account_name',$accountName)->find();
-                    $return['id'] = $employeeAccountModel->id;
-                    $return['employee_id']    = $employeeModel->id;
+                    $return['id'] = $accountName;
+                    $return['employee_id'] = $employeeModel->id;
+                    $return['employee_token'] = $employeeModel->employee_token;
                     $return['department_name'] = $employeeModel->department_name;
                     $return['employee_name'] = $employeeModel->employee_name;
                     $return['title'] = $employeeModel->title;
                     $return['employee_avatar']  = $employeeModel->employee_avatar;
-                    $return['employee_sn'] = $employeeModel->employee_sn;
+                    $return['account_id'] = $employeeAccountModel->id;
                     return getSuccess($return);
                 }else{
                     return getError('登录失败');
