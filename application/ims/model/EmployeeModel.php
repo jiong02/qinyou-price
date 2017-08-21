@@ -1,6 +1,7 @@
 <?php
 
 namespace app\ims\model;
+use think\Request;
 
 /**
 * 模型字段列表
@@ -39,5 +40,14 @@ class EmployeeModel extends BaseModel
     public function department()
     {
         return $this->belongsTo('DepartmentModel','department_id');
+    }
+
+    public function checkExist($employeeId, $employeeToken)
+    {
+        $employeeCount = $this->where('id',$employeeId)->where('employee_token',$employeeToken)->count();
+        if($employeeCount > 0 ){
+            return true;
+        }
+        return false;
     }
 }

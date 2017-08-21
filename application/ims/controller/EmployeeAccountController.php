@@ -3,7 +3,7 @@
 namespace app\ims\controller;
 
 use app\components\Math;
-use app\components\wechat\SendMessageWechatEnterprise;
+use app\components\wechat\WechatEnterpriseSendMessage;
 use app\ims\model\DepartmentModel;
 use app\ims\model\EmployeeAccountModel;
 use app\ims\model\EmployeeModel;
@@ -15,7 +15,7 @@ class EmployeeAccountController extends BaseController
     public $verifyCodeExpireTime = 15*3600;
     public $verifyCodeLength = 4;
 
-    /*public function login(Request $request)
+    public function wechatEnterpriseLogin(Request $request)
     {
         $accountName = $request->post('account_name','');
         $verifyCode = $request->post('verify_code','');
@@ -47,16 +47,15 @@ class EmployeeAccountController extends BaseController
         }
     }
 
-    public function sendVerifyCode($accountName)
+    public function sendVerifyCode(Request $request)
     {
+        $accountName = $request->param('account_name');
         $employeeAccount = new EmployeeAccountModel();
         $result = $employeeAccount->checkAccountName($accountName);
         if($result){
             $verifyCode = Math::generateRandomNumber($this->verifyCodeLength);
-            $sendMessage = new SendMessageWechatEnterprise();
-            $sendMessage->setUserId($accountName);
-            $sendMessage->setTextContent($verifyCode);
-            $sendMessage->sendTextMessage();
+            $sendMessage = new WechatEnterpriseSendMessage();
+            $sendMessage->sendTextMessage($accountName, $verifyCode);
             if ($sendMessage->status == 'SUCCESS'){
                 if ($sendMessage->invalidUser != ''){
                     return getError('消息发送失败:无效用户');
@@ -73,7 +72,7 @@ class EmployeeAccountController extends BaseController
         }else{
             return getError('当前账号不存在');
         }
-    }*/
+    }
 
     public function login(Request $request)
     {
@@ -94,12 +93,12 @@ class EmployeeAccountController extends BaseController
             $info['login_time'] = date('Y-m-d H:i:s');
             if ($account->save($info)) {
                 $empModel = EmployeeModel::get(['account_id'=>$account->id]);
-                $return['id']    = $account->account_name;
-                $return['employee_id']    = $empModel->id;
-                $return['department_name'] = $empModel->department->department_name;
-                $return['superior_department_name'] = DepartmentModel::get($empModel->department->superior_id)->department_name;
+                $return['id'] = $account->account_name;
+                $return['employee_id'] = $empModel->id;
+                $return['employee_token'] = $empModel->token;
+                $return['department_name'] = $empModel->department_name;
                 $return['employee_name'] = $empModel->employee_name;
-                $return['title'] = $empModel->title->title;
+                $return['title'] = $empModel->title;
                 $return['employee_avatar']  = $empModel->employee_avatar;
                 $return['account_id'] = $empModel->account_id;
                 return json($return);

@@ -55,6 +55,17 @@ class EmployeeController extends PrivilegeController
         return getSucc($result);
     }
 
+    public function getAllEmployeeDataByDepartmentId($departmentId)
+    {
+        $employeeModel = new EmployeeModel();
+        $result = $employeeModel->view('ims_employee','id,employee_name')
+            ->view('ims_title','title','ims_title.id = ims_employee.title_id')
+            ->view('ims_department','department_name','ims_department.id = ims_employee.department_id')
+            ->where('ims_employee.department_id',$departmentId)
+            ->select();
+        return getSuccess($result);
+    }
+
     public function modifyEmployeeData(Request $request)
     {
         $employeeId = $request->param('employee_id');

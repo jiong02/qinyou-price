@@ -344,3 +344,11 @@ function get_need_between($str,$first,$second){
     }
     return substr($str, $start + strlen($first) ,$end - $start - strlen($first));
 }
+
+function checkEmpty($data)
+{
+    if (empty($data) || trim($data) == ''){
+        return true;
+    }
+    return false;
+}

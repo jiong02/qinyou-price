@@ -84,7 +84,12 @@ Route::domain('test', function(){
      * 微信支付功能组
      */
     Route::any('wechatPay/qrcodePay','test/AliPay/qrcodePay');
-    Route::any('/testVerify','ims/EmployeeAccount/testVerify');
+
+    /**
+     * 企业微信登录功能
+     */
+    Route::any('wechatEnterpriseLogin','ims/EmployeeAccount/wechatEnterpriseLogin');
+    Route::any('sendVerifyCode','ims/EmployeeAccount/sendVerifyCode');
 });
 
 
