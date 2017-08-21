@@ -146,7 +146,7 @@ class BasePricingController extends BaseController
             $type = 'kids_fare';
         }
         foreach ($contractItemData as $index => $contractItemDatum) {
-            if ($contractItemData['fare_type'] == '按次收费'){
+            if ($contractItemDatum['fare_type'] == '按次收费'){
                 $itemFare = $itemFare + $contractItemDatum[$type];
                 $fareDetail = $itemFare . $this->currencyUnit;
             }else{
@@ -155,6 +155,8 @@ class BasePricingController extends BaseController
             }
             $this->itemFareDetail[$contractItemDatum['item_name']] = $fareDetail;
         }
+
+
         $itemFare = $itemFare / $this->exchangeRate;
         return $itemFare;
     }

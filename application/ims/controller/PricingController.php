@@ -52,7 +52,6 @@ class PricingController extends BasePricingController
         $data['exchange_rate'] = $placeName = $hotelModel->exchange->exchange_rate;
         $contractModel = new ContractModel();
         $contractData = $contractModel->where('hotel_id',$hotelId)->where('date_type','可用')->order('contract_start_date')->select();
-        halt($contractData);
         foreach ($contractData as $key => $contractDatum) {
             $data['expired_date'][] =  $this->formatDate($contractDatum['contract_start_date']).'-'.$this->formatDate($contractDatum['contract_end_date']);
             $contractSeasonModel = new ContractSeasonModel();
