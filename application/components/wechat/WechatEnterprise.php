@@ -33,13 +33,13 @@ class WechatEnterprise
         }elseif(is_array($config)){
             $config = array_merge($defaultConfig,$config);
         }
-        if (!isset($config['corp_id']) && checkEmpty($config['corp_id'])){
+        if (!isset($config['corp_id']) || checkEmpty($config['corp_id'])){
             throw new \think\Exception('缺少corp_id');
         }
-        if (!isset($config['secret']) && checkEmpty($config['secret'])){
+        if (!isset($config['secret']) || checkEmpty($config['secret'])){
             throw new \think\Exception('缺少secret');
         }
-        if (!isset($config['agent_id']) && checkEmpty($config['agent_id'])){
+        if (!isset($config['agent_id']) || checkEmpty($config['agent_id'])){
             throw new \think\Exception('缺少agent_id');
         }
         $this->corpId = $config['corp_id'];
