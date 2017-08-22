@@ -78,7 +78,11 @@ class CustomTailorController extends BaseController
                 $customerData = $employeeModel->customTailor()->field('id, follow_up_employee_id as follow_up_employee_name,customer_name as name, customer_gender as sex, customer_phone as phone')->select();
             }
             foreach ($customerData as $key => $customerDatum) {
-                $customerData[$key]['follow_up_employee_name'] = $employeeModel->get($customerDatum['follow_up_employee_name'])->employee_name;
+                if ($customerDatum['follow_up_employee_name'] == 0){
+                    $customerData[$key]['follow_up_employee_name'] = '未分配';
+                }else{
+                    $customerData[$key]['follow_up_employee_name'] = $employeeModel->get($customerDatum['follow_up_employee_name'])->employee_name;
+                }
             }
             $customerData = $customerData->toArray();
             if ($customerData){
