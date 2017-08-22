@@ -11,10 +11,9 @@ namespace app\components\ali\alipay;
 
 use app\components\Curl;
 use app\components\StringComponents;
-use Endroid\QrCode\QrCode;
 use think\Config;
 
-class AliPay
+class Alipay
 {
     //应用ID
     private $appId;
@@ -46,6 +45,11 @@ class AliPay
     protected $systemParams = array();
 
     protected $bizContent = array();
+
+    public function __construct()
+    {
+        $this->init();
+    }
 
     public function init($config = [])
     {
@@ -134,9 +138,8 @@ class AliPay
 
     public function setMethod($method = '')
     {
-        if (!$method){
-            $method = $this->method;
-        }
+
+        $this->method = $method;
         $this->systemParams['method'] = $method;
     }
 
@@ -163,10 +166,24 @@ class AliPay
         return $this->systemParams;
     }
 
+    public function checkSystemParams()
+    {
+        if (!$this->getMethod()){
+            throw new \think\Exception('缺少method');
+        }
+        if (!$this->getBizContent()){
+            throw new \think\Exception('缺少biz_content');
+        }
+    }
+
+    public function setBizContent($bizContent)
+    {
+        $this->bizContent = json_encode($bizContent, JSON_UNESCAPED_UNICODE);
+    }
+
     public function getBizContent()
     {
-        $bizContent = json_encode($this->bizContent, JSON_UNESCAPED_UNICODE);
-        return $bizContent;
+        return $this->bizContent;
     }
 
     protected function generateSign($data)
@@ -190,8 +207,29 @@ class AliPay
         return $sign;
     }
 
-    protected function execute()
+    public function verifySign($data, $sign) {
+        $pubKey = $this->getAlipayPublicKey();
+        $res = "-----BEGIN PUBLIC KEY-----\n" .
+            wordwrap($pubKey, 64, "\n", true) .
+            "\n-----END PUBLIC KEY-----";
+        if(!$res){
+            throw new \think\Exception('支付宝RSA公钥错误。请检查公钥文件格式是否正确');
+        }
+        //调用openssl内置方法验签，返回bool值
+        $result = (bool)openssl_verify($data, base64_decode($sign), $res, OPENSSL_ALGO_SHA256);
+
+        return $result;
+    }
+
+    public function formatSignData($signData)
     {
+        $signData = json_encode($signData, JSON_UNESCAPED_UNICODE);
+        return $signData;
+    }
+
+    public function execute()
+    {
+        $this->checkSystemParams();
         $systemParams = $this->getSystemParams();
         $bizContent['biz_content'] = $this->getBizContent();
         $signParams = array_merge($systemParams,$bizContent);

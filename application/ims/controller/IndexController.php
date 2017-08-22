@@ -10,7 +10,6 @@ class IndexController extends PrivilegeController
 {
     public function index()
     {
-        $qrcodePay = new AliPayQrcodePay();
-        $qrcodePay->testQrcodePay();
+        return AliPayQrcodePay::pay(123123,'hehda',20000);
     }
 }

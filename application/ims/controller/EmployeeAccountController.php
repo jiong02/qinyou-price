@@ -4,7 +4,6 @@ namespace app\ims\controller;
 
 use app\components\Math;
 use app\components\wechat\WechatEnterpriseSendMessage;
-use app\ims\model\DepartmentModel;
 use app\ims\model\EmployeeAccountModel;
 use app\ims\model\EmployeeModel;
 use think\Cache;

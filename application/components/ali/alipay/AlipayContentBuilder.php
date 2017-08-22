@@ -9,7 +9,7 @@
 namespace app\components\ali\alipay;
 
 
-class PayContentBuilder extends AliPay
+class AlipayContentBuilder
 {
     //支付授权码,用户支付宝钱包app点击"付款",在条码下对应的一串数字
     private $authCode;
@@ -60,6 +60,8 @@ class PayContentBuilder extends AliPay
 
     // (推荐使用，相对时间) 支付超时时间，5m 5分钟
     private $timeExpress;
+
+    private $bizContent;
 
     public function getAuthCode()
     {
@@ -223,5 +225,23 @@ class PayContentBuilder extends AliPay
     {
         $this->goodsDetailList = $goodsDetailList;
         $this->bizContent['goods_detail'] = $goodsDetailList;
+    }
+
+    public function getBizContent()
+    {
+        return $this->bizContent;
+    }
+
+    public function checkPayContent()
+    {
+        if (!$this->getOutTradeNo()){
+            throw new \think\Exception('缺少订单号');
+        }
+        if (!$this->getTotalAmount()){
+            throw new \think\Exception('缺少订单金额');
+        }
+        if (!$this->getSubject()){
+            throw new \think\Exception('缺少订单名称');
+        }
     }
 }

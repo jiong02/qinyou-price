@@ -10,38 +10,54 @@ namespace app\components\ali\alipay;
 
 use Endroid\QrCode\QrCode;
 
-class AliPayQrcodePay extends PayContentBuilder
+class AliPayQrcodePay
 {
-    protected $method = 'alipay.trade.precreate';
-    protected $resultType =  'alipay_trade_precreate_response';
-    public function qrcodePay($outTradeNo, $body, $fee)
+    public static $method = 'alipay.trade.precreate';
+    public static $resultType =  'alipay_trade_precreate_response';
+    public static $bizContent; //支付参数
+    public static $result; //支付结果
+    public static function pay($outTradeNo, $body, $fee)
     {
-        $this->init();
-        $this->setMethod();
-        $this->setOutTradeNo($outTradeNo);
-        $this->setTotalAmount($fee);
-        $this->setSubject($body);
-        $result = $this->execute();
-        $aliPayResult = new AliPayResult();
-        $aliPayResult->setResponse($result,$this->resultType);
-        if($aliPayResult->status = 'SUCCESS'){
-
-        }else{
-
-        }
-//        halt($systemParams);
-//        //检测必填参数
-
-//        $this->params['sign'] = $this->generateSign(array_merge($this->params,$bizContent));
-//        $url = self::GATEWAY_URL . '?';
-//        $url = $this->toStrParams($this->params, $url);
-//        dump($url);
-//        halt($bizContent);
-//        halt($this->params);
+        self::setPayContent($outTradeNo, $body, $fee);
+        self::execute();
+        $result = self::payResult();
+        return $result;
     }
 
-    public function testQrcodePay()
+    public static function setPayContent($outTradeNo, $body, $fee)
     {
-        $this->qrcodePay(123123,123123,1);
+        //设置支付信息
+        $alipayContentBuilder = new AlipayContentBuilder();
+        $alipayContentBuilder->setOutTradeNo($outTradeNo);
+        $alipayContentBuilder->setTotalAmount($fee);
+        $alipayContentBuilder->setSubject($body);
+        $alipayContentBuilder->checkPayContent();
+        $bizContent = $alipayContentBuilder->getBizContent();
+        self::$bizContent = $bizContent;
+    }
+
+    public static function execute()
+    {
+        //集成支付信息并发送支付请求
+        $alipay = new Alipay();
+        $alipay->setMethod(self::$method);
+        $alipay->setBizContent(self::$bizContent);
+        $result = $alipay->execute();
+        self::$result = $result;
+    }
+
+    public static function payResult()
+    {
+        //接收并分析返回结果
+        $alipayResult = new AlipayResult();
+        $alipayResult->setResponse(self::$result,self::$resultType);
+        if($alipayResult->status = 'SUCCESS'){
+            $qrCode = new QrCode($alipayResult->qrCode);
+            header('Content-Type: '.$qrCode->getContentType());
+            echo $qrCode->writeString();
+            exit;
+        }else{
+            return getError('二维码生成失败');
+        }
     }
 }
