@@ -149,17 +149,13 @@ class TemplateFluxController extends BaseController
         $tmpRouteModel = new TemplateRouteModel();
 
         $tmpRouteList = $tmpRouteModel->where('temp_id',$tempId)->select();
-        $tmpRouteStr = '';
 
         if(!empty($tmpRouteList)){
-            foreach($tmpRouteList as $k=>$v){
-                $tmpRouteStr .= $v['id'].',';
-            }
-
-            $tmpRouteStr = trim($tmpRouteStr,',');
+            $tmpRouteList = $tmpRouteList->toArray();
         }else{
-            $tmpRouteStr = 0;
+            $tmpRouteList = array();
         }
+
 
         $pvModel = new RoutePvFluxModel();
         $uvModel = new RouteUvFluxModel();
@@ -222,6 +218,8 @@ class TemplateFluxController extends BaseController
 
             }
 
+            $pvInfo['temp_route_list'][] = $this->getPvUvRouteInfo($pvModel,$tmpRouteList,$ymdTimeEnd,$ymdTimeStart);
+
             $pvInfo['change'][] = $change;
 
             $pvInfo['x'][] = $dateTimeEnd;
@@ -253,6 +251,8 @@ class TemplateFluxController extends BaseController
 
             }
 
+            $uvInfo['temp_route_list'][] = $this->getPvUvRouteInfo($uvModel,$tmpRouteList,$ymdTimeEnd,$ymdTimeStart);
+
             $uvInfo['change'][] = $change;
 
             $uvInfo['x'][] = $dateTimeEnd;
@@ -278,6 +278,8 @@ class TemplateFluxController extends BaseController
         $pvInfo['temp_create_order'] = array_reverse($pvInfo['temp_create_order']);
         //PV模板转化率
         $pvInfo['change'] = array_reverse($pvInfo['change']);
+        //PV模板线路信息
+        $pvInfo['temp_route_list'] = array_reverse($pvInfo['temp_route_list']);
 
         //UV模板 点击量总数
         $uvInfo['temp_click_count'] = array_reverse($uvInfo['temp_click_count']);
@@ -287,6 +289,8 @@ class TemplateFluxController extends BaseController
         $uvInfo['temp_create_order'] = array_reverse($uvInfo['temp_create_order']);
         //PV模板转化率
         $uvInfo['change'] = array_reverse($uvInfo['change']);
+        //UV模板线路信息
+        $uvInfo['temp_route_list'] = array_reverse($uvInfo['temp_route_list']);
 
         $returnData['pv_data'] = $pvInfo;
         $returnData['uv_data'] = $uvInfo;
@@ -307,6 +311,17 @@ class TemplateFluxController extends BaseController
 
         if($start > $end){
             return '请输入正确的时间';
+        }
+
+        //获取模板下的线路信息
+        $tmpRouteModel = new TemplateRouteModel();
+
+        $tmpRouteList = $tmpRouteModel->where('temp_id',$tempId)->select();
+
+        if(!empty($tmpRouteList)){
+            $tmpRouteList = $tmpRouteList->toArray();
+        }else{
+            $tmpRouteList = array();
         }
 
         $yStart = date('Y',$start);
@@ -386,8 +401,7 @@ class TemplateFluxController extends BaseController
 
             $pvInfo['change'][] = $change;
 
-
-
+            $pvInfo['temp_route_list'][] = $this->getPvUvRouteInfo($pvModel,$tmpRouteList,$ymdTimeEnd,$ymdTimeStart);
 
             $pvInfo['x'][] = $dateTimeEnd;
 
@@ -412,6 +426,7 @@ class TemplateFluxController extends BaseController
 
             $uvInfo['change'][] = $change;
 
+            $uvInfo['temp_route_list'][] = $this->getPvUvRouteInfo($uvModel,$tmpRouteList,$ymdTimeEnd,$ymdTimeStart);
 
             $uvInfo['x'][] = $dateTimeEnd;
 
@@ -425,8 +440,62 @@ class TemplateFluxController extends BaseController
         return $returnData;
     }
 
+    /**
+     * @name 获取PV/UV模板下线路的信息
+     * @auth Sam
+     * @param $model
+     * @param $tempRouteList
+     * @param $startTime
+     * @param $endTime
+     * @return mixed
+     */
+    public function getPvUvRouteInfo($model,$tempRouteList,$startTime,$endTime)
+    {
+        $orderModel = new OrderModel();
 
+        foreach($tempRouteList as $k=>$v){
+            $return['route_name'] = $v['route_name'];
 
+            //线路点击量
+            $routeClick = $model->field('count(*) as count')->where("template_route_id = $v[id] AND click_time BETWEEN '$startTime' AND '$endTime'")->find();
+
+            $return['route_click'] = $routeClick['count'];
+
+            //订单量
+            $orderCount = $orderModel->field('count(*) as count')->where("id = $v[id] AND create_time BETWEEN '$startTime' AND '$endTime'")->find();
+
+            $return['order_count'] = $orderCount['count'];
+
+            //支付数
+            $orderPay = $orderModel->field('count(*) as count')->where("id = $v[id] AND create_time BETWEEN '$startTime' AND '$endTime' AND order_status >= 3")->find();
+
+            $return['order_pay'] = $orderPay['count'];
+
+            //转化量
+            if(empty($orderPay['count']) && empty($routeClick['count'])){
+                $change = 0;
+            }else{
+                if(empty($routeClick['count'])){
+                    $routeClick['count'] = 1;
+                }
+
+                if(empty($orderPay['count'])){
+                    $change = 0;
+                }else{
+                    $change = round(($orderPay['count'] / $routeClick['count']) * 100);
+                }
+            }
+
+            $return['change'] = $change;
+
+            $routeClick['count'] = 0;
+            $orderCount['count'] = 0;
+            $orderPay['count'] = 0;
+            $change = 0;
+        }
+
+        return $return;
+    }
 
 
 
