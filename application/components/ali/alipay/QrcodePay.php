@@ -19,6 +19,7 @@ class QrcodePay extends PayContentBuilder
         $this->setOutTradeNo($outTradeNo);
         $this->setTotalAmount($fee);
         $this->setSubject($body);
+        $this->setMethod($this->method);
         $this->params['method'] = $this->method;
         $bizContent['bizContent'] = $this->getBizContent();
         //检测必填参数

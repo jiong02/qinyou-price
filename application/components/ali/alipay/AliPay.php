@@ -23,6 +23,8 @@ class AliPay
     private $gatewayUrl;
     //异步通知地址,只有扫码支付预下单可用
     protected $notifyUrl;
+    //接口名称
+    protected $method;
     //签名算法类型
     protected $signType;
     //编码格式
@@ -100,12 +102,8 @@ class AliPay
 
     public function setAppAuthToken($appAuthToken)
     {
+        $this->params['app_auth_token'] = $appAuthToken;
         $this->appAuthToken = $appAuthToken;
-    }
-
-    public function setNotifyUrl($notifyUrl)
-    {
-        $this->notifyUrl = $notifyUrl;
     }
 
     public function getAppAuthToken()
@@ -113,8 +111,25 @@ class AliPay
         return $this->appAuthToken;
     }
 
+    public function setNotifyUrl($notifyUrl)
+    {
+        $this->params['notify_url'] = $notifyUrl;
+        $this->notifyUrl = $notifyUrl;
+    }
+
     public function getNotifyUrl()
     {
         return $this->notifyUrl;
+    }
+
+    public function setMethod($method)
+    {
+        $this->method = $method;
+        $this->params['method'] = $method;
+    }
+
+    public function getMethod()
+    {
+        return $this->method;
     }
 }

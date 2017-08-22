@@ -102,7 +102,7 @@ class CustomTailorController extends BaseController
         $customerModel = new CustomTailorModel();
         $customerCount = $customerModel->where('id',$customerId)->count();
         if ($customerCount){
-            $customerData = $customerModel->field('record, remark, customer_name as name, customer_gender as sex, customer_phone as phone, itinerary_days as days, departure_of_date as date')->find();
+            $customerData = $customerModel->field('follow_up_record, remark, customer_name as name, customer_gender as sex, customer_phone as phone, itinerary_days as days, departure_of_date as date')->find();
             if ($customerData){
                 return Response::Success('定制信息获取成功',$customerData->toArray());
             }

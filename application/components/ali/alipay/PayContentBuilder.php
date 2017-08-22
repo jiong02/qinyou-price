@@ -205,7 +205,6 @@ class PayContentBuilder extends AliPay
         return $this->alipayStoreId;
     }
 
-
     public function setAlipayStoreId($alipayStoreId)
     {
         $this->alipayStoreId = $alipayStoreId;
