@@ -6,10 +6,10 @@
  * Time: 16:22
  */
 
-namespace app\components\ali\alipay\builder;
+namespace app\components\ali\alipay;
 
 
-class PayContentBuilder
+class PayContentBuilder extends AliPay
 {
     //支付授权码,用户支付宝钱包app点击"付款",在条码下对应的一串数字
     private $authCode;

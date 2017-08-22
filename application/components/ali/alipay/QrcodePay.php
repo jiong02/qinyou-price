@@ -8,9 +8,7 @@
 
 namespace app\components\ali;
 
-
-use think\Config;
-use think\Db;
+use app\components\ali\alipay\PayContentBuilder;
 
 class QrcodePay extends PayContentBuilder
 {
@@ -18,7 +16,6 @@ class QrcodePay extends PayContentBuilder
 
     public function qrcodePay($outTradeNo, $body, $fee)
     {
-        Config::
         $this->setOutTradeNo($outTradeNo);
         $this->setTotalAmount($fee);
         $this->setSubject($body);

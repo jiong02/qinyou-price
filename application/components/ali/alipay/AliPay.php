@@ -15,14 +15,14 @@ class AliPay
 {
     //应用ID
     private $appId;
-    //商户私钥
-    private $merchantPrivateKey;
     //支付宝公钥
     private $alipayPublicKey;
-    //异步通知地址,只有扫码支付预下单可用
-    protected $notifyUrl;
+    //商户私钥
+    private $merchantPrivateKey;
     //支付宝网关
     private $gatewayUrl;
+    //异步通知地址,只有扫码支付预下单可用
+    protected $notifyUrl;
     //签名算法类型
     protected $signType;
     //编码格式
@@ -44,7 +44,7 @@ class AliPay
     {
         $defaultConfig = Config::get('alipay');
         if (count($config) == 0){
-            $config = $defaultConfig ;
+            $config = $defaultConfig;
         }elseif(is_array($config)){
             $config = array_merge($defaultConfig,$config);
         }
@@ -96,5 +96,25 @@ class AliPay
         $this->appAuthToken = $config['app_auth_token'];
         $this->maxQueryRetry = $config['max_query_retry'];
         $this->queryDuration = $config['query_duration'];
+    }
+
+    public function setAppAuthToken($appAuthToken)
+    {
+        $this->appAuthToken = $appAuthToken;
+    }
+
+    public function setNotifyUrl($notifyUrl)
+    {
+        $this->notifyUrl = $notifyUrl;
+    }
+
+    public function getAppAuthToken()
+    {
+        return $this->appAuthToken;
+    }
+
+    public function getNotifyUrl()
+    {
+        return $this->notifyUrl;
     }
 }

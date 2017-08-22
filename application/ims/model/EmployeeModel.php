@@ -23,6 +23,11 @@ class EmployeeModel extends BaseModel
         return $this->belongsTo('DepartmentModel','department_id');
     }
 
+    public function customTailor()
+    {
+        return $this->hasMany('CustomTailorModel','follow_up_employee_id');
+    }
+
     public function checkExist($employeeId, $employeeToken)
     {
         $employeeCount = $this->where('id',$employeeId)->where('employee_token',$employeeToken)->count();
