@@ -16,11 +16,11 @@ class QrcodePay extends PayContentBuilder
 
     public function qrcodePay($outTradeNo, $body, $fee)
     {
+        $this->init();
         $this->setOutTradeNo($outTradeNo);
         $this->setTotalAmount($fee);
         $this->setSubject($body);
-        $this->setMethod($this->method);
-        $this->params['method'] = $this->method;
+        $this->setMethod();
         $bizContent['bizContent'] = $this->getBizContent();
         //检测必填参数
         if(!$this->getOutTradeNo()) {

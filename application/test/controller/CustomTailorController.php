@@ -90,7 +90,6 @@ class CustomTailorController extends BaseController
             }else{
                 return getError('当前无定制信息');
             }
-
         }
         return getError('定制信息获取失败');
 
@@ -102,7 +101,7 @@ class CustomTailorController extends BaseController
         $customerModel = new CustomTailorModel();
         $customerCount = $customerModel->where('id',$customerId)->count();
         if ($customerCount){
-            $customerData = $customerModel->field('follow_up_record, remark, customer_name as name, customer_gender as sex, customer_phone as phone, itinerary_days as days, departure_of_date as date')->find();
+            $customerData = $customerModel->where('id',$customerId)->field('follow_up_record, remark, customer_name as name, customer_gender as sex, customer_phone as phone, itinerary_days as days, departure_of_date as date')->find();
             if ($customerData){
                 return Response::Success('定制信息获取成功',$customerData->toArray());
             }

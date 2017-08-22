@@ -40,7 +40,7 @@ class AliPay
     //查询间隔
     protected $queryDuration;
 
-    protected $params = array();
+    protected $systemParams = array();
 
     public function init($config = [])
     {
@@ -102,7 +102,7 @@ class AliPay
 
     public function setAppAuthToken($appAuthToken)
     {
-        $this->params['app_auth_token'] = $appAuthToken;
+        $this->systemParams['app_auth_token'] = $appAuthToken;
         $this->appAuthToken = $appAuthToken;
     }
 
@@ -113,7 +113,7 @@ class AliPay
 
     public function setNotifyUrl($notifyUrl)
     {
-        $this->params['notify_url'] = $notifyUrl;
+        $this->systemParams['notify_url'] = $notifyUrl;
         $this->notifyUrl = $notifyUrl;
     }
 
@@ -122,14 +122,29 @@ class AliPay
         return $this->notifyUrl;
     }
 
-    public function setMethod($method)
+    public function setMethod($method = '')
     {
-        $this->method = $method;
-        $this->params['method'] = $method;
+        if (!$method){
+            $method = $this->method;
+        }
+        $this->systemParams['method'] = $method;
     }
 
     public function getMethod()
     {
         return $this->method;
+    }
+
+    public function getSystemParams()
+    {
+        $this->systemParams["app_id"] = $this->appId;
+        $this->systemParams["format"] = $this->format;
+        $this->systemParams["charset"] = $this->charset;
+        $this->systemParams["sign_type"] = $this->signType;
+        $this->systemParams["timestamp"] = date("Y-m-d H:i:s");
+        $this->systemParams["version"] = $this->version;
+        $this->systemParams["notify_url"] = $this->getNotifyUrl();
+        $this->systemParams["app_auth_token"] = $this->getAppAuthToken();
+        return $this->systemParams;
     }
 }
