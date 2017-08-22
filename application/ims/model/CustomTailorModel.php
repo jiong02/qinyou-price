@@ -6,7 +6,7 @@
  * Time: 19:24
  */
 
-namespace app\test\model;
+namespace app\ims\model;
 
 
 class CustomTailorModel extends BaseModel

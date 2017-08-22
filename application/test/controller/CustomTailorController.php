@@ -12,7 +12,7 @@ use app\components\Response;
 use app\components\wechat\WechatEnterpriseSendMessage;
 use app\ims\model\EmployeeModel;
 use app\test\model\CustomTailorAssignModel;
-use app\test\model\CustomTailorModel;
+use app\ims\model\CustomTailorModel;
 use think\Request;
 
 class CustomTailorController extends BaseController
@@ -54,23 +54,42 @@ class CustomTailorController extends BaseController
 
     public function getCustomerData(Request $request)
     {
+        $employeeId = $request->param('employee_id');
+        $employeeToken = $request->param('employee_token');
         $offset = $request->param('offset', 1);
         $length = $request->param('length',5);
         $params = [
             'offset'=>[$offset , 'require|integer'],
+            'employee_id'=>[$employeeId , 'require|integer'],
+            'employee_token'=>[$offset , 'require'],
             'length'=>[$length , 'require|integer'],
         ];
         $this->checkAllParam($params);
-        $customerModel = new CustomTailorModel();
-        $customerData = $customerModel->limit($offset, $length)->field('id, remark, customer_name as name, customer_gender as sex, customer_phone as phone, itinerary_days as days, departure_of_date as date')->select();
-        if ($customerData){
-            if (!$customerData->isEmpty()){
-                return Response::Success('定制信息获取成功',$customerData->toArray());
+        $employeeModel = new EmployeeModel();
+        $result = $employeeModel->checkExist($employeeId, $employeeToken);
+        $employeeModel = $employeeModel->get($employeeId);
+        if ($result){
+            $customTailorAssignModel = new CustomTailorAssignModel();
+            $employeeCount = $customTailorAssignModel->where('employee_account_name', $employeeModel->account_name)->where('permissions',10)->count();
+            if ($employeeCount > 0){
+                $customerModel = new CustomTailorModel();
+                $customerData = $customerModel->limit($offset, $length)->field('id, follow_up_employee_id as follow_up_employee_name,customer_name as name, customer_gender as sex, customer_phone as phone')->select();
             }else{
-                return Response::Success('当前无定制信息');
+                $customerData = $employeeModel->customTailor()->field('id, follow_up_employee_id as follow_up_employee_name,customer_name as name, customer_gender as sex, customer_phone as phone')->select();
             }
+            foreach ($customerData as $key => $customerDatum) {
+                $customerData[$key]['follow_up_employee_name'] = $employeeModel->get($customerDatum['follow_up_employee_name'])->employee_name;
+            }
+            $customerData = $customerData->toArray();
+            if ($customerData){
+                return getSuccess($customerData);
+            }else{
+                return getError('当前无定制信息');
+            }
+
         }
-        return Response::Error('定制信息获取失败');
+        return getError('定制信息获取失败');
+
     }
 
     public function getCustomerDataByCustomerId(Request $request)
@@ -79,7 +98,7 @@ class CustomTailorController extends BaseController
         $customerModel = new CustomTailorModel();
         $customerCount = $customerModel->where('id',$customerId)->count();
         if ($customerCount){
-            $customerData = $customerModel->field('remark, customer_name as name, customer_gender as sex, customer_phone as phone, itinerary_days as days, departure_of_date as date')->find();
+            $customerData = $customerModel->field('record, remark, customer_name as name, customer_gender as sex, customer_phone as phone, itinerary_days as days, departure_of_date as date')->find();
             if ($customerData){
                 return Response::Success('定制信息获取成功',$customerData->toArray());
             }
