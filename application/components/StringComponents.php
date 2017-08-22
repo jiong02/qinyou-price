@@ -9,7 +9,7 @@
 namespace app\components;
 
 
-class String
+class StringComponents
 {
     /**
      * 获取随机字符串

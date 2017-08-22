@@ -61,14 +61,6 @@ class PayContentBuilder extends AliPay
     // (推荐使用，相对时间) 支付超时时间，5m 5分钟
     private $timeExpress;
 
-    private $bizContent = array();
-
-    public function getBizContent()
-    {
-        $bizContent = json_encode($this->bizContent, JSON_UNESCAPED_UNICODE);
-        return $bizContent;
-    }
-
     public function getAuthCode()
     {
         return $this->authCode;

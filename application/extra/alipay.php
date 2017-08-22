@@ -35,7 +35,7 @@ return [
     'format' => "json",
 
     //应用授权TOKEN
-    'app_auth_token' => NULL,
+    'app_auth_token' => "",
 
     //最大查询重试次数
     'max_query_retry' => "10",

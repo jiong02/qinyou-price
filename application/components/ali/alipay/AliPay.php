@@ -9,6 +9,9 @@
 
 namespace app\components\ali\alipay;
 
+use app\components\Curl;
+use app\components\StringComponents;
+use Endroid\QrCode\QrCode;
 use think\Config;
 
 class AliPay
@@ -42,6 +45,8 @@ class AliPay
 
     protected $systemParams = array();
 
+    protected $bizContent = array();
+
     public function init($config = [])
     {
         $defaultConfig = Config::get('alipay');
@@ -50,40 +55,40 @@ class AliPay
         }elseif(is_array($config)){
             $config = array_merge($defaultConfig,$config);
         }
-        if (isset($config['app_id']) || checkEmpty($config['app_id'])){
+        if (!array_key_exists('app_id', $config) || checkEmpty($config['app_id'])){
             throw new \think\Exception('缺少app_id');
         }
-        if (isset($config['merchant_private_key']) || checkEmpty($config['merchant_private_key'])){
+        if (!array_key_exists('merchant_private_key', $config) || checkEmpty($config['merchant_private_key'])){
             throw new \think\Exception('缺少merchant_private_key');
         }
-        if (isset($config['alipay_public_key']) || checkEmpty($config['alipay_public_key'])){
+        if (!array_key_exists('alipay_public_key', $config) || checkEmpty($config['alipay_public_key'])){
             throw new \think\Exception('缺少alipay_public_key');
         }
-        if (isset($config['notify_url']) || checkEmpty($config['notify_url'])){
+        if (!array_key_exists('notify_url', $config) || checkEmpty($config['notify_url'])){
             throw new \think\Exception('缺少notify_url');
         }
-        if (isset($config['gateway_url']) || checkEmpty($config['gateway_url'])){
+        if (!array_key_exists('gateway_url', $config) || checkEmpty($config['gateway_url'])){
             throw new \think\Exception('缺少gateway_url');
         }
-        if (isset($config['sign_type']) || checkEmpty($config['sign_type'])){
+        if (!array_key_exists('sign_type', $config) || checkEmpty($config['sign_type'])){
             throw new \think\Exception('缺少sign_type');
         }
-        if (isset($config['charset']) || checkEmpty($config['charset'])){
+        if (!array_key_exists('charset', $config) || checkEmpty($config['charset'])){
             throw new \think\Exception('缺少charset');
         }
-        if (isset($config['version']) || checkEmpty($config['version'])){
+        if (!array_key_exists('version', $config) || checkEmpty($config['version'])){
             throw new \think\Exception('缺少version');
         }
-        if (isset($config['format']) || checkEmpty($config['format'])){
+        if (!array_key_exists('format', $config) || checkEmpty($config['format'])){
             throw new \think\Exception('缺少format');
         }
-        if (isset($config['app_auth_token']) || checkEmpty($config['app_auth_token'])){
+        if (!array_key_exists('app_auth_token', $config)){
             throw new \think\Exception('缺少app_auth_token');
         }
-        if (isset($config['max_query_retry']) || checkEmpty($config['max_query_retry'])){
+        if (!array_key_exists('max_query_retry', $config) || checkEmpty($config['max_query_retry'])){
             throw new \think\Exception('缺少max_query_retry');
         }
-        if (isset($config['query_duration']) || checkEmpty($config['query_duration'])){
+        if (!array_key_exists('query_duration', $config) || checkEmpty($config['query_duration'])){
             throw new \think\Exception('缺少query_duration');
         }
         $this->appId = $config['app_id'];
@@ -98,6 +103,11 @@ class AliPay
         $this->appAuthToken = $config['app_auth_token'];
         $this->maxQueryRetry = $config['max_query_retry'];
         $this->queryDuration = $config['query_duration'];
+    }
+
+    public function getGatewayUrl()
+    {
+       return $this->gatewayUrl;
     }
 
     public function setAppAuthToken($appAuthToken)
@@ -135,16 +145,61 @@ class AliPay
         return $this->method;
     }
 
+    public function getAlipayPublicKey()
+    {
+        return $this->alipayPublicKey;
+    }
+
     public function getSystemParams()
     {
         $this->systemParams["app_id"] = $this->appId;
         $this->systemParams["format"] = $this->format;
         $this->systemParams["charset"] = $this->charset;
         $this->systemParams["sign_type"] = $this->signType;
-        $this->systemParams["timestamp"] = date("Y-m-d H:i:s");
+        $this->systemParams["timestamp"] = date ("Y-m-d H:i:s");
         $this->systemParams["version"] = $this->version;
         $this->systemParams["notify_url"] = $this->getNotifyUrl();
         $this->systemParams["app_auth_token"] = $this->getAppAuthToken();
         return $this->systemParams;
+    }
+
+    public function getBizContent()
+    {
+        $bizContent = json_encode($this->bizContent, JSON_UNESCAPED_UNICODE);
+        return $bizContent;
+    }
+
+    protected function generateSign($data)
+    {
+        ksort($data);
+        $data = StringComponents::toUrlParams($data);
+        $sign = $this->sign($data);
+        return $sign;
+    }
+
+    protected function sign($data) {
+        $priKey = $this->merchantPrivateKey;
+        $result = "-----BEGIN RSA PRIVATE KEY-----\n" .
+            wordwrap($priKey, 64, "\n", true) .
+            "\n-----END RSA PRIVATE KEY-----";
+        if (!$result){
+            throw new \think\Exception('您使用的私钥格式错误，请检查RSA私钥配置');
+        }
+        openssl_sign($data, $sign, $result, OPENSSL_ALGO_SHA256);
+        $sign = base64_encode($sign);
+        return $sign;
+    }
+
+    protected function execute()
+    {
+        $systemParams = $this->getSystemParams();
+        $bizContent['biz_content'] = $this->getBizContent();
+        $signParams = array_merge($systemParams,$bizContent);
+        $systemParams['sign'] = $this->generateSign($signParams);
+        $gateWayUrl = $this->getGatewayUrl();
+        $url = $gateWayUrl . '?' .http_build_query($systemParams);
+        $curl = new Curl();
+        $result = $curl->post($url,$bizContent);
+        return $result;
     }
 }
