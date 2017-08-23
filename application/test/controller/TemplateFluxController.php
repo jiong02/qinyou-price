@@ -518,10 +518,11 @@ class TemplateFluxController extends BaseController
 
         $routeModel = new RouteModel();
 
-        $routeInfo = $routeModel->where("route_code like '%$search%'")->find();
+        $routeInfo = $routeModel->where("route_code like '%$search%'")->select();
+        $routeInfo = $routeInfo->toArray();
 
         if(empty($routeInfo)){
-            $routeInfo = $routeModel->where("route_name like '%$search%'")->find();
+            $routeInfo = $routeModel->where("route_name like '%$search%'")->select();
         }
 
         if(empty($routeInfo)){
@@ -530,134 +531,24 @@ class TemplateFluxController extends BaseController
 
         $routeInfo = $routeInfo->toArray();
 
-        $tempRouteInfo = $tempRouteModel->where('route_id',$routeInfo['id'])->find();
-
-        if(empty($tempRouteInfo)){
-            return '没有模板信息';
-        }
-
-        $tempRouteInfo = $tempRouteInfo->toArray();
-
         //指定时间
         if(!empty($startTime) && !empty($endTime)){
-            $return = $this->getChooseTimeRouteData($tempRouteInfo['id'],$routeInfo['id'],$startTime,$endTime);
+            $return = $this->getChooseTimeRouteData();
         }else{//一周时间
-            $return = $this->getWeekRouteData($tempRouteInfo['id'],$routeInfo['id']);
+            $return = $this->getWeekRouteData();
         }
 
-        $return['route_code'] = $routeInfo['route_code'];
-        $return['route_name'] = $routeInfo['route_name'];
-        return $return;
     }
 
-    /**
-     * @name 获取一周的线路数据
-     * @auth Sam
-     * @param $tempRouteId
-     * @param $routeId
-     * @return array
-     */
-    public function getWeekRouteData($tempRouteId,$routeId)
+
+    public function getWeekRouteData()
     {
-        $nowTime = time();
-        $nowTime = mktime(23,59,59,date('m',$nowTime),date('d',$nowTime),date('Y',$nowTime));
 
-        $pvModel = new RoutePvFluxModel();
-        $uvModel = new RouteUvFluxModel();
-        $orderModel = new OrderModel();
+    }
 
-        $return = array();
+    public function getChooseTimeRouteData()
+    {
 
-        for($i=0;$i<7;$i++){
-            if($i == 0){
-                $timeStart = $nowTime;
-                $timeEnd = strtotime('- 1 day',$nowTime);
-                $timeEnd = strtotime('+ 1 second',$timeEnd);
-
-            }else{
-                $timeStart = strtotime('- 1 second',$timeEnd);
-                $timeEnd = strtotime('- 1 day',$timeStart);
-                $timeEnd = strtotime('+ 1 second',$timeEnd);
-
-            }
-
-            $ymdTimeStart = date('Y-m-d H:i:s',$timeStart);
-            $ymdTimeEnd = date('Y-m-d H:i:s',$timeEnd);
-
-
-            //PV线路点击量
-            $pvRouteClick = $pvModel->field('count(*) as count')->where("template_route_id = $tempRouteId AND click_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->find();
-
-            $return['pv_data']['route_click_count'][] = $pvRouteClick['count'];
-
-            $uvRouteClick = $uvModel->field('count(*) as count')->where("template_route_id = $tempRouteId AND click_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->find();
-
-            $return['uv_data']['route_click_count'][] = $uvRouteClick['count'];
-
-            //订单量
-            $orderCount = $orderModel->field('count(*) as count')->where("route_id = $routeId AND create_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->find();
-
-            $return['pv_data']['order_count'][] = $orderCount['count'];
-            $return['uv_data']['order_count'][] = $orderCount['count'];
-
-            //支付数
-            $orderPay = $orderModel->field('count(*) as count')->where("route_id = $routeId AND create_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart' AND order_status >= 3")->find();
-
-            $return['pv_data']['order_pay'][] = $orderPay['count'];
-            $return['uv_data']['order_pay'][] = $orderPay['count'];
-
-            //PV转化量
-            if(empty($orderPay['count']) && empty($pvRouteClick['count'])){
-                $change = 0;
-            }else{
-                if(empty($pvRouteClick['count'])){
-                    $pvRouteClick['count'] = 1;
-                }
-
-                if(empty($orderPay['count'])){
-                    $change = 0;
-                }else{
-                    $change = round(($orderPay['count'] / $pvRouteClick['count']) * 100);
-                }
-            }
-
-            $return['pv_data']['change'][] = $change;
-
-            //UV转化量
-            if(empty($orderPay['count']) && empty($uvRouteClick['count'])){
-                $change = 0;
-            }else{
-                if(empty($uvRouteClick['count'])){
-                    $uvRouteClick['count'] = 1;
-                }
-
-                if(empty($orderPay['count'])){
-                    $change = 0;
-                }else{
-                    $change = round(($orderPay['count'] / $uvRouteClick['count']) * 100);
-                }
-            }
-
-            $return['uv_data']['change'][] = $change;
-
-            $pvRouteClick['count'] = 0;
-            $uvRouteClick['count'] = 0;
-            $orderCount['count'] = 0;
-            $orderPay['count'] = 0;
-            $change = 0;
-
-        }
-
-        $return['pv_data']['route_click_count'] = array_reverse($return['pv_data']['route_click_count']);
-        $return['uv_data']['route_click_count'] = array_reverse($return['uv_data']['route_click_count']);
-        $return['pv_data']['order_count'] = array_reverse($return['pv_data']['order_count']);
-        $return['uv_data']['order_count'] = array_reverse($return['uv_data']['order_count']);
-        $return['pv_data']['order_pay'] = array_reverse($return['pv_data']['order_pay']);
-        $return['uv_data']['order_pay'] = array_reverse($return['uv_data']['order_pay']);
-        $return['pv_data']['change'] = array_reverse($return['pv_data']['change']);
-        $return['uv_data']['change'] =  array_reverse($return['uv_data']['change']);
-
-        return $return;
     }
 
     /**
@@ -669,7 +560,7 @@ class TemplateFluxController extends BaseController
      * @param $end
      * @return string
      */
-    public function getChooseTimeRouteData($tempRouteId,$routeId,$start,$end)
+/*    public function getChooseTimeRouteData($tempRouteId,$routeId,$start,$end)
     {
         $start = strtotime($start);
         $end = strtotime($end);
@@ -775,12 +666,121 @@ class TemplateFluxController extends BaseController
         }
 
         return $return;
-    }
+    }*/
 
 
 
 
 
+    /**
+     * @name 获取一周的线路数据
+     * @auth Sam
+     * @param $tempRouteId
+     * @param $routeId
+     * @return array
+     */
+    /*    public function getWeekRouteData($tempRouteId,$routeId)
+        {
+            $nowTime = time();
+            $nowTime = mktime(23,59,59,date('m',$nowTime),date('d',$nowTime),date('Y',$nowTime));
+
+            $pvModel = new RoutePvFluxModel();
+            $uvModel = new RouteUvFluxModel();
+            $orderModel = new OrderModel();
+
+            $return = array();
+
+            for($i=0;$i<7;$i++){
+                if($i == 0){
+                    $timeStart = $nowTime;
+                    $timeEnd = strtotime('- 1 day',$nowTime);
+                    $timeEnd = strtotime('+ 1 second',$timeEnd);
+
+                }else{
+                    $timeStart = strtotime('- 1 second',$timeEnd);
+                    $timeEnd = strtotime('- 1 day',$timeStart);
+                    $timeEnd = strtotime('+ 1 second',$timeEnd);
+
+                }
+
+                $ymdTimeStart = date('Y-m-d H:i:s',$timeStart);
+                $ymdTimeEnd = date('Y-m-d H:i:s',$timeEnd);
+
+
+                //PV线路点击量
+                $pvRouteClick = $pvModel->field('count(*) as count')->where("template_route_id = $tempRouteId AND click_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->find();
+
+                $return['pv_data']['route_click_count'][] = $pvRouteClick['count'];
+
+                $uvRouteClick = $uvModel->field('count(*) as count')->where("template_route_id = $tempRouteId AND click_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->find();
+
+                $return['uv_data']['route_click_count'][] = $uvRouteClick['count'];
+
+                //订单量
+                $orderCount = $orderModel->field('count(*) as count')->where("route_id = $routeId AND create_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->find();
+
+                $return['pv_data']['order_count'][] = $orderCount['count'];
+                $return['uv_data']['order_count'][] = $orderCount['count'];
+
+                //支付数
+                $orderPay = $orderModel->field('count(*) as count')->where("route_id = $routeId AND create_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart' AND order_status >= 3")->find();
+
+                $return['pv_data']['order_pay'][] = $orderPay['count'];
+                $return['uv_data']['order_pay'][] = $orderPay['count'];
+
+                //PV转化量
+                if(empty($orderPay['count']) && empty($pvRouteClick['count'])){
+                    $change = 0;
+                }else{
+                    if(empty($pvRouteClick['count'])){
+                        $pvRouteClick['count'] = 1;
+                    }
+
+                    if(empty($orderPay['count'])){
+                        $change = 0;
+                    }else{
+                        $change = round(($orderPay['count'] / $pvRouteClick['count']) * 100);
+                    }
+                }
+
+                $return['pv_data']['change'][] = $change;
+
+                //UV转化量
+                if(empty($orderPay['count']) && empty($uvRouteClick['count'])){
+                    $change = 0;
+                }else{
+                    if(empty($uvRouteClick['count'])){
+                        $uvRouteClick['count'] = 1;
+                    }
+
+                    if(empty($orderPay['count'])){
+                        $change = 0;
+                    }else{
+                        $change = round(($orderPay['count'] / $uvRouteClick['count']) * 100);
+                    }
+                }
+
+                $return['uv_data']['change'][] = $change;
+
+                $pvRouteClick['count'] = 0;
+                $uvRouteClick['count'] = 0;
+                $orderCount['count'] = 0;
+                $orderPay['count'] = 0;
+                $change = 0;
+
+            }
+
+            $return['pv_data']['route_click_count'] = array_reverse($return['pv_data']['route_click_count']);
+            $return['uv_data']['route_click_count'] = array_reverse($return['uv_data']['route_click_count']);
+            $return['pv_data']['order_count'] = array_reverse($return['pv_data']['order_count']);
+            $return['uv_data']['order_count'] = array_reverse($return['uv_data']['order_count']);
+            $return['pv_data']['order_pay'] = array_reverse($return['pv_data']['order_pay']);
+            $return['uv_data']['order_pay'] = array_reverse($return['uv_data']['order_pay']);
+            $return['pv_data']['change'] = array_reverse($return['pv_data']['change']);
+            $return['uv_data']['change'] =  array_reverse($return['uv_data']['change']);
+
+            return $return;
+        }*/
 
 
 
