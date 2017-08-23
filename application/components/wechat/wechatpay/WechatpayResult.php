@@ -13,40 +13,72 @@ class WechatpayResult
 {
     public $errorCode;
     public $errorMessage;
+    public $outTradeNo;
+    public $tradeType;
     public $sign;
-    public $qrCode;
     public $status;
-    public $response;
+    public $result;
+    public $subCode;
+    public $subMessage;
 
-    const ERR_CHECK_SIGN = 40001;
-    const SUCCESS = 10000;
-    const STATUS_SUCCESS = 'SUCCESS';
-    const STATUS_FAIL = 'FAIL';
+    public $qrCode;
+
+    const CODE_SUCCESS = 10000;
+
     const NATIVE = 'NATIVE';
+    const SUCCESS = 'SUCCESS';
+    const FAIL = 'FAIL';
+    const ERR_CHECK_SIGN_CODE = 'SIGNERROR';
+    const ERR_CHECK_SIGN_MESSAGE = '签名检验失败';
 
-    public function setResponse($response, $tradeType)
+    public function setCommonResponse($response)
     {
-        $this->response = $response;
         $this->sign = $response['sign'];
         unset($response['sign']);
-        $wechatpay = new Wechatpay();
-        $result = $wechatpay->verifySign($response, $this->sign);
-        if ($result){
-            $this->status = self::STATUS_SUCCESS;
-            $this->errorCode = self::ERR_CHECK_SIGN;
-            $this->errorMessage = 'SUCCESS';
-            if ($tradeType == self::NATIVE){
-                $this->setNativeResponse();
+        $this->result = $response;
+        $this->tradeType = $response['trade_type'];
+        $this->errorCode = $response['return_code'];
+        $this->errorMessage = $response['return_msg'];
+    }
+
+    public function setResponse($response)
+    {
+        if ($response['return_code'] == self::SUCCESS){
+            $this->setCommonResponse($response);
+            $wechatpay = new Wechatpay();
+            $result = $wechatpay->verifySign($this->result, $this->sign);
+            if ($result){
+                if ($response['result_code'] == self::SUCCESS){
+                    $this->setSuccessResponse();
+                }else{
+                    $this->setFailResponse();
+                }
+            }else{
+                $this->setFailResponse(self::ERR_CHECK_SIGN_CODE, self::ERR_CHECK_SIGN_MESSAGE);
             }
         }else{
-            $this->status = self::STATUS_FAIL;
-            $this->errorCode = self::ERR_CHECK_SIGN;
-            $this->errorMessage = '签名检验失败';
+            $this->setFailResponse($response['return_code'], $response['return_msg']);
         }
+
+    }
+
+    public function setSuccessResponse()
+    {
+        $this->status = self::SUCCESS;
+        if ($this->tradeType == self::NATIVE){
+            $this->setNativeResponse();
+        }
+    }
+
+    public function setFailResponse($errorCode = '', $errorMessage = '')
+    {
+        $this->status = self::FAIL;
+        $this->errorCode = $errorCode ? $errorCode : $this->result['err_code'];
+        $this->errorMessage = $errorMessage ? $errorMessage : $this->result['err_code_des'];
     }
 
     public function setNativeResponse()
     {
-        $this->qrCode = $this->response['code_url'];
+        $this->qrCode = $this->result['code_url'];
     }
 }

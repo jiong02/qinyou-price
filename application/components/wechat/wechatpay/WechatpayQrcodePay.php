@@ -17,13 +17,13 @@ class WechatpayQrcodePay
     public static $result; //支付结果
     public static function pay($outTradeNo, $body, $fee, $productId)
     {
-        self::setPayContent($outTradeNo, $body, $fee, $productId);
+        self::buildPayContent($outTradeNo, $body, $fee, $productId);
         self::execute();
         $result = self::payResult();
         return $result;
     }
 
-    public static function setPayContent($outTradeNo, $body, $fee, $productId)
+    public static function buildPayContent($outTradeNo, $body, $fee, $productId)
     {
         //设置支付信息
         $wechatpayContentBuilder = new WechatpayContentBuilder();
@@ -51,14 +51,14 @@ class WechatpayQrcodePay
     {
         //接收并分析返回结果
         $wechatpayResult = new WechatpayResult();
-        $wechatpayResult->setResponse(self::$result, self::TRADE_TYPE);
-        if($wechatpayResult->status = 'SUCCESS'){
+        $wechatpayResult->setResponse(self::$result);
+        if($wechatpayResult->status == 'SUCCESS'){
             $qrCode = new QrCode($wechatpayResult->qrCode);
             header('Content-Type: '.$qrCode->getContentType());
             echo $qrCode->writeString();
             exit;
         }else{
-            return getError('二维码生成失败');
+            return getError($wechatpayResult->errorMessage);
         }
     }
 }

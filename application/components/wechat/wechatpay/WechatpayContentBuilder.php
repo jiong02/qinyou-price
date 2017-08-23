@@ -116,28 +116,28 @@ class WechatpayContentBuilder
         return $this->bizContent;
     }
 
-    public function checkPayContent()
-    {
-        if (!$this->getOutTradeNo()){
-            throw new Exception('缺少订单号');
-        }
-        if (!$this->getTotalFee()){
-            throw new Exception('缺少订单金额');
-        }
-        if (!$this->getBody()){
-            throw new Exception('缺少订单名称');
-        }
-        switch ($this->getTradeType()) {
-            case self::NATIVE:
-                if (!$this->getProductId()){
-                    throw new Exception('缺少产品id');
-                }
-                break;
-            case self::JSAPI:
-                if (!$this->getOpenid()){
-                    throw new Exception('缺少openid');
-                }
-                break;
-        }
-    }
+//    public function checkPayContent()
+//    {
+//        if (!$this->getOutTradeNo()){
+//            throw new Exception('缺少订单号');
+//        }
+//        if (!$this->getTotalFee()){
+//            throw new Exception('缺少订单金额');
+//        }
+//        if (!$this->getBody()){
+//            throw new Exception('缺少订单名称');
+//        }
+//        switch ($this->getTradeType()) {
+//            case self::NATIVE:
+//                if (!$this->getProductId()){
+//                    throw new Exception('缺少产品id');
+//                }
+//                break;
+//            case self::JSAPI:
+//                if (!$this->getOpenid()){
+//                    throw new Exception('缺少openid');
+//                }
+//                break;
+//        }
+//    }
 }

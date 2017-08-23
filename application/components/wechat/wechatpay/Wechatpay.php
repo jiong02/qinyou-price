@@ -161,7 +161,6 @@ class Wechatpay
     {
         $sign = $this->MakeSign($signData);
         $this->sign = $sign;
-        return $sign;
     }
 
     public function verifySign($signData, $sign)
@@ -217,7 +216,8 @@ class Wechatpay
         $bizContent = $this->getBizContent();
         $this->checkSystemParams();
         $apiParams = array_merge($systemParams, $bizContent);
-        $apiParams['sign'] = $this->setSign($apiParams);
+        $this->setSign($apiParams);
+        $apiParams['sign'] = $this->getSign();
         $xmlApiParams = Data::formatArraytoXml($apiParams);
         $curl = new Curl();
         $result = $curl->post($this->url,$xmlApiParams);

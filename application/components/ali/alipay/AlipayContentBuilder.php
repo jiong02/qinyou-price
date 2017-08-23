@@ -232,17 +232,4 @@ class AlipayContentBuilder
     {
         return $this->bizContent;
     }
-
-    public function checkPayContent()
-    {
-        if (!$this->getOutTradeNo()){
-            throw new Exception('缺少订单号');
-        }
-        if (!$this->getTotalAmount()){
-            throw new Exception('缺少订单金额');
-        }
-        if (!$this->getSubject()){
-            throw new Exception('缺少订单名称');
-        }
-    }
 }

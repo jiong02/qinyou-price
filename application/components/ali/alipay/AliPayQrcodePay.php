@@ -13,25 +13,24 @@ use Endroid\QrCode\QrCode;
 class AliPayQrcodePay
 {
     public static $method = 'alipay.trade.precreate';
-    public static $resultType =  'alipay_trade_precreate_response';
+    public static $responseType =  'alipay_trade_precreate_response';
     public static $bizContent; //支付参数
     public static $result; //支付结果
     public static function pay($outTradeNo, $body, $fee)
     {
-        self::setPayContent($outTradeNo, $body, $fee);
+        self::buildPayContent($outTradeNo, $body, $fee);
         self::execute();
         $result = self::payResult();
         return $result;
     }
 
-    public static function setPayContent($outTradeNo, $body, $fee)
+    public static function buildPayContent($outTradeNo, $body, $fee)
     {
         //设置支付信息
         $alipayContentBuilder = new AlipayContentBuilder();
         $alipayContentBuilder->setOutTradeNo($outTradeNo);
         $alipayContentBuilder->setTotalAmount($fee);
         $alipayContentBuilder->setSubject($body);
-        $alipayContentBuilder->checkPayContent();
         $bizContent = $alipayContentBuilder->getBizContent();
         self::$bizContent = $bizContent;
     }
@@ -50,8 +49,8 @@ class AliPayQrcodePay
     {
         //接收并分析返回结果
         $alipayResult = new AlipayResult();
-        $alipayResult->setResponse(self::$result,self::$resultType);
-        if($alipayResult->status = 'SUCCESS'){
+        $alipayResult->setResponse(self::$result,self::$responseType);
+        if($alipayResult->status == 'SUCCESS'){
             $qrCode = new QrCode($alipayResult->qrCode);
             header('Content-Type: '.$qrCode->getContentType());
             echo $qrCode->writeString();
