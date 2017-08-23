@@ -189,7 +189,7 @@ class TemplateFluxController extends BaseController
             $pvTmpClick = $pvModel->field('count(*) as count')->where("template_id = $tempId AND click_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->find();
 
             $pvInfo['temp_click_count'][] = $pvTmpClick['count'];
-            $uvInfo['temp_click_count'][] = $pvTmpClick['count'];
+//            $uvInfo['temp_click_count'][] = $pvTmpClick['count'];
 
             //PV 模板 订单数
             $pvTmpOrder = $orderModel->field('count(*) as count')->where("temp_id = $tempId AND create_time BETWEEN '$ymdTimeEnd' AND '$ymdTimeStart'")->find();
@@ -497,7 +497,21 @@ class TemplateFluxController extends BaseController
         return $return;
     }
 
+    public function getRouteAnalyzeInfo(Request $request)
+    {
+        $search = $request->param('search','');
+        $startTime = $request->param('start_time','');
+        $endTime = $request->param('end_time','');
 
+        if(empty($search)){
+            return '查询数据为空';
+        }
+
+
+
+
+
+    }
 
 
 
