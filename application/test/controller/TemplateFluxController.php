@@ -523,13 +523,13 @@ class TemplateFluxController extends BaseController
 
         if(empty($routeInfo)){
             $routeInfo = $routeModel->where("route_name like '%$search%'")->select();
+            $routeInfo = $routeInfo->toArray();
         }
 
         if(empty($routeInfo)){
             return '没有线路信息';
         }
 
-        $routeInfo = $routeInfo->toArray();
 
         //指定时间
         if(!empty($startTime) && !empty($endTime)){
