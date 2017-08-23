@@ -5,7 +5,7 @@ use app\ims\model\BaseModel;
 
 class RouteModel extends BaseModel
 {
-    public $table = 'ims_route';
+    public $table = 'ims_route.ims_route';
 //    protected $pk = 'id';
 
     public $rule = [
