@@ -116,6 +116,8 @@ Route::domain('test', function(){
     Route::any('/Flux/addPvUvFlux','test/TemplateFlux/addPvUvFlux');
     //获得板块流量数据
     Route::any('/Flux/getTempInfo','test/TemplateFlux/getTempInfo');
+    //获取线路分析数据
+    Route::any('/Flux/getRouteAnalyzeInfo','test/TemplateFlux/getRouteAnalyzeInfo');
     //获得海岛分页信息
     Route::any('/Search/getPlacePage','test/Search/getPlacePage');
     //前端页面搜索海岛线路信息
