@@ -2,43 +2,41 @@
 /**
  * Created by PhpStorm.
  * User: ZYone
- * Date: 2017/8/22
- * Time: 15:52
+ * Date: 2017/8/23
+ * Time: 14:59
  */
 
-namespace app\components\ali\alipay;
+namespace app\components\wechat\wechatpay;
 
 
-class AlipayResult
+class WechatpayResult
 {
     public $errorCode;
     public $errorMessage;
-    public $outTradeNo;
     public $sign;
     public $qrCode;
     public $status;
     public $response;
 
-    const PRE_CREATE = 'alipay_trade_precreate_response';
     const ERR_CHECK_SIGN = 40001;
     const SUCCESS = 10000;
     const STATUS_SUCCESS = 'SUCCESS';
     const STATUS_FAIL = 'FAIL';
+    const NATIVE = 'NATIVE';
 
     public function setResponse($response, $tradeType)
     {
         $this->response = $response;
         $this->sign = $response['sign'];
-        $alipay = new Alipay();
-        $signData = $alipay->formatSignData($response[$tradeType]);
-        $result = $alipay->verifySign($signData, $this->sign);
+        unset($response['sign']);
+        $wechatpay = new Wechatpay();
+        $result = $wechatpay->verifySign($response, $this->sign);
         if ($result){
             $this->status = self::STATUS_SUCCESS;
             $this->errorCode = self::ERR_CHECK_SIGN;
-            $this->outTradeNo = $response['out_trade_no'];
             $this->errorMessage = 'SUCCESS';
-            if ($tradeType == self::PRE_CREATE){
-                $this->setPreCreateResponse();
+            if ($tradeType == self::NATIVE){
+                $this->setNativeResponse();
             }
         }else{
             $this->status = self::STATUS_FAIL;
@@ -47,8 +45,8 @@ class AlipayResult
         }
     }
 
-    public function setPreCreateResponse()
+    public function setNativeResponse()
     {
-        $this->qrCode = $this->response->qr_code;
+        $this->qrCode = $this->response['code_url'];
     }
 }

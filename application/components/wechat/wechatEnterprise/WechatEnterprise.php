@@ -6,7 +6,7 @@
  * Time: 10:45
  */
 
-namespace app\components\wechat;
+namespace app\components\wechat\wechatEnterprise;
 
 
 use app\components\Curl;

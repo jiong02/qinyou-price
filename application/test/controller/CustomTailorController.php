@@ -9,7 +9,7 @@
 namespace app\test\controller;
 
 use app\components\Response;
-use app\components\wechat\WechatEnterpriseSendMessage;
+use app\components\wechat\WechatEnterprise\WechatEnterpriseSendMessage;
 use app\ims\model\EmployeeModel;
 use app\test\model\CustomTailorAssignModel;
 use app\ims\model\CustomTailorModel;

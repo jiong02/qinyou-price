@@ -6,7 +6,7 @@
  * Time: 21:52
  */
 
-namespace app\components\wechat;
+namespace app\components\wechat\wechatEnterprise;
 
 
 use app\components\Curl;
@@ -154,6 +154,7 @@ class WechatEnterpriseSendMessage extends WechatEnterprise
         $this->setParams();
         $curl = new Curl();
         $result = $curl->post($this->url,$this->params);
+        $result = json_decode($result,true);
         $result = $this->formatResult($result);
         if ($this->status == self::SUCCESS) {
             $this->invalidUser = $result['invaliduser'];

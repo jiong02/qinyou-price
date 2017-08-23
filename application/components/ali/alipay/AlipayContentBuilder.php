@@ -8,6 +8,7 @@
 
 namespace app\components\ali\alipay;
 
+use think\Exception;
 
 class AlipayContentBuilder
 {
@@ -235,13 +236,13 @@ class AlipayContentBuilder
     public function checkPayContent()
     {
         if (!$this->getOutTradeNo()){
-            throw new \think\Exception('缺少订单号');
+            throw new Exception('缺少订单号');
         }
         if (!$this->getTotalAmount()){
-            throw new \think\Exception('缺少订单金额');
+            throw new Exception('缺少订单金额');
         }
         if (!$this->getSubject()){
-            throw new \think\Exception('缺少订单名称');
+            throw new Exception('缺少订单名称');
         }
     }
 }

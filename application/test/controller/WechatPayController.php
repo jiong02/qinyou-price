@@ -8,17 +8,17 @@
 
 namespace app\test\controller;
 
-use app\components\wechat\QrcodePay;
+use app\components\wechat\WechatpayQrcodePay;
 use Endroid\QrCode\QrCode;
 
 class WechatPayController extends BaseController
 {
     public function qrpay()
     {
-        $url = QrcodePay::init('10247681','验孕棒',99.00,'000011');
-        $qrCode = new QrCode($url);
-        header('Content-Type: '.$qrCode->getContentType());
-        echo $qrCode->writeString();
-        exit;
+        WechatpayQrcodePay::init('10247681','验孕棒',99.00,'000011');
+//        $qrCode = new QrCode($url);
+//        header('Content-Type: '.$qrCode->getContentType());
+//        echo $qrCode->writeString();
+//        exit;
     }
 }

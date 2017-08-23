@@ -10,7 +10,8 @@
 namespace app\components\ali\alipay;
 
 use app\components\Curl;
-use app\components\StringComponents;
+use app\components\Data;
+use think\Exception;
 use think\Config;
 
 class Alipay
@@ -41,6 +42,8 @@ class Alipay
     protected $maxQueryRetry;
     //查询间隔
     protected $queryDuration;
+    //签名
+    protected $sign;
 
     protected $systemParams = array();
 
@@ -60,40 +63,40 @@ class Alipay
             $config = array_merge($defaultConfig,$config);
         }
         if (!array_key_exists('app_id', $config) || checkEmpty($config['app_id'])){
-            throw new \think\Exception('缺少app_id');
+            throw new Exception('缺少app_id');
         }
         if (!array_key_exists('merchant_private_key', $config) || checkEmpty($config['merchant_private_key'])){
-            throw new \think\Exception('缺少merchant_private_key');
+            throw new Exception('缺少merchant_private_key');
         }
         if (!array_key_exists('alipay_public_key', $config) || checkEmpty($config['alipay_public_key'])){
-            throw new \think\Exception('缺少alipay_public_key');
+            throw new Exception('缺少alipay_public_key');
         }
         if (!array_key_exists('notify_url', $config) || checkEmpty($config['notify_url'])){
-            throw new \think\Exception('缺少notify_url');
+            throw new Exception('缺少notify_url');
         }
         if (!array_key_exists('gateway_url', $config) || checkEmpty($config['gateway_url'])){
-            throw new \think\Exception('缺少gateway_url');
+            throw new Exception('缺少gateway_url');
         }
         if (!array_key_exists('sign_type', $config) || checkEmpty($config['sign_type'])){
-            throw new \think\Exception('缺少sign_type');
+            throw new Exception('缺少sign_type');
         }
         if (!array_key_exists('charset', $config) || checkEmpty($config['charset'])){
-            throw new \think\Exception('缺少charset');
+            throw new Exception('缺少charset');
         }
         if (!array_key_exists('version', $config) || checkEmpty($config['version'])){
-            throw new \think\Exception('缺少version');
+            throw new Exception('缺少version');
         }
         if (!array_key_exists('format', $config) || checkEmpty($config['format'])){
-            throw new \think\Exception('缺少format');
+            throw new Exception('缺少format');
         }
         if (!array_key_exists('app_auth_token', $config)){
-            throw new \think\Exception('缺少app_auth_token');
+            throw new Exception('缺少app_auth_token');
         }
         if (!array_key_exists('max_query_retry', $config) || checkEmpty($config['max_query_retry'])){
-            throw new \think\Exception('缺少max_query_retry');
+            throw new Exception('缺少max_query_retry');
         }
         if (!array_key_exists('query_duration', $config) || checkEmpty($config['query_duration'])){
-            throw new \think\Exception('缺少query_duration');
+            throw new Exception('缺少query_duration');
         }
         $this->appId = $config['app_id'];
         $this->merchantPrivateKey = $config['merchant_private_key'];
@@ -148,6 +151,15 @@ class Alipay
         return $this->method;
     }
 
+    public function setSign($bizContent)
+    {
+        $systemParams = $this->getSystemParams();
+        $signParams = array_merge($systemParams,$bizContent);
+        $sign = $this->generateSign($signParams);
+        $this->sign = $sign;
+        $this->systemParams['sign'] = $sign;
+    }
+
     public function getAlipayPublicKey()
     {
         return $this->alipayPublicKey;
@@ -169,10 +181,10 @@ class Alipay
     public function checkSystemParams()
     {
         if (!$this->getMethod()){
-            throw new \think\Exception('缺少method');
+            throw new Exception('缺少method');
         }
         if (!$this->getBizContent()){
-            throw new \think\Exception('缺少biz_content');
+            throw new Exception('缺少biz_content');
         }
     }
 
@@ -189,7 +201,7 @@ class Alipay
     protected function generateSign($data)
     {
         ksort($data);
-        $data = StringComponents::toUrlParams($data);
+        $data = Data::toUrlParams($data);
         $sign = $this->sign($data);
         return $sign;
     }
@@ -200,7 +212,7 @@ class Alipay
             wordwrap($priKey, 64, "\n", true) .
             "\n-----END RSA PRIVATE KEY-----";
         if (!$result){
-            throw new \think\Exception('您使用的私钥格式错误，请检查RSA私钥配置');
+            throw new Exception('您使用的私钥格式错误，请检查RSA私钥配置');
         }
         openssl_sign($data, $sign, $result, OPENSSL_ALGO_SHA256);
         $sign = base64_encode($sign);
@@ -213,7 +225,7 @@ class Alipay
             wordwrap($pubKey, 64, "\n", true) .
             "\n-----END PUBLIC KEY-----";
         if(!$res){
-            throw new \think\Exception('支付宝RSA公钥错误。请检查公钥文件格式是否正确');
+            throw new Exception('支付宝RSA公钥错误。请检查公钥文件格式是否正确');
         }
         //调用openssl内置方法验签，返回bool值
         $result = (bool)openssl_verify($data, base64_decode($sign), $res, OPENSSL_ALGO_SHA256);
@@ -229,15 +241,15 @@ class Alipay
 
     public function execute()
     {
+        $bizContent['biz_content'] = $this->getBizContent();
+        $this->setSign($bizContent);
         $this->checkSystemParams();
         $systemParams = $this->getSystemParams();
-        $bizContent['biz_content'] = $this->getBizContent();
-        $signParams = array_merge($systemParams,$bizContent);
-        $systemParams['sign'] = $this->generateSign($signParams);
         $gateWayUrl = $this->getGatewayUrl();
-        $url = $gateWayUrl . '?' .http_build_query($systemParams);
+        $url = $gateWayUrl . '?' . http_build_query($systemParams);
         $curl = new Curl();
         $result = $curl->post($url,$bizContent);
+        $result = json_decode($result,true);
         return $result;
     }
 }

@@ -2,8 +2,8 @@
 
 namespace app\ims\controller;
 
-use app\components\Math;
-use app\components\wechat\WechatEnterpriseSendMessage;
+use app\components\Data;
+use app\components\wechat\WechatEnterprise\WechatEnterpriseSendMessage;
 use app\ims\model\EmployeeAccountModel;
 use app\ims\model\EmployeeModel;
 use think\Cache;
@@ -58,7 +58,7 @@ class EmployeeAccountController extends BaseController
         $employeeAccount = new EmployeeAccountModel();
         $result = $employeeAccount->checkAccountName($accountName);
         if($result){
-            $verifyCode = Math::generateRandomNumber($this->verifyCodeLength);
+            $verifyCode = Data::generateRandomNumber($this->verifyCodeLength);
             $sendMessage = new WechatEnterpriseSendMessage();
             $sendMessage->sendTextMessage($accountName, $verifyCode);
             if ($sendMessage->status == 'SUCCESS'){
