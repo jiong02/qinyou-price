@@ -533,23 +533,106 @@ class TemplateFluxController extends BaseController
 
         //指定时间
         if(!empty($startTime) && !empty($endTime)){
-            $return = $this->getChooseTimeRouteData();
+            $startTime = mktime(0,0,0,date('m',strtotime($startTime)),date('d',strtotime($startTime)),date('Y',strtotime($startTime)));
+            $startTime = date('Y-m-d H:i:s',$startTime);
+
+            $endTime = mktime(23,59,59,date('m',strtotime($endTime)),date('d',strtotime($endTime)),date('Y',strtotime($endTime)));
+            $endTime = date('Y-m-d H:i:s',$endTime);
+
+            $return = $this->getRouteData($routeInfo,$startTime,$endTime);
         }else{//一周时间
-            $return = $this->getWeekRouteData();
+            $nowTime = time();
+            $nowTime = mktime(23,59,59,date('m',$nowTime),date('d',$nowTime),date('Y',$nowTime));
+            $endTime = date('Y-m-d H:i:s',$nowTime);
+
+            $startTime = strtotime('- 7 day',$nowTime);
+            $startTime = strtotime('+ 1 second',$startTime);
+            $startTime = date('Y-m-d H:i:s',$startTime);
+
+            $return = $this->getRouteData($routeInfo,$startTime,$endTime);
         }
 
+        return $return;
     }
 
 
-    public function getWeekRouteData()
+    public function getRouteData($routeInfo,$startTime,$endTime)
     {
 
+        $pvFluxModel = new RoutePvFluxModel();
+        $uvFluxModel = new RouteUvFluxModel();
+        $orderModel = new OrderModel();
+
+        $return = array();
+
+        foreach($routeInfo as $k=>$v){
+            $return[$k]['route_name'] = $v['route_name'];
+            $return[$k]['route_code'] = $v['route_code'];
+
+            $pvClickCount = $pvFluxModel->field('count(*) as count')->where("route_id = $v[id] AND click_time BETWEEN '$startTime' AND '$endTime'")->find();
+
+            $return[$k]['pv_click_count'] = $pvClickCount['count'];
+
+            $uvClickCount = $uvFluxModel->field('count(*) as count')->where("route_id = $v[id] AND click_time BETWEEN '$startTime' AND '$endTime'")->find();
+
+            $return[$k]['uv_click_count'] = $uvClickCount['count'];
+
+            $orderCount = $orderModel->field('count(*) as count')->where("create_time BETWEEN '$startTime' AND '$endTime' AND route_id = $v[id]")->find();
+
+            $return[$k]['pv_order_count'] = $orderCount['count'];
+            $return[$k]['uv_order_count'] = $orderCount['count'];
+
+            $orderPay = $orderModel->field('count(*) as count')->where("create_time BETWEEN '$startTime' AND '$endTime' AND route_id = $v[id] AND order_status >= 3")->find();
+
+            $return[$k]['pv_order_pay'] = $orderPay['count'];
+            $return[$k]['uv_order_pay'] = $orderPay['count'];
+
+            //PV转化量
+            if(empty($orderPay['count']) && empty($pvClickCount['count'])){
+                $change = 0;
+            }else{
+                if(empty($pvClickCount['count'])){
+                    $pvClickCount['count'] = 1;
+                }
+
+                if(empty($orderPay['count'])){
+                    $change = 0;
+                }else{
+                    $change = round(($orderPay['count'] / $pvClickCount['count']) * 100);
+                }
+            }
+
+            $return[$k]['pv_change'] = $change;
+
+            $change = 0;
+
+            //UV转化量
+            if(empty($orderPay['count']) && empty($uvClickCount['count'])){
+                $change = 0;
+            }else{
+                if(empty($uvClickCount['count'])){
+                    $uvClickCount['count'] = 1;
+                }
+
+                if(empty($orderPay['count'])){
+                    $change = 0;
+                }else{
+                    $change = round(($orderPay['count'] / $uvClickCount['count']) * 100);
+                }
+            }
+
+            $return[$k]['uv_change'] = $change;
+
+            $pvClickCount['count'] = 0;
+            $uvClickCount['count'] = 0;
+            $orderCount['count'] = 0;
+            $orderPay['count'] = 0;
+
+        }
+
+        return $return;
     }
 
-    public function getChooseTimeRouteData()
-    {
-
-    }
 
     /**
      * @name 获得选择时间线路数据
