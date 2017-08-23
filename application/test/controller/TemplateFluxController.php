@@ -454,22 +454,22 @@ class TemplateFluxController extends BaseController
         $orderModel = new OrderModel();
 
         foreach($tempRouteList as $k=>$v){
-            $return['route_name'] = $v['route_name'];
+            $return[$k]['route_name'] = $v['route_name'];
 
             //线路点击量
             $routeClick = $model->field('count(*) as count')->where("template_route_id = $v[id] AND click_time BETWEEN '$startTime' AND '$endTime'")->find();
 
-            $return['route_click'] = $routeClick['count'];
+            $return[$k]['route_click'] = $routeClick['count'];
 
             //订单量
             $orderCount = $orderModel->field('count(*) as count')->where("id = $v[id] AND create_time BETWEEN '$startTime' AND '$endTime'")->find();
 
-            $return['order_count'] = $orderCount['count'];
+            $return[$k]['order_count'] = $orderCount['count'];
 
             //支付数
             $orderPay = $orderModel->field('count(*) as count')->where("id = $v[id] AND create_time BETWEEN '$startTime' AND '$endTime' AND order_status >= 3")->find();
 
-            $return['order_pay'] = $orderPay['count'];
+            $return[$k]['order_pay'] = $orderPay['count'];
 
             //转化量
             if(empty($orderPay['count']) && empty($routeClick['count'])){
@@ -486,7 +486,7 @@ class TemplateFluxController extends BaseController
                 }
             }
 
-            $return['change'] = $change;
+            $return[$k]['change'] = $change;
 
             $routeClick['count'] = 0;
             $orderCount['count'] = 0;
