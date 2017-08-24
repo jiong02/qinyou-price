@@ -10,20 +10,22 @@ namespace app\components\wechat\wechatpay;
 
 use Endroid\QrCode\QrCode;
 
-class WechatpayQrcodePay
+class WechatpayQrcodePay extends Wechatpay
 {
     const TRADE_TYPE = 'NATIVE';
-    public static $bizContent; //支付参数
-    public static $result; //支付结果
-    public static function pay($outTradeNo, $body, $fee, $productId)
+
+    public function pay($outTradeNo, $body, $fee, $productId)
     {
+        //集成支付信息并发送支付请求
         self::buildPayContent($outTradeNo, $body, $fee, $productId);
-        self::execute();
-        $result = self::payResult();
+        $this->setUrl();
+        $this->setNotifyUrl();
+        $this->execute();
+        $result = $this->payResult();
         return $result;
     }
 
-    public static function buildPayContent($outTradeNo, $body, $fee, $productId)
+    public function buildPayContent($outTradeNo, $body, $fee, $productId)
     {
         //设置支付信息
         $wechatpayContentBuilder = new WechatpayContentBuilder();
@@ -32,26 +34,16 @@ class WechatpayQrcodePay
         $wechatpayContentBuilder->SetBody($body);
         $wechatpayContentBuilder->setTotalFee($fee);
         $wechatpayContentBuilder->setTradeType(self::TRADE_TYPE);
-        $wechatpayContentBuilder->checkPayContent();
+//      $wechatpayContentBuilder->checkPayContent();
         $bizContent = $wechatpayContentBuilder->getBizContent();
-        self::$bizContent = $bizContent;
+        $this->setBizContent($bizContent);
     }
 
-    public static function execute()
-    {
-        //集成支付信息并发送支付请求
-        $wechatpay = new Wechatpay();
-        $wechatpay->setUrl();
-        $wechatpay->setBizContent(self::$bizContent);
-        $result = $wechatpay->execute();
-        self::$result = $result;
-    }
-
-    public static function payResult()
+    public function payResult()
     {
         //接收并分析返回结果
         $wechatpayResult = new WechatpayResult();
-        $wechatpayResult->setResponse(self::$result);
+        $wechatpayResult->setResponse($this->result);
         if($wechatpayResult->status == 'SUCCESS'){
             $qrCode = new QrCode($wechatpayResult->qrCode);
             header('Content-Type: '.$qrCode->getContentType());

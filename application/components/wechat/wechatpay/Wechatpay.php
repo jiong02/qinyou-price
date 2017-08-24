@@ -26,20 +26,16 @@ class Wechatpay
     private $merchantId;
     //随机字符串，不长于32位。推荐随机数生成算法。
     private $nonceString;
-    //接收微信支付异步通知回调地址。
-    private $notifyUrl;
     //APP和网页支付提交用户端ip，Native支付填调用微信支付API的机器IP。
     private $spbillCreateIP;
-
-    private $sign;
-
+    //接收微信支付异步通知回调地址。
     private $url;
-
-    private $unifiedOrderUrl = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
-
+    protected $notifyUrl;
+    protected $sign;
+    protected $unifiedOrderUrl = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
     protected $systemParams = array();
     protected $bizContent = array();
-
+    protected $result;
     public function __construct()
     {
         $this->init();
@@ -108,9 +104,11 @@ class Wechatpay
         return $this->nonceString;
     }
 
-    public function SetNotifyUrl($notifyUrl)
+    public function SetNotifyUrl($notifyUrl = '')
     {
-        $this->notifyUrl = $notifyUrl;
+        if (!$notifyUrl){
+            $notifyUrl = $this->notifyUrl;
+        }
         $this->systemParams['notify_url'] = $notifyUrl;
     }
 
@@ -199,7 +197,6 @@ class Wechatpay
     {
         $this->setAppId($this->appId);
         $this->setMerchantId($this->merchantId);
-        $this->setNotifyUrl($this->notifyUrl);
         if (!$this->getNonceString()){
             $nonceString = Data::generateNonceString();
             $this->setNonceString($nonceString);
@@ -222,6 +219,6 @@ class Wechatpay
         $curl = new Curl();
         $result = $curl->post($this->url,$xmlApiParams);
         $result = Data::formatXmlToArray($result);
-        return $result;
+        $this->result = $result;
     }
 }

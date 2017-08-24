@@ -9,41 +9,35 @@
 namespace app\components\wechat\wechatpay;
 
 
-class WechatpayQuery
+class WechatpayQuery extends Wechatpay
 {
-    private static $url = 'https://api.mch.weixin.qq.com/pay/orderquery';
-    private static $bizContent;
-    private static $result;
+    private $url = 'https://api.mch.weixin.qq.com/pay/orderquery';
 
-    public static function query($outTradeNo)
+    public function query($outTradeNo)
     {
-        self::buildQueryContent($outTradeNo);
-        self::execute();
+        $this->buildQueryContent($outTradeNo);
+        //集成支付信息并发送支付请求
+        $this->setUrl($this->url);
+        $this->setBizContent($this->bizContent);
+        $this->execute();
+        $this->queryResult();
     }
 
-    public static function buildQueryContent($outTradeNo)
+    public function buildQueryContent($outTradeNo)
     {
         //设置支付信息
         $wechatpayContentBuilder = new WechatpayContentBuilder();
         $wechatpayContentBuilder->setOutTradeNo($outTradeNo);
-//        $wechatpayContentBuilder->checkPayContent();
         $bizContent = $wechatpayContentBuilder->getBizContent();
-        self::$bizContent = $bizContent;
+        $this->bizContent = $bizContent;
     }
 
-    public static function execute()
+    public function queryResult()
     {
-        //集成支付信息并发送支付请求
-        $wechatpay = new Wechatpay();
-        $wechatpay->setUrl(self::$url);
-        $wechatpay->setBizContent(self::$bizContent);
-        $result = $wechatpay->execute();
-        halt($result);
-        self::$result = $result;
-    }
-
-    public static function queryResult()
-    {
-
+        $wechatpayResult = new WechatpayResult();
+        $wechatpayResult->setResponse($this->result);
+        halt($wechatpayResult->result);
+        dump($wechatpayResult->status);
+        halt($wechatpayResult->errorMessage);
     }
 }

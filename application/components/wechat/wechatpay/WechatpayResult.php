@@ -36,7 +36,6 @@ class WechatpayResult
         $this->sign = $response['sign'];
         unset($response['sign']);
         $this->result = $response;
-        $this->tradeType = $response['trade_type'];
         $this->errorCode = $response['return_code'];
         $this->errorMessage = $response['return_msg'];
     }
@@ -79,6 +78,7 @@ class WechatpayResult
 
     public function setNativeResponse()
     {
+        $this->tradeType = $this->result['trade_type'];
         $this->qrCode = $this->result['code_url'];
     }
 }

@@ -49,6 +49,8 @@ class Alipay
 
     protected $bizContent = array();
 
+    protected $result; //支付结果
+
     public function __construct()
     {
         $this->init();
@@ -250,6 +252,6 @@ class Alipay
         $curl = new Curl();
         $result = $curl->post($url,$bizContent);
         $result = json_decode($result,true);
-        return $result;
+        $this->result = $result;
     }
 }
