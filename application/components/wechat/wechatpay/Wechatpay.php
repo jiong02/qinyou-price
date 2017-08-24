@@ -30,6 +30,8 @@ class Wechatpay
     private $spbillCreateIP;
     //接收微信支付异步通知回调地址。
     private $url;
+    protected $maxQueryRetry;
+    protected $queryDuration;
     protected $notifyUrl;
     protected $sign;
     protected $unifiedOrderUrl = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
@@ -64,11 +66,19 @@ class Wechatpay
         if (!array_key_exists('notify_url', $config) || checkEmpty($config['notify_url'])){
             throw new Exception('缺少notify_url');
         }
+        if (!array_key_exists('max_query_retry', $config) || checkEmpty($config['max_query_retry'])){
+            throw new Exception('缺少max_query_retry');
+        }
+        if (!array_key_exists('query_duration', $config) || checkEmpty($config['query_duration'])){
+            throw new Exception('缺少query_duration');
+        }
         $this->appId = $config['app_id'];
         $this->appSecret = $config['app_secret'];
         $this->merchantId = $config['merchant_id'];
         $this->key = $config['key'];
         $this->notifyUrl = $config['notify_url'];
+        $this->maxQueryRetry = $config['max_query_retry'];
+        $this->queryDuration = $config['query_duration'];
     }
 
     public function setAppId($appId)

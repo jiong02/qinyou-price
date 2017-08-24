@@ -12,15 +12,16 @@ use Endroid\QrCode\QrCode;
 
 class AliPayQrcodePay extends Alipay
 {
-    public static $method = 'alipay.trade.precreate';
-    public static $responseType =  'alipay_trade_precreate_response';
-    public static function pay($outTradeNo, $body, $fee)
+    private $method = 'alipay.trade.precreate';
+    private $responseType =  'alipay_trade_precreate_response';
+
+    public function pay($outTradeNo, $body, $fee)
     {
-        self::buildPayContent($outTradeNo, $body, $fee);
-        self::setMethod(self::$method);
-        self::execute();
-        self::payResult();
-        return self::$result;
+        $this->buildPayContent($outTradeNo, $body, $fee);
+        $this->setMethod($this->method);
+        $this->execute();
+        $result = $this->payResult();
+        return $result;
     }
 
     public function buildPayContent($outTradeNo, $body, $fee)
@@ -38,14 +39,14 @@ class AliPayQrcodePay extends Alipay
     {
         //接收并分析返回结果
         $alipayResult = new AlipayResult();
-        $alipayResult->setResponse($this->result,self::$responseType);
-        if($alipayResult->status == 'SUCCESS'){
-            $qrCode = new QrCode($alipayResult->qrCode);
-            header('Content-Type: '.$qrCode->getContentType());
+        $alipayResult->setResponse($this->result,$this->responseType);
+        if($alipayResult->getStatus() == $alipayResult::STATUS_SUCCESS){
+            $qrCode = new QrCode($alipayResult->getQrCode());
+            header('Content-Type: ' . $qrCode->getContentType());
             echo $qrCode->writeString();
             exit;
         }else{
-            return getError($alipayResult->errorMessage);
+            return getError($alipayResult->getErrorMessage());
         }
     }
 }

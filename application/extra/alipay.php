@@ -38,8 +38,8 @@ return [
     'app_auth_token' => "",
 
     //最大查询重试次数
-    'max_query_retry' => "10",
+    'max_query_retry' => "5",
 
     //查询间隔
-    'query_duration' => "3",
+    'query_duration' => "2",
 ];

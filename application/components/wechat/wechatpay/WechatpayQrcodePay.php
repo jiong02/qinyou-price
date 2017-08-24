@@ -44,13 +44,13 @@ class WechatpayQrcodePay extends Wechatpay
         //接收并分析返回结果
         $wechatpayResult = new WechatpayResult();
         $wechatpayResult->setResponse($this->result);
-        if($wechatpayResult->status == 'SUCCESS'){
-            $qrCode = new QrCode($wechatpayResult->qrCode);
+        if($wechatpayResult->getStatus() == 'SUCCESS'){
+            $qrCode = new QrCode($wechatpayResult->getQrCode());
             header('Content-Type: '.$qrCode->getContentType());
             echo $qrCode->writeString();
             exit;
         }else{
-            return getError($wechatpayResult->errorMessage);
+            return getError($wechatpayResult->getErrorMessage());
         }
     }
 }

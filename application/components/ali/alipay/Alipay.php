@@ -27,7 +27,7 @@ class Alipay
     //异步通知地址,只有扫码支付预下单可用
     protected $notifyUrl;
     //接口名称
-    protected $method;
+    private $method;
     //签名算法类型
     protected $signType;
     //编码格式
@@ -202,6 +202,7 @@ class Alipay
 
     protected function generateSign($data)
     {
+        unset($data['sign']);
         ksort($data);
         $data = Data::toUrlParams($data);
         $sign = $this->sign($data);

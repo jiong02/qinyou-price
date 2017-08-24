@@ -9,6 +9,8 @@
 namespace app\components\wechat\wechatpay;
 
 
+use think\Exception;
+
 class WechatpayQuery extends Wechatpay
 {
     private $url = 'https://api.mch.weixin.qq.com/pay/orderquery';
@@ -20,7 +22,7 @@ class WechatpayQuery extends Wechatpay
         $this->setUrl($this->url);
         $this->setBizContent($this->bizContent);
         $this->execute();
-        $this->queryResult();
+        return $this->queryResult();
     }
 
     public function buildQueryContent($outTradeNo)
@@ -36,8 +38,42 @@ class WechatpayQuery extends Wechatpay
     {
         $wechatpayResult = new WechatpayResult();
         $wechatpayResult->setResponse($this->result);
-        halt($wechatpayResult->result);
-        dump($wechatpayResult->status);
-        halt($wechatpayResult->errorMessage);
+        if($wechatpayResult->getStatus() == $wechatpayResult::SUCCESS){
+
+        }else{
+            return getError($wechatpayResult->getErrorCode());
+        }
+    }
+
+    public function loopQuery($outTradeNo)
+    {
+        $wechatpayResult = new WechatpayResult();
+        for ($i = 0; $i < $this->maxQueryRetry; $i++){
+            try{
+                sleep($this->queryDuration);
+            }catch (Exception $e){
+                $wechatpayResult->setStatus($wechatpayResult::FAIL);
+                $wechatpayResult->setErrorCode($e->getCode());
+                $wechatpayResult->setErrorMessage($e->getMessage());
+            }
+            $this->buildQueryContent($outTradeNo);
+            $this->setUrl($this->url);
+            $this->setBizContent($this->bizContent);
+            $this->execute();
+            $wechatpayResult->setResponse($this->result);
+            if($wechatpayResult->stopQuery()){
+                return $this->loopQueryResult($wechatpayResult);
+            }
+        }
+        return $this->loopQueryResult($wechatpayResult);
+    }
+
+    public function loopQueryResult($wechatpayResult)
+    {
+        if($wechatpayResult->getStatus() == $wechatpayResult::SUCCESS){
+
+        }else{
+            return getError($wechatpayResult->getErrorCode());
+        }
     }
 }

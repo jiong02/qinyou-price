@@ -11,70 +11,211 @@ namespace app\components\ali\alipay;
 
 class AlipayResult
 {
-    public $errorCode;
-    public $errorMessage;
-    public $outTradeNo;
-    public $tradeType;
-    public $sign;
-    public $status;
-    public $result;
-    public $subCode;
-    public $subMessage;
+    private $errorCode;
+    private $errorMessage;
+    private $responseType;
+    private $sign;
+    private $status;
+    private $result;
+    private $subCode;
+    private $subMessage;
 
-    public $qrCode;
+    private $outTradeNo;
+    private $qrCode;
+    private $tradeStatus;
 
     const CODE_SUCCESS = 10000;
-    const ERR_CHECK_SIGN = 40001;
-    const PRE_CREATE = 'alipay_trade_precreate_response';
+    const ERR_CHECK_SIGN_CODE = 40001;
+    const ERR_CHECK_SIGN_MESSAGE = '签名检验失败';
+
+    const RESPONSE_QUERY = 'alipay_trade_precreate_response';
+    const RESPONSE_PRE_CREATE = 'alipay_trade_precreate_response';
+    const RESPONSE_REFUND = 'alipay_trade_precreate_response';
+
+    const TRADE_FINISHED = 'TRADE_FINISHED';
+    const TRADE_SUCCESS = 'TRADE_SUCCESS';
+    const TRADE_CLOSED = 'TRADE_CLOSED';
+
     const STATUS_SUCCESS = 'SUCCESS';
     const STATUS_FAIL = 'FAIL';
 
-    public function setCommonResponse($response)
+    public function setErrorCode($errorCode)
     {
-        $result = $response[$this->tradeType];
-        $this->sign = $response['sign'];
-        $this->result = $result;
-        $this->errorCode = $result['code'];
-        $this->errorMessage = $result['msg'];
+        $this->errorCode = $errorCode;
     }
 
-    public function setResponse($response, $tradeType)
+    public function getErrorCode()
     {
-        $this->tradeType = $tradeType;
+        return $this->errorCode;
+    }
+
+    public function setErrorMessage($errorMessage)
+    {
+        $this->errorMessage = $errorMessage;
+    }
+
+    public function getErrorMessage()
+    {
+        return $this->errorMessage;
+    }
+
+    public function setOutTradeNo($outTradeNo)
+    {
+        $this->outTradeNo = $outTradeNo;
+    }
+
+    public function getOutTradeNo()
+    {
+        return $this->outTradeNo;
+    }
+
+    public function setResponseType($responseType)
+    {
+        $this->responseType = $responseType;
+    }
+
+    public function getResponseType()
+    {
+        return $this->responseType;
+    }
+
+    public function setTradeStatus($tradeStatus)
+    {
+        $this->tradeStatus = $tradeStatus;
+    }
+
+    public function getTradeStatus()
+    {
+        return $this->tradeStatus;
+    }
+
+    public function setSign($sign)
+    {
+        $this->sign = $sign;
+    }
+
+    public function getSign()
+    {
+        return $this->sign;
+    }
+
+    public function setStatus($status)
+    {
+        $this->status = $status;
+    }
+
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    public function setResult($result)
+    {
+        $this->result = $result;
+    }
+
+    public function getResult()
+    {
+        return $this->result;
+    }
+
+    public function setSubCode($subCode)
+    {
+        $this->subCode = $subCode;
+    }
+
+    public function getSubCode()
+    {
+        return $this->subCode;
+    }
+
+    public function setSubMessage($subMessage)
+    {
+        $this->subMessage = $subMessage;
+    }
+
+    public function getSubMessage()
+    {
+        return $this->subMessage;
+    }
+
+    public function setQrCode($qrCode)
+    {
+        $this->qrCode = $qrCode;
+    }
+
+    public function getQrCode()
+    {
+        return $this->qrCode;
+    }
+
+    public function setCommonResponse($response)
+    {
+        $result = $response[$this->getResponseType()];
+        $this->setSign($response['sign']);
+        $this->setResult($result);
+        $this->setErrorCode($result['code']);
+        $this->setErrorMessage($result['msg']);
+    }
+
+    public function setResponse($response, $responseType)
+    {
+        $this->setResponseType($responseType);
         $this->setCommonResponse($response);
         $alipay = new Alipay();
-        $signData = $alipay->formatSignData($this->result);
-        $result = $alipay->verifySign($signData, $this->sign);
+        $signData = $alipay->formatSignData($this->getResult());
+        $result = $alipay->verifySign($signData, $this->getSign());
         if ($result){
-            if ($this->errorCode == self::CODE_SUCCESS) {
+            if ($this->getErrorCode() == self::CODE_SUCCESS) {
                 $this->setSuccessResponse();
             }else{
                 $this->setFailResponse();
             }
         }else{
-            $this->status = self::STATUS_FAIL;
-            $this->subCode = self::ERR_CHECK_SIGN;
-            $this->subMessage = '签名校验失败';
+            $this->setStatus(self::STATUS_FAIL);
+            $this->setSubCode(self::ERR_CHECK_SIGN_CODE);
+            $this->setSubMessage(self::ERR_CHECK_SIGN_MESSAGE);
         }
     }
 
     public function setSuccessResponse()
     {
-        $this->status = self::STATUS_SUCCESS;
-        $this->outTradeNo = $this->result['out_trade_no'];
-        if ($this->tradeType == self::PRE_CREATE) {
+        $this->setStatus(self::STATUS_SUCCESS);
+        $this->setOutTradeNo($this->result['out_trade_no']);
+        if ($this->getResponseType() == self::RESPONSE_PRE_CREATE) {
             $this->setPreCreateResponse();
+        }elseif($this->getResponseType() == self::RESPONSE_QUERY){
+            $this->setQueryResponse();
+        }elseif($this->getResponseType() == self::RESPONSE_REFUND){
+
         }
     }
     public function setFailResponse()
     {
-        $this->status = self::STATUS_FAIL;
-        $this->subCode = $this->result['sub_code'];
-        $this->subMessage = $this->result['sub_msg'];
+        $this->setStatus(self::STATUS_FAIL);
+        $this->setSubCode($this->result['sub_code']);
+        $this->setSubMessage($this->result['sub_msg']);
     }
 
     public function setPreCreateResponse()
     {
-        $this->qrCode = $this->result['qr_code'];
+        $this->setQrCode($this->result['qr_code']);
+    }
+
+    public function setQueryResponse()
+    {
+        $this->SetTradeStatus($this->result['trade_status']);
+    }
+
+    // 判断是否停止查询
+    public function stopQuery(){
+        if($this->errorCode == self::CODE_SUCCESS){
+            if($this->getTradeStatus() == self::TRADE_FINISHED ||
+                $this->getTradeStatus() == self::TRADE_SUCCESS ||
+                $this->getTradeStatus() == self::TRADE_CLOSED){
+                return true;
+            }
+        }
+        return false;
     }
 }

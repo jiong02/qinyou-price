@@ -125,4 +125,12 @@ class Data
         $time = $time2[0];
         return $time;
     }
+
+    /**
+     * 获取32位唯一字符串
+     */
+    public static function getUniqueString()
+    {
+        return md5(uniqid(mt_rand(), true));
+    }
 }

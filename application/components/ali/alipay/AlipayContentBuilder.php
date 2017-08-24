@@ -62,6 +62,11 @@ class AlipayContentBuilder
     // (推荐使用，相对时间) 支付超时时间，5m 5分钟
     private $timeExpress;
 
+    /**
+     * 退款接口参数
+     */
+    private $refundAmount;
+    private $outRequestNo;
     private $bizContent;
 
     public function getAuthCode()
@@ -231,5 +236,30 @@ class AlipayContentBuilder
     public function getBizContent()
     {
         return $this->bizContent;
+    }
+
+    /**
+     * 退款接口参数
+     */
+    public function getRefundAmount()
+    {
+        return $this->refundAmount;
+    }
+
+    public function setRefundAmount($refundAmount)
+    {
+        $this->refundAmount = $refundAmount;
+        $this->bizContent['refund_amount'] = $refundAmount;
+    }
+
+    public function getOutRequestNo()
+    {
+        return $this->outRequestNo;
+    }
+
+    public function setOutRequestNo($outRequestNo)
+    {
+        $this->outRequestNo = $outRequestNo;
+        $this->bizContent['out_request_no'] = $outRequestNo;
     }
 }

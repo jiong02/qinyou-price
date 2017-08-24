@@ -20,4 +20,8 @@ return [
     'ssl_key_path' => '../cert/apiclient_key.pem',
     //回调通知接口
     'notify_url' => 'www.baidu.com',
+    //最大查询重试次数
+    'max_query_retry' => "5",
+    //查询间隔
+    'query_duration' => "2",
 ];

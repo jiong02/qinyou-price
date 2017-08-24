@@ -88,7 +88,11 @@ Route::domain('test', function(){
     /*
      * 测试
      */
-    Route::any('ceshi','ims/Index/index');
+    Route::any('alipayQrcodePay','ims/Index/alipayQrcodePay');
+    Route::any('alipayQuery','ims/Index/alipayQuery');
+    Route::any('alipayRefund','ims/Index/alipayRefund');
+    Route::any('wechatQrcodePay','ims/Index/wechatQrcodePay');
+    Route::any('wechatQuery','ims/Index/wechatQuery');
 });
 
 

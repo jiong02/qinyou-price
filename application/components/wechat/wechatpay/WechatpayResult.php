@@ -11,33 +11,136 @@ namespace app\components\wechat\wechatpay;
 
 class WechatpayResult
 {
-    public $errorCode;
-    public $errorMessage;
-    public $outTradeNo;
-    public $tradeType;
-    public $sign;
-    public $status;
-    public $result;
-    public $subCode;
-    public $subMessage;
+    private $errorCode;
+    private $errorMessage;
+    private $responseType;
+    private $sign;
+    private $status;
+    private $result;
 
-    public $qrCode;
-
-    const CODE_SUCCESS = 10000;
+    private $outTradeNo;
+    private $tradeStatus;
+    private $qrCode;
 
     const NATIVE = 'NATIVE';
+    const QUERY = 'QUERY';
+
+    const TRADE_SUCCESS = 'SUCCESS';
+    const TRADE_REFUND = 'REFUND';
+    const TRADE_NOTPAY = 'NOTPAY';
+    const TRADE_CLOSED = 'CLOSED';
+    const TRADE_REVOKED = 'REVOKED';
+    const TRADE_USERPAYING = 'USERPAYING';
+    const TRADE_PAYERROR = 'PAYERROR';
+
     const SUCCESS = 'SUCCESS';
     const FAIL = 'FAIL';
+
     const ERR_CHECK_SIGN_CODE = 'SIGNERROR';
     const ERR_CHECK_SIGN_MESSAGE = '签名检验失败';
 
+    public function setErrorCode($errorCode)
+    {
+        $this->errorCode = $errorCode;
+    }
+
+    public function getErrorCode()
+    {
+        return $this->errorCode;
+    }
+
+    public function setErrorMessage($errorMessage)
+    {
+        $this->errorMessage = $errorMessage;
+    }
+
+    public function getErrorMessage()
+    {
+        return $this->errorMessage;
+    }
+
+    public function setOutTradeNo($outTradeNo)
+    {
+        $this->outTradeNo = $outTradeNo;
+    }
+
+    public function getOutTradeNo()
+    {
+        return $this->outTradeNo;
+    }
+
+    public function setResponseType($responseType)
+    {
+        $this->responseType = $responseType;
+    }
+
+    public function getResponseType()
+    {
+        return $this->responseType;
+    }
+
+    public function setTradeStatus($tradeStatus)
+    {
+        $this->tradeStatus = $tradeStatus;
+    }
+
+    public function getTradeStatus()
+    {
+        return $this->tradeStatus;
+    }
+
+    public function setSign($sign)
+    {
+        $this->sign = $sign;
+    }
+
+    public function getSign()
+    {
+        return $this->sign;
+    }
+
+    public function setStatus($status)
+    {
+        $this->status = $status;
+    }
+
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    public function setResult($result)
+    {
+        $this->result = $result;
+    }
+
+    public function getResult()
+    {
+        return $this->result;
+    }
+
+    public function setQrCode($qrCode)
+    {
+        $this->qrCode = $qrCode;
+    }
+
+    public function getQrCode()
+    {
+        return $this->qrCode;
+    }
+
     public function setCommonResponse($response)
     {
-        $this->sign = $response['sign'];
+        $this->setSign($response['sign']);
         unset($response['sign']);
-        $this->result = $response;
-        $this->errorCode = $response['return_code'];
-        $this->errorMessage = $response['return_msg'];
+        $this->setResult($response);
+        if (array_key_exists('trade_type',$response)){
+            $this->setResponseType($response['trade_type']);
+        }else{
+            $this->setResponseType(self::QUERY);
+        }
+        $this->setErrorCode($response['return_code']);
+        $this->setErrorMessage($response['return_msg']);
     }
 
     public function setResponse($response)
@@ -58,27 +161,50 @@ class WechatpayResult
         }else{
             $this->setFailResponse($response['return_code'], $response['return_msg']);
         }
-
     }
 
     public function setSuccessResponse()
     {
-        $this->status = self::SUCCESS;
-        if ($this->tradeType == self::NATIVE){
+        $this->setStatus(self::SUCCESS);
+        if ($this->getResponseType() == self::NATIVE){
             $this->setNativeResponse();
+        }elseif($this->getResponseType() == self::QUERY){
+            $this->setQueryResponse();
         }
     }
 
     public function setFailResponse($errorCode = '', $errorMessage = '')
     {
-        $this->status = self::FAIL;
-        $this->errorCode = $errorCode ? $errorCode : $this->result['err_code'];
-        $this->errorMessage = $errorMessage ? $errorMessage : $this->result['err_code_des'];
+        $errorCode =  $errorCode ? $errorCode : $this->result['err_code'];
+        $errorMessage = $errorMessage ? $errorMessage : $this->result['err_code_des'];
+        $this->setStatus(self::FAIL);
+        $this->setErrorCode($errorCode);
+        $this->setErrorMessage($errorMessage);
     }
 
     public function setNativeResponse()
     {
-        $this->tradeType = $this->result['trade_type'];
-        $this->qrCode = $this->result['code_url'];
+        $this->setQrCode($this->result['code_url']);
+    }
+
+    public function setQueryResponse()
+    {
+        if ($this->result['trade_state'] != self::SUCCESS){
+            $this->setStatus(self::FAIL);
+        }
+        $this->setErrorCode($this->result['trade_state']);
+        $this->setErrorMessage($this->result['trade_state_desc']);
+        $this->setOutTradeNo($this->result['out_trade_no']);
+        $this->setTradeStatus($this->result['trade_state']);
+    }
+
+    // 判断是否停止查询
+    public function stopQuery(){
+        if($this->getResult()['result_code'] == self::SUCCESS){
+            if($this->getTradeStatus() == self::TRADE_NOTPAY || $this->getTradeStatus() == self::TRADE_USERPAYING){
+                return false;
+            }
+        }
+        return true;
     }
 }
