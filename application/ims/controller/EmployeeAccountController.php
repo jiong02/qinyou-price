@@ -3,7 +3,7 @@
 namespace app\ims\controller;
 
 use app\components\Data;
-use app\components\wechat\WechatEnterprise\WechatEnterpriseSendMessage;
+use app\components\wechat\wechatEnterprise\WechatEnterpriseSendMessage;
 use app\ims\model\EmployeeAccountModel;
 use app\ims\model\EmployeeModel;
 use think\Cache;
