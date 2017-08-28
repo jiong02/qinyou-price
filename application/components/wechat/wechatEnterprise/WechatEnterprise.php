@@ -10,6 +10,7 @@ namespace app\components\wechat\wechatEnterprise;
 
 
 use app\components\Curl;
+use app\components\Data;
 use think\Cache;
 use think\Config;
 
@@ -64,6 +65,7 @@ class WechatEnterprise
         $params['corpsecret'] = $this->secret;
         $url = 'https://qyapi.weixin.qq.com/cgi-bin/gettoken';
         $curl = new Curl();
+        $params = Data::toUrlParams($params);
         $result = $curl->get($url, $params);
         $result = $this->formatResult($result);
         if ($this->status == self::SUCCESS){

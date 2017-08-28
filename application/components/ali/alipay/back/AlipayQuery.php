@@ -18,7 +18,6 @@ use think\Exception;
 class AlipayQuery extends Alipay
 {
     private $method = 'alipay.trade.query';
-    private $responseType = 'alipay_trade_query_response';
 
     public function query($outTradeNo)
     {
@@ -40,6 +39,7 @@ class AlipayQuery extends Alipay
     {
         //接收并分析返回结果
         $alipayResult = new AlipayResult();
+        $this->setResponseType($this->method);
         $alipayResult->setResponse($this->result,$this->responseType);
         if($alipayResult->getStatus() == 'SUCCESS'){
 

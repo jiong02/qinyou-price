@@ -1,265 +1,284 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: ZYone
- * Date: 2017/8/15
- * Time: 16:22
+ * Date: 2017/8/27
+ * Time: 14:33
  */
 
 namespace app\components\ali\alipay;
 
-use think\Exception;
-
 class AlipayContentBuilder
 {
-    //支付授权码,用户支付宝钱包app点击"付款",在条码下对应的一串数字
-    private $authCode;
-    // 商户网站订单系统中唯一订单号，64个字符以内，只能包含字母、数字、下划线，
-    // 需保证商户系统端不能重复，建议通过数据库sequence生成，
     private $outTradeNo;
-
-    // 卖家支付宝账号ID，用于支持一个签约账号下支持打款到不同的收款账号，(打款到sellerId对应的支付宝账号)
-    // 如果该字段为空，则默认为与支付宝签约的商户的PID，也就是appid对应的PID
     private $sellerId;
-
-    // 订单总金额，整形，此处单位为元，精确到小数点后2位，不能超过1亿元
-    // 如果同时传入了【打折金额】,【不可打折金额】,【订单总金额】三者,则必须满足如下条件:【订单总金额】=【打折金额】+【不可打折金额】
     private $totalAmount;
-
-    // 订单可打折金额，此处单位为元，精确到小数点后2位
-    // 可以配合商家平台配置折扣活动，如果订单部分商品参与打折，可以将部分商品总价填写至此字段，默认全部商品可打折
-    // 如果该值未传入,但传入了【订单总金额】,【不可打折金额】 则该值默认为【订单总金额】- 【不可打折金额】
     private $discountableAmount;
-
-    // 订单不可打折金额，此处单位为元，精确到小数点后2位，可以配合商家平台配置折扣活动，如果酒水不参与打折，则将对应金额填写至此字段
-    // 如果该值未传入,但传入了【订单总金额】,【打折金额】,则该值默认为【订单总金额】-【打折金额】
-    private $undiscountableAmount;
-
-    // 订单标题，粗略描述用户的支付目的。如“XX品牌XXX门店消费”
     private $subject;
-
-    // 订单描述，可以对交易或商品进行一个详细地描述，比如填写"购买商品2件共15.00元"
     private $body;
-
-    // 商品明细列表，需填写购买商品详细信息，
-    private $goodsDetailList = array();
-
-    // 商户操作员编号，添加此参数可以为商户操作员做销售统
+    private $goodsDetail = array();
     private $operatorId;
-
-    // 商户门店编号，通过门店号和商家后台可以配置精准到门店的折扣信息，详询支付宝技术支持
     private $storeId;
-
-    // 支付宝商家平台中配置的商户门店号，详询支付宝技术支持
-    private $alipayStoreId;
-
-    // 商户机具终端编号，当以机具方式接入支付宝时必传，详询支付宝技术支持
     private $terminalId;
-
-    // 业务扩展参数，目前可添加由支付宝分配的系统商编号(通过setSysServiceProviderId方法)，详情请咨询支付宝技术支持
     private $extendParams = array();
+    private $timeoutExpress;
 
-    // (推荐使用，相对时间) 支付超时时间，5m 5分钟
-    private $timeExpress;
-
-    /**
-     * 退款接口参数
-     */
+    //退款接口参数
     private $refundAmount;
     private $outRequestNo;
-    private $bizContent;
 
-    public function getAuthCode()
-    {
-        return $this->authCode;
-    }
+    private $bizParams = array();
 
-    public function setAuthCode($authCode)
-    {
-        $this->authCode = $authCode;
-        $this->bizContent['auth_code'] = $authCode;
-    }
-
-    public function setOutTradeNo($outTradeNo)
-    {
-        $this->outTradeNo = $outTradeNo;
-        $this->bizContent['out_trade_no'] = $outTradeNo;
-    }
+    private $bizContent = NULL;
+    /**
+     * @return mixed
+     */
     public function getOutTradeNo()
     {
         return $this->outTradeNo;
     }
 
-    public function setSellerId($sellerId)
+    /**
+     * @param mixed $outTradeNo
+     */
+    public function setOutTradeNo($outTradeNo)
     {
-        $this->sellerId = $sellerId;
-        $this->bizContent['seller_id'] = $sellerId;
+        $this->outTradeNo = $outTradeNo;
+        $this->bizParams['out_trade_no'] = $outTradeNo;
     }
 
+    /**
+     * @return mixed
+     */
     public function getSellerId()
     {
         return $this->sellerId;
     }
 
-    public function setTotalAmount($totalAmount)
+    /**
+     * @param mixed $sellerId
+     */
+    public function setSellerId($sellerId)
     {
-        $this->totalAmount = $totalAmount;
-        $this->bizContent['total_amount'] = $totalAmount;
+        $this->sellerId = $sellerId;
+        $this->bizParams['seller_id'] = $sellerId;
     }
 
+    /**
+     * @return mixed
+     */
     public function getTotalAmount()
     {
         return $this->totalAmount;
     }
 
-    public function setDiscountableAmount($discountableAmount)
+    /**
+     * @param mixed $totalAmount
+     */
+    public function setTotalAmount($totalAmount)
     {
-        $this->discountableAmount = $discountableAmount;
-        $this->bizContent['discountable_amount'] = $discountableAmount;
+        $this->totalAmount = $totalAmount;
+        $this->bizParams['total_amount'] = $totalAmount;
     }
 
+    /**
+     * @return mixed
+     */
     public function getDiscountableAmount()
     {
         return $this->discountableAmount;
     }
 
-    public function setUndiscountableAmount($undiscountableAmount)
+    /**
+     * @param mixed $discountableAmount
+     */
+    public function setDiscountableAmount($discountableAmount)
     {
-        $this->undiscountableAmount = $undiscountableAmount;
-        $this->bizContent['undiscountable_amount'] = $undiscountableAmount;
+        $this->discountableAmount = $discountableAmount;
+        $this->bizParams['discountable_amount'] = $discountableAmount;
     }
 
-    public function getUndiscountableAmount()
-    {
-        return $this->undiscountableAmount;
-    }
-
-    public function setSubject($subject)
-    {
-        $this->subject = $subject;
-        $this->bizContent['subject'] = $subject;
-    }
-
+    /**
+     * @return mixed
+     */
     public function getSubject()
     {
         return $this->subject;
     }
 
-    public function setBody($body)
+    /**
+     * @param mixed $subject
+     */
+    public function setSubject($subject)
     {
-        $this->body = $body;
-        $this->bizContent['body'] = $body;
+        $this->subject = $subject;
+        $this->bizParams['subject'] = $subject;
     }
 
+    /**
+     * @return mixed
+     */
     public function getBody()
     {
         return $this->body;
     }
 
-    public function setOperatorId($operatorId)
+    /**
+     * @param mixed $body
+     */
+    public function setBody($body)
     {
-        $this->operatorId = $operatorId;
-        $this->bizContent['operator_id'] = $operatorId;
+        $this->body = $body;
+        $this->bizParams['body'] = $body;
     }
 
+    /**
+     * @return array
+     */
+    public function getGoodsDetail()
+    {
+        return $this->goodsDetail;
+    }
+
+    /**
+     * @param array $bizParams
+     */
+    public function setGoodsDetail($goodsDetail)
+    {
+        $this->goodsDetail = $goodsDetail;
+        $this->bizParams['goods_detail'] = $goodsDetail;
+    }
+
+    /**
+     * @return mixed
+     */
     public function getOperatorId()
     {
         return $this->operatorId;
     }
 
-    public function setStoreId($storeId)
+    /**
+     * @param mixed $operatorId
+     */
+    public function setOperatorId($operatorId)
     {
-        $this->storeId = $storeId;
-        $this->bizContent['store_id'] = $storeId;
+        $this->operatorId = $operatorId;
+        $this->bizParams['operator_id'] = $operatorId;
     }
 
+    /**
+     * @return mixed
+     */
     public function getStoreId()
     {
         return $this->storeId;
     }
 
-    public function setTerminalId($terminalId)
+    /**
+     * @param mixed $storeId
+     */
+    public function setStoreId($storeId)
     {
-        $this->terminalId = $terminalId;
-        $this->bizContent['terminal_id'] = $terminalId;
+        $this->storeId = $storeId;
+        $this->bizParams['store_id'] = $storeId;
     }
 
+    /**
+     * @return mixed
+     */
     public function getTerminalId()
     {
         return $this->terminalId;
     }
 
-    public function setTimeExpress($timeExpress)
+    /**
+     * @param mixed $terminalId
+     */
+    public function setTerminalId($terminalId)
     {
-        $this->timeExpress = $timeExpress;
-        $this->bizContent['timeout_express'] = $timeExpress;
+        $this->terminalId = $terminalId;
+        $this->bizParams['terminal_id'] = $terminalId;
     }
 
-    public function getTimeExpress()
-    {
-        return $this->timeExpress;
-    }
-
-    public function getAlipayStoreId()
-    {
-        return $this->alipayStoreId;
-    }
-
-    public function setAlipayStoreId($alipayStoreId)
-    {
-        $this->alipayStoreId = $alipayStoreId;
-        $this->bizContent['alipay_store_id'] = $alipayStoreId;
-    }
-
+    /**
+     * @return array
+     */
     public function getExtendParams()
     {
         return $this->extendParams;
     }
 
+    /**
+     * @param array $bizParams
+     */
     public function setExtendParams($extendParams)
     {
         $this->extendParams = $extendParams;
-        $this->bizContent['extend_params'] = $extendParams;
-    }
-
-    public function getGoodsDetailList()
-    {
-        return $this->goodsDetailList;
-    }
-
-    public function setGoodsDetailList($goodsDetailList)
-    {
-        $this->goodsDetailList = $goodsDetailList;
-        $this->bizContent['goods_detail'] = $goodsDetailList;
-    }
-
-    public function getBizContent()
-    {
-        return $this->bizContent;
+        $this->bizParams['extend_params'] = $extendParams;
     }
 
     /**
-     * 退款接口参数
+     * @return mixed
+     */
+    public function getTimeoutExpress()
+    {
+        return $this->timeoutExpress;
+    }
+
+    /**
+     * @param mixed $timeoutExpress
+     */
+    public function setTimeoutExpress($timeoutExpress)
+    {
+        $this->timeoutExpress = $timeoutExpress;
+        $this->bizParams['timeout_express'] = $timeoutExpress;
+    }
+
+    /**
+     * @return mixed
      */
     public function getRefundAmount()
     {
         return $this->refundAmount;
     }
 
+    /**
+     * @param mixed $refundAmount
+     */
     public function setRefundAmount($refundAmount)
     {
         $this->refundAmount = $refundAmount;
-        $this->bizContent['refund_amount'] = $refundAmount;
+        $this->bizParams['refund_amount'] = $refundAmount;
     }
 
+    /**
+     * @return mixed
+     */
     public function getOutRequestNo()
     {
         return $this->outRequestNo;
     }
 
+    /**
+     * @param mixed $outRequestNo
+     */
     public function setOutRequestNo($outRequestNo)
     {
         $this->outRequestNo = $outRequestNo;
-        $this->bizContent['out_request_no'] = $outRequestNo;
+        $this->bizParams['out_request_no'] = $outRequestNo;
     }
+
+    /**
+     * @return null or json
+     */
+    public function getBizContent()
+    {
+        if(!empty($this->bizParams)){
+            $this->bizContent = json_encode($this->bizParams,JSON_UNESCAPED_UNICODE);
+        }
+        return $this->bizContent;
+    }
+
+
 }

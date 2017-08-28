@@ -13,7 +13,6 @@ use Endroid\QrCode\QrCode;
 class AliPayQrcodePay extends Alipay
 {
     private $method = 'alipay.trade.precreate';
-    private $responseType =  'alipay_trade_precreate_response';
 
     public function pay($outTradeNo, $body, $fee)
     {
@@ -39,6 +38,7 @@ class AliPayQrcodePay extends Alipay
     {
         //接收并分析返回结果
         $alipayResult = new AlipayResult();
+        $this->setResponseType($this->method);
         $alipayResult->setResponse($this->result,$this->responseType);
         if($alipayResult->getStatus() == $alipayResult::STATUS_SUCCESS){
             $qrCode = new QrCode($alipayResult->getQrCode());

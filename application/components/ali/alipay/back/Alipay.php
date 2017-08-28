@@ -51,6 +51,8 @@ class Alipay
 
     protected $result; //支付结果
 
+    protected $responseType;
+
     public function __construct()
     {
         $this->init();
@@ -200,6 +202,16 @@ class Alipay
         return $this->bizContent;
     }
 
+    public function setResponseType($method)
+    {
+        $this->responseType = str_replace('.', '_', $method) . '_response';
+    }
+
+    public function getResponseType()
+    {
+        return $this->responseType;
+    }
+
     protected function generateSign($data)
     {
         unset($data['sign']);
@@ -250,9 +262,17 @@ class Alipay
         $systemParams = $this->getSystemParams();
         $gateWayUrl = $this->getGatewayUrl();
         $url = $gateWayUrl . '?' . http_build_query($systemParams);
+        $this->curl($url, $bizContent);
+    }
+
+    public function curl($url, $bizContent)
+    {
         $curl = new Curl();
-        $result = $curl->post($url,$bizContent);
-        $result = json_decode($result,true);
-        $this->result = $result;
+        $curl->post($url,$bizContent);
+        if ($curl->getStatus() == $curl::STATUS_SUCCESS){
+            $result = json_decode($curl->getResult(),true);
+            $curl->setResult($result);
+        }
+        $this->result = $curl->getResponse();
     }
 }

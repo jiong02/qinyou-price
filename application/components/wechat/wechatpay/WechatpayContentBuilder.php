@@ -11,133 +11,216 @@ namespace app\components\wechat\wechatpay;
 use think\Exception;
 class WechatpayContentBuilder
 {
-    //商品或支付单简要描述。
+    private $deviceInfo;
     private $body;
-    //附加数据，在查询API和支付通知中原样返回，该字段主要用于商户携带订单的自定义数据。
+    private $detail;
     private $attach;
-    //商户系统内部的订单号,32个字符内、可包含字母, 其他说明见商户订单号。
     private $outTradeNo;
-    //订单总金额，只能为整数，详见支付金额。
+    private $feeType;
     private $totalFee;
-    //取值如下：JSAPI，NATIVE，APP，详细说明见参数规定。
+    private $timeStart;
+    private $timeExpire;
+    private $goodsTag;
     private $tradeType;
-    //trade_type=NATIVE，此参数必传。此id为二维码中包含的商品ID，商户自行定义。
     private $productId;
-    //trade_type=JSAPI，此参数必传，用户在商户appid下的唯一标识。下单前需要调用【网页授权获取用户信息】接口获取到用户的Openid 。
+    private $limitPay;
     private $openid;
-
+    private $sceneInfo;
+    private $tradType;
+    //APP和网页支付提交用户端ip，Native支付填调用微信支付API的机器IP
+    private $spbillCreateIp;
+    //异步接收微信支付结果通知的回调地址，通知url必须为外网可访问的url，不能携带参数。
+    private $notifyUrl;
+    //退款金额
+    private $refundFee;
+    //退款单号
+    private $outRefundNo;
     protected $bizContent;
 
-    const NATIVE = 'NATIVE';
-    const JSAPI = 'JSAPI';
+    /**
+     * @param mixed $deviceInfo
+     */
+    public function setDeviceInfo($deviceInfo)
+    {
+        $this->deviceInfo = $deviceInfo;
+        $this->bizContent['device_info'] = $deviceInfo;
+    }
 
+    /**
+     * @param mixed $body
+     */
     public function setBody($body)
     {
         $this->body = $body;
         $this->bizContent['body'] = $body;
     }
 
-    public function getBody()
+    /**
+     * @param mixed $detail
+     */
+    public function setDetail($detail)
     {
-        return $this->body;
+        $this->detail = $detail;
+        $this->bizContent['detail'] = $detail;
     }
 
+    /**
+     * @param mixed $attach
+     */
     public function setAttach($attach)
     {
         $this->attach = $attach;
         $this->bizContent['attach'] = $attach;
     }
 
-    public function getAttach()
-    {
-        return $this->attach;
-    }
-
-
+    /**
+     * @param mixed $outTradeNo
+     */
     public function setOutTradeNo($outTradeNo)
     {
         $this->outTradeNo = $outTradeNo;
         $this->bizContent['out_trade_no'] = $outTradeNo;
     }
 
-    public function getOutTradeNo()
+    /**
+     * @param mixed $feeType
+     */
+    public function setFeeType($feeType)
     {
-        return $this->bizContent['out_trade_no'];
+        $this->feeType = $feeType;
+        $this->bizContent['fee_type'] = $feeType;
     }
 
-
+    /**
+     * @param mixed $totalFee
+     */
     public function setTotalFee($totalFee)
     {
         $this->totalFee = $totalFee;
         $this->bizContent['total_fee'] = $totalFee;
     }
 
-    public function getTotalFee()
+    /**
+     * @param mixed $spbillCreateIp
+     */
+    public function setSpbillCreateIp($spbillCreateIp)
     {
-        return $this->totalFee;
+        $this->spbillCreateIp = $spbillCreateIp;
+        $this->bizContent['spbill_create_ip'] = $spbillCreateIp;
     }
 
+    /**
+     * @param mixed $timeStart
+     */
+    public function setTimeStart($timeStart)
+    {
+        $this->timeStart = $timeStart;
+        $this->bizContent['time_start'] = $timeStart;
+    }
+
+    /**
+     * @param mixed $timeExpire
+     */
+    public function setTimeExpire($timeExpire)
+    {
+        $this->timeExpire = $timeExpire;
+        $this->bizContent['time_expire'] = $timeExpire;
+    }
+
+    /**
+     * @param mixed $goodsTag
+     */
+    public function setGoodsTag($goodsTag)
+    {
+        $this->goodsTag = $goodsTag;
+        $this->bizContent['goods_tag'] = $goodsTag;
+    }
+
+    /**
+     * @param mixed $notifyUrl
+     */
+    public function setNotifyUrl($notifyUrl)
+    {
+        $this->notifyUrl = $notifyUrl;
+        $this->bizContent['notify_url'] = $notifyUrl;
+    }
+
+    /**
+     * @param mixed $tradeType
+     */
     public function setTradeType($tradeType)
     {
         $this->tradeType = $tradeType;
         $this->bizContent['trade_type'] = $tradeType;
     }
 
-    public function getTradeType()
-    {
-        return $this->tradeType;
-    }
-
-
+    /**
+     * @param mixed $productId
+     */
     public function setProductId($productId)
     {
         $this->productId = $productId;
         $this->bizContent['product_id'] = $productId;
     }
 
-    public function getProductId()
+    /**
+     * @param mixed $limitPay
+     */
+    public function setLimitPay($limitPay)
     {
-        return $this->productId;
+        $this->limitPay = $limitPay;
+        $this->bizContent['limit_pay'] = $limitPay;
     }
 
+    /**
+     * @param mixed $openid
+     */
     public function setOpenid($openid)
     {
         $this->openid = $openid;
         $this->bizContent['openid'] = $openid;
     }
 
-    public function getOpenid()
+    /**
+     * @param mixed $sceneInfo
+     */
+    public function setSceneInfo($sceneInfo)
     {
-        return $this->openid;
+        $this->sceneInfo = $sceneInfo;
+        $this->bizContent['scene_info'] = $sceneInfo;
     }
 
+    /**
+     * @param mixed $tradType
+     */
+    public function setTradType($tradType)
+    {
+        $this->tradType = $tradType;
+    }
+
+    /**
+     * @param mixed $refundFree
+     */
+    public function setRefundFee($refundFree)
+    {
+        $this->refundFee = $refundFree;
+        $this->bizContent['refund_fee'] = $refundFree;
+    }
+
+    /**
+     * @param mixed $outRefundNo
+     */
+    public function setOutRefundNo($outRefundNo)
+    {
+        $this->outRefundNo = $outRefundNo;
+        $this->bizContent['out_refund_no'] = $outRefundNo;
+    }
+
+    /**
+     * @return mixed
+     */
     public function getBizContent()
     {
         return $this->bizContent;
     }
-
-//    public function checkPayContent()
-//    {
-//        if (!$this->getOutTradeNo()){
-//            throw new Exception('缺少订单号');
-//        }
-//        if (!$this->getTotalFee()){
-//            throw new Exception('缺少订单金额');
-//        }
-//        if (!$this->getBody()){
-//            throw new Exception('缺少订单名称');
-//        }
-//        switch ($this->getTradeType()) {
-//            case self::NATIVE:
-//                if (!$this->getProductId()){
-//                    throw new Exception('缺少产品id');
-//                }
-//                break;
-//            case self::JSAPI:
-//                if (!$this->getOpenid()){
-//                    throw new Exception('缺少openid');
-//                }
-//                break;
-//        }
-//    }
 }

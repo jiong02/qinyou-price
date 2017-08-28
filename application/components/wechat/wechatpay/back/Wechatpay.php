@@ -226,9 +226,19 @@ class Wechatpay
         $this->setSign($apiParams);
         $apiParams['sign'] = $this->getSign();
         $xmlApiParams = Data::formatArraytoXml($apiParams);
+        $this->curl($this->url,$xmlApiParams);
+    }
+
+    public function curl($url, $bizContent)
+    {
         $curl = new Curl();
-        $result = $curl->post($this->url,$xmlApiParams);
-        $result = Data::formatXmlToArray($result);
-        $this->result = $result;
+        $curl->post($url,$bizContent);
+        $curl->SetSslCertPath($this->sslCertPath);
+        $curl->SetSslKeyPath($this->sslCertPath);
+        if ($curl->getStatus() == $curl::STATUS_SUCCESS){
+            $result = Data::formatXmlToArray($curl->getResult());
+            $curl->setResult($result);
+        }
+        $this->result = $curl->getResponse();
     }
 }

@@ -15,9 +15,9 @@ return [
     //商户密钥
     'key' => '7oXyBHsx1Kk2obXeapbJosHWQFZs93pv',
     //ssl证书路径
-    'ssl_cert_path' => '../cert/apiclient_cert.pem',
+    'ssl_cert_path' => '/data/wwwroot/price.cheeruislands.com/application/components/cert/apiclient_cert.pem',
     //ssl证书密钥路径
-    'ssl_key_path' => '../cert/apiclient_key.pem',
+    'ssl_key_path' => '/data/wwwroot/price.cheeruislands.com/application/components/cert/apiclient_key.pem',
     //回调通知接口
     'notify_url' => 'www.baidu.com',
     //最大查询重试次数

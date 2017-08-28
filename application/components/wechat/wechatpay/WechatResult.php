@@ -2,14 +2,14 @@
 /**
  * Created by PhpStorm.
  * User: ZYone
- * Date: 2017/8/27
- * Time: 23:58
+ * Date: 2017/8/28
+ * Time: 16:10
  */
 
-namespace app\components\ali\alipay;
+namespace app\components\wechat\wechatpay;
 
 
-class AlipayResult
+class WechatResult
 {
     private $tradeStatus;
     private $response;

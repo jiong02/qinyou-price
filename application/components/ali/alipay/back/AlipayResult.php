@@ -2,14 +2,14 @@
 /**
  * Created by PhpStorm.
  * User: ZYone
- * Date: 2017/8/23
- * Time: 14:59
+ * Date: 2017/8/22
+ * Time: 15:52
  */
 
-namespace app\components\wechat\wechatpay;
+namespace app\components\ali\alipay;
 
 
-class WechatpayResult
+class AlipayResult
 {
     private $errorCode;
     private $errorMessage;
@@ -20,27 +20,23 @@ class WechatpayResult
     private $curlResponse;
 
     private $outTradeNo;
-    private $tradeStatus;
     private $qrCode;
+    private $tradeStatus;
 
-    const NATIVE = 'NATIVE';
-    const QUERY = 'QUERY';
-
-    const TRADE_SUCCESS = 'SUCCESS';
-    const TRADE_REFUND = 'REFUND';
-    const TRADE_NOTPAY = 'NOTPAY';
-    const TRADE_CLOSED = 'CLOSED';
-    const TRADE_REVOKED = 'REVOKED';
-    const TRADE_USERPAYING = 'USERPAYING';
-    const TRADE_PAYERROR = 'PAYERROR';
-
-    const SUCCESS = 'SUCCESS';
-    const FAIL = 'FAIL';
-
-    const ERR_CURL_ERROR_CODE = 'CURLERROR';
-    const ERR_CURL_ERROR_MESSAGE = 'CURL出错';
-    const ERR_CHECK_SIGN_CODE = 'SIGNERROR';
+    const CODE_SUCCESS = 10000;
+    const ERR_CHECK_SIGN_CODE = 40001;
     const ERR_CHECK_SIGN_MESSAGE = '签名检验失败';
+
+    const RESPONSE_QUERY = 'alipay_trade_precreate_response';
+    const RESPONSE_PRE_CREATE = 'alipay_trade_precreate_response';
+    const RESPONSE_REFUND = 'alipay_trade_precreate_response';
+
+    const TRADE_FINISHED = 'TRADE_FINISHED';
+    const TRADE_SUCCESS = 'TRADE_SUCCESS';
+    const TRADE_CLOSED = 'TRADE_CLOSED';
+
+    const STATUS_SUCCESS = 'SUCCESS';
+    const STATUS_FAIL = 'FAIL';
 
     public function setErrorCode($errorCode)
     {
@@ -150,36 +146,29 @@ class WechatpayResult
 
     public function setCommonResponse()
     {
+        $result = $this->curlResponse['result'][$this->getResponseType()];
         $this->setSign($this->curlResponse['result']['sign']);
-        unset($this->curlResponse['result']['sign']);
-        $this->setResult($this->curlResponse['result']);
-        if (array_key_exists('trade_type',$this->result)){
-            $this->setResponseType($this->result['trade_type']);
-        }else{
-            $this->setResponseType(self::QUERY);
-        }
-        $this->setErrorCode($this->result['return_code']);
-        $this->setErrorMessage($this->result['return_msg']);
+        $this->setResult($result);
+        $this->setErrorCode($result['code']);
+        $this->setErrorMessage($result['msg']);
     }
 
-    public function setResponse($response)
+    public function setResponse($response, $responseType)
     {
         if($this->judgeResponse($response)){
-            if ($response['return_code'] == self::SUCCESS){
-                $this->setCommonResponse();
-                $wechatpay = new WechatpayService();
-                $result = $wechatpay->verifySign($this->result, $this->sign);
-                if ($result){
-                    if ($this->result['result_code'] == self::SUCCESS){
-                        $this->setSuccessResponse();
-                    }else{
-                        $this->setFailResponse();
-                    }
+            $this->setResponseType($responseType);
+            $this->setCommonResponse();
+            $alipay = new Alipay();
+            $signData = $alipay->formatSignData($this->getResult());
+            $result = $alipay->verifySign($signData, $this->getSign());
+            if ($result){
+                if ($this->getErrorCode() == self::CODE_SUCCESS) {
+                    $this->setSuccessResponse();
                 }else{
-                    $this->setFailResponse(self::ERR_CHECK_SIGN_CODE, self::ERR_CHECK_SIGN_MESSAGE);
+                    $this->setStatus(self::STATUS_FAIL);
                 }
             }else{
-                $this->setFailResponse($this->result['return_code'], $this->result['return_msg']);
+                $this->setFailResponse(self::ERR_CHECK_SIGN_CODE,self::ERR_CHECK_SIGN_MESSAGE);
             }
         }
     }
@@ -187,7 +176,7 @@ class WechatpayResult
     public function judgeResponse($response)
     {
         $this->setCurlResponse($response);
-        if ($response['status'] == self::SUCCESS){
+        if ($response['status'] == self::STATUS_SUCCESS){
             return true;
         }else{
             $this->setFailResponse($response['error_code'],$response['error_message']);
@@ -196,46 +185,42 @@ class WechatpayResult
 
     public function setSuccessResponse()
     {
-        $this->setStatus(self::SUCCESS);
-        if ($this->getResponseType() == self::NATIVE){
-            $this->setNativeResponse();
-        }elseif($this->getResponseType() == self::QUERY){
+        $this->setStatus(self::STATUS_SUCCESS);
+        $this->setOutTradeNo($this->result['out_trade_no']);
+        if ($this->getResponseType() == self::RESPONSE_PRE_CREATE) {
+            $this->setPreCreateResponse();
+        }elseif($this->getResponseType() == self::RESPONSE_QUERY){
             $this->setQueryResponse();
+        }elseif($this->getResponseType() == self::RESPONSE_REFUND){
+
         }
     }
-
-    public function setFailResponse($errorCode = '', $errorMessage = '')
+    public function setFailResponse($errorCode, $errorMessage)
     {
-        $errorCode =  $errorCode ? $errorCode : $this->result['err_code'];
-        $errorMessage = $errorMessage ? $errorMessage : $this->result['err_code_des'];
-        $this->setStatus(self::FAIL);
+        $this->setStatus(self::STATUS_FAIL);
         $this->setErrorCode($errorCode);
         $this->setErrorMessage($errorMessage);
     }
 
-    public function setNativeResponse()
+    public function setPreCreateResponse()
     {
-        $this->setQrCode($this->result['code_url']);
+        $this->setQrCode($this->result['qr_code']);
     }
 
     public function setQueryResponse()
     {
-        if ($this->result['trade_state'] != self::SUCCESS){
-            $this->setStatus(self::FAIL);
-        }
-        $this->setErrorCode($this->result['trade_state']);
-        $this->setErrorMessage($this->result['trade_state_desc']);
-        $this->setOutTradeNo($this->result['out_trade_no']);
-        $this->setTradeStatus($this->result['trade_state']);
+        $this->SetTradeStatus($this->result['trade_status']);
     }
 
     // 判断是否停止查询
     public function stopQuery(){
-        if($this->getResult()['result_code'] == self::SUCCESS){
-            if($this->getTradeStatus() == self::TRADE_NOTPAY || $this->getTradeStatus() == self::TRADE_USERPAYING){
-                return false;
+        if($this->errorCode == self::CODE_SUCCESS){
+            if($this->getTradeStatus() == self::TRADE_FINISHED ||
+                $this->getTradeStatus() == self::TRADE_SUCCESS ||
+                $this->getTradeStatus() == self::TRADE_CLOSED){
+                return true;
             }
         }
-        return true;
+        return false;
     }
 }

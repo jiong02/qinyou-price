@@ -91,8 +91,9 @@ Route::domain('test', function(){
     Route::any('alipayQrcodePay','ims/Index/alipayQrcodePay');
     Route::any('alipayQuery','ims/Index/alipayQuery');
     Route::any('alipayRefund','ims/Index/alipayRefund');
-    Route::any('wechatQrcodePay','ims/Index/wechatQrcodePay');
-    Route::any('wechatQuery','ims/Index/wechatQuery');
+    Route::any('wechatpayQrcodePay','ims/Index/wechatpayQrcodePay');
+    Route::any('wechatpayQuery','ims/Index/wechatpayQuery');
+    Route::any('wechatpayRefund','ims/Index/wechatpayRefund');
 });
 
 

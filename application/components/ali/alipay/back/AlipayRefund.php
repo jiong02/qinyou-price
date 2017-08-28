@@ -13,21 +13,28 @@ use app\components\Data;
 
 class AlipayRefund extends Alipay
 {
-    private $outTradeNo;
+    private $outRequestNo;
     private $method = 'alipay.trade.refund';
-    private $responseType = 'alipay_trade_refund_response';
-    public function setOutRequestNo($outTradeNo = '')
-    {
-        if (!$outTradeNo){
-            $outTradeNo = Data::getUniqueString();
-        }
-        $this->outTradeNo = $outTradeNo;
-    }
 
+    /**
+     * @return mixed
+     */
     public function getOutRequestNo()
     {
-        return $this->outTradeNo;
+        return $this->outRequestNo;
     }
+
+    /**
+     * @param mixed $outRequestNo
+     */
+    public function setOutRequestNo($outRequestNo = '')
+    {
+        if (!$outRequestNo){
+            $outRequestNo = Data::getUniqueString();
+        }
+        $this->outRequestNo = $outRequestNo;
+    }
+
 
     public function refund($outTradeNo, $refundAmount)
     {
@@ -51,11 +58,17 @@ class AlipayRefund extends Alipay
     public function refundResult()
     {
         $alipayResult = new AlipayResult();
-        $alipayResult->setResponse($this->result,$this->responseType);
+        $this->setResponseType($this->method);
+        $alipayResult->setResponse($this->result,$this->getResponseType());
         if($alipayResult->getStatus() == 'SUCCESS'){
 
         }else{
             return getError($alipayResult->getErrorMessage());
         }
     }
+
+
+
+
+
 }
