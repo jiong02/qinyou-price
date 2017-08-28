@@ -1,10 +1,10 @@
 <?php
 namespace app\route\model;
-
+//use app\route\model\BaseModel;
 use think\Model;
 
 class RouteVehicleModel extends Model{
-    public $table = 'ims_route_vehicle';
+    public $table = 'ims_route.ims_route_vehicle';
 
     public $rule = [
             'vehicle_id|交通标志' => 'number|require',
@@ -16,9 +16,13 @@ class RouteVehicleModel extends Model{
     ];
 
 
+    public $baseHidden = ['create_time','modify_time'];
 
-
-
+    public function __construct($data = [])
+    {
+        $this->hidden = array_merge($this->hidden, $this->baseHidden);
+        parent::__construct($data);
+    }
 }
 
 

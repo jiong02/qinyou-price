@@ -5,7 +5,7 @@ use think\Model;
 
 class RouteDescriptionVehicleModel extends Model
 {
-    public $table = 'ims_route_description_vehicle';
+    public $table = 'ims_route.ims_route_description_vehicle';
 
     public $rule = [
         'description_id|描述' => 'number|require',

@@ -143,7 +143,11 @@ Route::domain('test', function(){
     //修改订单价格
     Route::any('/Order/updateOrderPrice','test/Order/updateOrderPrice');
     //导出world文档
-    Route::any('/Order/outputOrderWorld','test/Order/outputOrderWorld');
+//    Route::any('/Order/outputOrderWorld','test/Order/outputOrderWorld');
+    //导出订单word文档
+    Route::any('/OrderWord/outputOrderWord','test/OrderWord/outputOrderWord');
+
+
 
 
 
