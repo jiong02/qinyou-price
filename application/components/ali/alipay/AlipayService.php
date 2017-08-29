@@ -191,7 +191,6 @@ class AlipayService
         } else {
             $result->setTradeStatus("FAILED");
         }
-
         return $result;
     }
 
@@ -203,7 +202,6 @@ class AlipayService
         $refundQueryRequest->setBizContent($bizContent);
         $response = $this->clientExecute($refundQueryRequest);
         $result = new AlipayResult($response);
-        halt($result);
     }
 
     public function clientExecute($request)

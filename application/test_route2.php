@@ -85,15 +85,19 @@ Route::domain('test', function(){
     Route::any('wechatEnterpriseLogin','ims/EmployeeAccount/wechatEnterpriseLogin');
     Route::any('sendVerifyCode','ims/EmployeeAccount/sendVerifyCode');
 
+    /**
+     * 支付功能
+     */
+    Route::any('pay/qrcodePay','test/Pay/qrcodePay');
     /*
      * 测试
      */
-    Route::any('alipayQrcodePay','ims/Index/alipayQrcodePay');
-    Route::any('alipayQuery','ims/Index/alipayQuery');
-    Route::any('alipayRefund','ims/Index/alipayRefund');
-    Route::any('wechatpayQrcodePay','ims/Index/wechatpayQrcodePay');
-    Route::any('wechatpayQuery','ims/Index/wechatpayQuery');
-    Route::any('wechatpayRefund','ims/Index/wechatpayRefund');
+    // Route::any('alipayQrcodePay','ims/Index/alipayQrcodePay');
+    // Route::any('alipayQuery','ims/Index/alipayQuery');
+    // Route::any('alipayRefund','ims/Index/alipayRefund');
+    // Route::any('wechatpayQrcodePay','ims/Index/wechatpayQrcodePay');
+    // Route::any('wechatpayQuery','ims/Index/wechatpayQuery');
+    // Route::any('wechatpayRefund','ims/Index/wechatpayRefund');
 });
 
 

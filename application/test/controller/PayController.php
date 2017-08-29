@@ -30,19 +30,20 @@ class PayController extends BaseController
         $outTradeNo = $request->param('out_trade_no');
         $subject = $request->param('subject');
         $totalAmount = $request->param('total_amount');
+        $payType = $request->param('pay_type');
         $params = [
             'out_trade_no'=>[$outTradeNo , 'require'],
             'subject'=>[$subject , 'require'],
             'total_amount'=>[$totalAmount , 'require'],
+            'pay_type'=>[$payType , 'require'],
         ];
         $this->checkAllParam($params);
-        $payType = $request->param('pay_type');
         if ($payType == '支付宝'){
             $result = $this->alipayQrcodePay($outTradeNo, $subject, $totalAmount);
         }elseif($payType == '微信'){
             $result = $this->wechatpayQrcodePay($outTradeNo, $subject, $totalAmount);
         }else{
-            $result = getError('支付类型错误')
+            $result = getError('支付类型错误');
         }
         return $result;
     }
@@ -77,9 +78,9 @@ class PayController extends BaseController
         $result = $qrcodePay->qrcodePay($wechatpayContentBuilder);
         $response = $result->getResponse();
         if ($result->getTradeStatus() == 'SUCCESS'){
-            Data::createQrCode($response->qr_code);
+            Data::createQrCode($response['code_url']);
         }else{
-            return getError($response['return_msg']);
+            return getError($response['err_code']);
         }
     }
 
@@ -116,23 +117,23 @@ class PayController extends BaseController
         halt($result);
     }
 
-    public function wechatpayQrcodePay()
-    {
-        $wechatpayContentBuilder = new WechatpayContentBuilder();
-        $wechatpayContentBuilder->setOutTradeNo(date('YmdHis'));
-        $wechatpayContentBuilder->setBody('验孕棒');
-        $wechatpayContentBuilder->setTotalFee(99.00);
-        $wechatpayContentBuilder->setProductId(000011);
-        $qrcodePay = new WechatpayService();
-        $result = $qrcodePay->qrcodePay($wechatpayContentBuilder);
-        if ($result->getTradeStatus() == 'SUCCESS'){
-            $response = $result->getResponse();
-            $qrCode = new QrCode($response['code_url']);
-            header('Content-Type: ' . $qrCode->getContentType());
-            echo $qrCode->writeString();
-            exit;
-        }
-    }
+//    public function wechatpayQrcodePay()
+//    {
+//        $wechatpayContentBuilder = new WechatpayContentBuilder();
+//        $wechatpayContentBuilder->setOutTradeNo(date('YmdHis'));
+//        $wechatpayContentBuilder->setBody('验孕棒');
+//        $wechatpayContentBuilder->setTotalFee(99.00);
+//        $wechatpayContentBuilder->setProductId(000011);
+//        $qrcodePay = new WechatpayService();
+//        $result = $qrcodePay->qrcodePay($wechatpayContentBuilder);
+//        if ($result->getTradeStatus() == 'SUCCESS'){
+//            $response = $result->getResponse();
+//            $qrCode = new QrCode($response['code_url']);
+//            header('Content-Type: ' . $qrCode->getContentType());
+//            echo $qrCode->writeString();
+//            exit;
+//        }
+//    }
 
     public function wechatpayRefund()
     {

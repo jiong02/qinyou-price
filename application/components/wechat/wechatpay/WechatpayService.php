@@ -112,6 +112,16 @@ class WechatpayService
         return $response;
     }
 
+    public function refundQuery($contentBuilder)
+    {
+        $bizContent = $contentBuilder->getBizContent();
+        $wechatpayRequest = new WechatpayRequest();
+        $wechatpayRequest->setBizContent($bizContent);
+        $wechatpayRequest->setUrl($wechatpayRequest::URL_REFUND_QUERY);
+        $response = $this->clientExecute($wechatpayRequest);
+        return $response;
+    }
+
     public function query($contentBuilder)
     {
         $bizContent = $contentBuilder->getBizContent();

@@ -1,12 +1,11 @@
 <?php
 namespace app\ims\controller;
 
-
+use app\components\Data;
 use app\components\ali\alipay\AlipayClient;
 use app\components\ali\alipay\AlipayRefund;
 use app\components\ali\alipay\AlipayService;
 use app\components\ali\alipay\AlipayContentBuilder;
-use app\components\Data;
 use app\components\wechat\wechatpay\WechatpayContentBuilder;
 use app\components\wechat\wechatpay\WechatpayQrcodePay;
 use app\components\wechat\wechatpay\WechatpayQuery;
@@ -34,10 +33,7 @@ class IndexController extends PrivilegeController
         $result = $qrcodePay->qrcodePay($alipayQrcodeBuilder);
         if ($result->getTradeStatus() == 'SUCCESS'){
             $response = $result->getResponse();
-            $qrCode = new QrCode($response->qr_code);
-            header('Content-Type: ' . $qrCode->getContentType());
-            echo $qrCode->writeString();
-            exit;
+            Data::createQrCode($response->qr_code);
         }else{
 
         }
@@ -65,7 +61,7 @@ class IndexController extends PrivilegeController
         $alipayRefundBuilder->setOutTradeNo(1503545268);
         $alipayRefundBuilder->setOutRequestNo($outRequestNo);
         $refund = new AlipayService();
-//        $result = $refund->refund($alipayRefundBuilder);
+        $result = $refund->refundQuery($alipayRefundBuilder);
         $refund->refundQuery($alipayRefundBuilder);
     }
 
@@ -101,11 +97,11 @@ class IndexController extends PrivilegeController
         $outRefundNo = Data::getUniqueString();
         $wechatpayContentBuilder = new WechatpayContentBuilder();
         $wechatpayContentBuilder->setOutTradeNo(date('YmdHis'));
-        $wechatpayContentBuilder->setTotalFee(99.00);
-        $wechatpayContentBuilder->setRefundFee(50.00);
-        $wechatpayContentBuilder->setOutRefundNo($outRefundNo);
+//        $wechatpayContentBuilder->setTotalFee(99.00);
+//        $wechatpayContentBuilder->setRefundFee(50.00);
+//        $wechatpayContentBuilder->setOutRefundNo($outRefundNo);
         $refund = new WechatpayService();
-        $result = $refund->refund($wechatpayContentBuilder);
+        $result = $refund->refundQuery($wechatpayContentBuilder);
         halt($result);
     }
 }

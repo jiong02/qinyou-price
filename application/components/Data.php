@@ -9,6 +9,7 @@
 namespace app\components;
 
 
+use Endroid\QrCode\QrCode;
 use think\Exception;
 
 class Data
@@ -132,5 +133,13 @@ class Data
     public static function getUniqueString()
     {
         return md5(uniqid(mt_rand(), true));
+    }
+
+    public static function createQrCode($codeUrl)
+    {
+        $qrCode = new QrCode($codeUrl);
+        header('Content-Type: ' . $qrCode->getContentType());
+        echo $qrCode->writeString();
+        exit;
     }
 }
