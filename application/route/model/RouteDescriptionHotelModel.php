@@ -5,7 +5,7 @@ use think\Model;
 
 class RouteDescriptionHotelModel extends Model
 {
-    public $table = 'ims_route_description_hotel';
+    public $table = 'ims_route.ims_route_description_hotel';
 
     public $rule = [
         'description_id|描述' => 'number|require',
@@ -18,7 +18,13 @@ class RouteDescriptionHotelModel extends Model
         'image_show_status|图片状态' => 'require',
 
         ];
+    public $baseHidden = ['create_time','modify_time'];
 
+    public function __construct($data = [])
+    {
+        $this->hidden = array_merge($this->hidden, $this->baseHidden);
+        parent::__construct($data);
+    }
 
 }
 
