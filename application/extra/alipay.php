@@ -38,7 +38,7 @@ return [
     'app_auth_token' => "",
 
     //最大查询重试次数
-    'max_query_retry' => "5",
+    'max_query_retry' => "10",
 
     //查询间隔
     'query_duration' => "2",

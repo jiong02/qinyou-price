@@ -108,7 +108,7 @@ class PayController extends BaseController
         $alipayQueryBuilder = new AlipayContentBuilder();
         $alipayQueryBuilder->setOutTradeNo($outTradeNo);
         $query = new AlipayService();
-        $result = $query->queryResult($alipayQueryBuilder);
+        $result = $query->loopQueryResult($alipayQueryBuilder);
         if ($result->getTradeStatus() == 'SUCCESS'){
             return getSuccess('订单支付成功');
         }else{
@@ -138,7 +138,7 @@ class PayController extends BaseController
             return getSuccess('订单支付成功');
         }else{
             $response = $result->getResponse();
-            return getError($response['err_code_des']);
+            return getError($response['trade_state_desc']);
         }
     }
 
