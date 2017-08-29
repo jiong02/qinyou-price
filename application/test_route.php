@@ -146,7 +146,8 @@ Route::domain('test', function(){
 //    Route::any('/Order/outputOrderWorld','test/Order/outputOrderWorld');
     //导出订单word文档
     Route::any('/OrderWord/outputOrderWord','test/OrderWord/outputOrderWord');
-
+    //修改订单支付状态
+    Route::any('/Order/updatePayStatus','test/Order/updatePayStatus');
 
 
 

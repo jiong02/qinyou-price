@@ -87,6 +87,46 @@ class OrderController extends BaseController
 
     }
 
+    /**
+     * @name 修改支付状态
+     * @auth Sam
+     * @param Request $request
+     * @return string
+     */
+    public function updatePayStatus(Request $request)
+    {
+        $payStatus = $request->param('pay_status',0);
+        $orderId = $request->param('order_id',0);
+
+        if(empty($payStatus) || !is_numeric($payStatus)){
+            return '数据错误';
+        }
+
+        if(empty($orderId) || !is_numeric($orderId)){
+            return '订单错误';
+        }
+
+        if($payStatus > 2 || $payStatus < 0){
+            return '状态错误';
+        }
+
+        $orderModel = new OrderModel();
+
+        $orderInfo = $orderModel->where('id',$orderId)->find();
+
+        if(empty($orderInfo)){
+            return '订单不存在';
+        }
+
+        $orderInfo->pay_status = $payStatus;
+
+        if($orderInfo->save()){
+            return '修改成功';
+        }
+
+        return '修改失败';
+    }
+
 
     /**
      * @name 获取订单（联系人）
