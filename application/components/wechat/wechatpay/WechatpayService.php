@@ -148,7 +148,7 @@ class WechatpayService
             $queryResponse = $this->query($queryContentBuilder);
             if(!empty($queryResponse)){
                 if($this->stopQuery($queryResponse)){
-                    return $queryResponse;
+                    return $this->setQueryResult($queryResponse);
                 }
                 $queryResult = $queryResponse;
             }
@@ -176,6 +176,7 @@ class WechatpayService
         }else{
             $wechatpayResult->setTradeStatus('FAILD');
         }
+        halt($wechatpayResult);
         return $wechatpayResult;
     }
 
