@@ -135,13 +135,7 @@ class WechatpayService
     public function queryResult($contentBuilder)
     {
         $response = $this->query($contentBuilder);
-        $wechatpayResult = new WechatResult($response);
-        if ($this->querySuccess($response)){
-            $wechatpayResult->setTradeStatus('SUCCESS');
-        }else{
-            $wechatpayResult->setTradeStatus('FAILD');
-        }
-        return $wechatpayResult;
+        return $this->setQueryResult($response);
     }
 
     // 轮询查询订单支付结果
@@ -159,7 +153,7 @@ class WechatpayService
                 $queryResult = $queryResponse;
             }
         }
-        return $queryResult;
+        return $this->setQueryResult($queryResult);
     }
 
     //判断是否返回成功
@@ -172,6 +166,17 @@ class WechatpayService
             }
         }
         return $result;
+    }
+
+    public function setQueryResult($response)
+    {
+        $wechatpayResult = new WechatResult($response);
+        if ($this->querySuccess($response)){
+            $wechatpayResult->setTradeStatus('SUCCESS');
+        }else{
+            $wechatpayResult->setTradeStatus('FAILD');
+        }
+        return $wechatpayResult;
     }
 
     public function stopQuery($response)

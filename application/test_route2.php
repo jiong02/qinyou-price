@@ -89,6 +89,7 @@ Route::domain('test', function(){
      * 支付功能
      */
     Route::any('pay/qrcodePay','test/Pay/qrcodePay');
+    Route::any('pay/query','test/Pay/query');
     /*
      * 测试
      */
