@@ -48,6 +48,25 @@ class PayController extends BaseController
         return $result;
     }
 
+    public function query(Request $request)
+    {
+        $outTradeNo = $request->param('out_trade_no');
+        $payType = $request->param('pay_type');
+        $params = [
+            'out_trade_no'=>[$outTradeNo , 'require'],
+            'pay_type'=>[$payType , 'require'],
+        ];
+        $this->checkAllParam($params);
+        if ($payType == '支付宝'){
+            $result = $this->alipayQuery($outTradeNo);
+        }elseif($payType == '微信'){
+            $result = $this->wechatpayQuery($outTradeNo);
+        }else{
+            $result = getError('支付类型错误');
+        }
+        return $result;
+    }
+
     public function alipayQrcodePay($outTradeNo, $subject, $totalAmount)
     {
         $alipayContentBuilder = new AlipayContentBuilder();
@@ -58,7 +77,7 @@ class PayController extends BaseController
         $result = $qrcodePay->qrcodePay($alipayContentBuilder);
         $response = $result->getResponse();
         if ($result->getTradeStatus() == 'SUCCESS'){
-            Data::createQrCode($response->qr_code);
+            return getSuccess($response->qr_code);
         }else{
             return getError($response->msg);
         }
@@ -78,27 +97,28 @@ class PayController extends BaseController
         $result = $qrcodePay->qrcodePay($wechatpayContentBuilder);
         $response = $result->getResponse();
         if ($result->getTradeStatus() == 'SUCCESS'){
-            Data::createQrCode($response['code_url']);
+            return getSuccess($response['code_url']);
         }else{
             return getError($response['err_code']);
         }
     }
 
-    public function alipayQuery()
+    public function alipayQuery($outTradeNo)
     {
-//        $alipayQuery = new AlipayQuery();
         $alipayQueryBuilder = new AlipayContentBuilder();
-        $alipayQueryBuilder->setOutTradeNo(1503545268);
+        $alipayQueryBuilder->setOutTradeNo($outTradeNo);
         $query = new AlipayService();
         $result = $query->queryResult($alipayQueryBuilder);
-        halt($result);
-        //        return $alipayQuery->loopQuery(1503545268);
+        if ($result->getTradeStatus() == 'SUCCESS'){
+            return getSuccess('订单支付成功');
+        }else{
+            $response = $result->getResponse();
+            return getSuccess($response->msg);
+        }
     }
 
     public function alipayRefund()
     {
-//        $alipayQuery = new AlipayRefund();
-//        $alipayRefundBuilder->setRefundAmount(0.01);
         $outRequestNo = Data::getUniqueString();
         $alipayRefundBuilder = new AlipayContentBuilder();
         $alipayRefundBuilder->setOutTradeNo(1503545268);
@@ -108,13 +128,18 @@ class PayController extends BaseController
         $refund->refundQuery($alipayRefundBuilder);
     }
 
-    public function wechatpayQuery()
+    public function wechatpayQuery($outTradeNo)
     {
         $wechatpayContentBuilder = new WechatpayContentBuilder();
-        $wechatpayContentBuilder->setOutTradeNo(10247681);
+        $wechatpayContentBuilder->setOutTradeNo($outTradeNo);
         $wechatpayQuery = new WechatpayService();
         $result = $wechatpayQuery->loopQueryResult($wechatpayContentBuilder);
-        halt($result);
+        if ($result->getTradeStatus() == 'SUCCESS'){
+            return getSuccess('订单支付成功');
+        }else{
+            $response = $result->getResponse();
+            return getError($response['trade_state_desc']);
+        }
     }
 
 //    public function wechatpayQrcodePay()
