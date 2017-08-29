@@ -38,6 +38,8 @@ class OrderController extends BaseController
         $orderInfo['order_status'] = 1;
         $orderInfo['create_date'] = date('Y-m-d',time());
         $orderInfo['total_price'] = $orderInfo['update_total_price'];
+        $orderInfo['order_id'] = uniqid();
+        $orderInfo['order_pay_id'] = uniqid();
 
         $result = $orderModel->save($orderInfo);
 
@@ -144,7 +146,7 @@ class OrderController extends BaseController
 
         $orderModel = new OrderModel();
 
-        $orderInfo = $orderModel->field("cheeru_order.id,cheeru_order.order_name,cheeru_order.route_id,cheeru_order.trip_date,cheeru_order.room_number,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.update_total_price,cheeru_order.linkman_name,cheeru_order.linkman_phone,cheeru_order.linkman_wechat,ims_route.ims_route.image_uniqid,ims_new.ims_image.image_category,ims_new.ims_image.image_path,ims_route.route_type,order_status,pay_status")->where("cheeru_order.id",$orderId)->join('ims_route.ims_route','cheeru_order.route_id = ims_route.ims_route.id','LEFT')->join('ims_new.ims_image','ims_route.ims_route.image_uniqid = ims_new.ims_image.image_uniqid','LEFT')->find();
+        $orderInfo = $orderModel->field("cheeru_order.id,cheeru_order.order_name,cheeru_order.route_id,cheeru_order.trip_date,cheeru_order.room_number,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.update_total_price,cheeru_order.linkman_name,cheeru_order.linkman_phone,cheeru_order.linkman_wechat,ims_route.ims_route.image_uniqid,ims_new.ims_image.image_category,ims_new.ims_image.image_path,ims_route.route_type,order_status,pay_status,order_id,order_pay_id")->where("cheeru_order.id",$orderId)->join('ims_route.ims_route','cheeru_order.route_id = ims_route.ims_route.id','LEFT')->join('ims_new.ims_image','ims_route.ims_route.image_uniqid = ims_new.ims_image.image_uniqid','LEFT')->find();
 
         if(!empty($orderInfo)){
             return $orderInfo->toArray();
