@@ -133,11 +133,12 @@ class RouteController extends Controller
         if(!empty($routeList)){
             $accountModel = new EmployeeAccountModel();
             $routeCreator = '';
-            $routePasser = '';   
+            $routePasser = '';
             foreach($routeList as $k=>$v){
                 $routeCreator = $accountModel->field('id,account_name')->where('id',$v['route_creator_id'])->find();
 
                 $routePasser = $accountModel->field('id,account_name')->where('id',$v['route_passer_id'])->find();
+
 
                 $routeList[$k]['route_creator'] = $routeCreator['account_name'];
                 $routeList[$k]['route_passer'] = $routePasser['account_name'];
