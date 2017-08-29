@@ -131,6 +131,29 @@ class AlipayService
     public function queryResult($contentBuilder)
     {
         $response = $this->query($contentBuilder);
+
+    }
+
+    // 轮询查询订单支付结果
+    public function loopQueryResult($queryContentBuilder){
+        $queryResult = NULL;
+        for ($i = 1;$i < $this->maxQueryRetry;$i++){
+
+            sleep($this->queryDuration);
+
+            $queryResponse = $this->query($queryContentBuilder);
+            if(!empty($queryResponse)){
+                if($this->stopQuery($queryResponse)){
+                    return $this->setQueryResult($queryResponse);
+                }
+                $queryResult = $queryResponse;
+            }
+        }
+        return $this->setQueryResult($queryResult);
+    }
+
+    protected function setQueryResult($response)
+    {
         $result = new AlipayResult($response);
         if($this->querySuccess($response)){
             // 查询返回该订单交易支付成功
@@ -144,24 +167,6 @@ class AlipayService
             $result->setTradeStatus("FAILED");
         }
         return $result;
-    }
-
-    // 轮询查询订单支付结果
-    protected function loopQueryResult($queryContentBuilder){
-        $queryResult = NULL;
-        for ($i = 1;$i < $this->maxQueryRetry;$i++){
-
-            sleep($this->queryDuration);
-
-            $queryResponse = $this->query($queryContentBuilder);
-            if(!empty($queryResponse)){
-                if($this->stopQuery($queryResponse)){
-                    return $queryResponse;
-                }
-                $queryResult = $queryResponse;
-            }
-        }
-        return $queryResult;
     }
 
     // 判断是否停止查询
