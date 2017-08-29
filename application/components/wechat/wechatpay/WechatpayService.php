@@ -176,7 +176,6 @@ class WechatpayService
         }else{
             $wechatpayResult->setTradeStatus('FAILD');
         }
-        halt($wechatpayResult);
         return $wechatpayResult;
     }
 
