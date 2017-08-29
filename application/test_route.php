@@ -142,12 +142,10 @@ Route::domain('test', function(){
     Route::any('/Order/outputOrderInfo','test/Order/outputOrderInfo');
     //修改订单价格
     Route::any('/Order/updateOrderPrice','test/Order/updateOrderPrice');
-    //导出world文档
-//    Route::any('/Order/outputOrderWorld','test/Order/outputOrderWorld');
     //导出订单word文档
     Route::any('/OrderWord/outputOrderWord','test/OrderWord/outputOrderWord');
     //修改订单支付状态
-    Route::any('/Order/updatePayStatus','test/Order/updatePayStatus');
+    Route::any('/Order/updatePayStatuss','test/Order/updatePayStatus');
 
 
 
