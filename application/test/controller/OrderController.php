@@ -95,6 +95,7 @@ class OrderController extends BaseController
      */
     public function updatePayStatus(Request $request)
     {
+        halt('aaa');
         $payStatus = $request->param('pay_status',0);
         $orderId = $request->param('order_id',0);
 
