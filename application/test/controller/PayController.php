@@ -138,7 +138,7 @@ class PayController extends BaseController
             return getSuccess('订单支付成功');
         }else{
             $response = $result->getResponse();
-            return getError($response['trade_state_desc']);
+            return getError($response['err_code_des']);
         }
     }
 
