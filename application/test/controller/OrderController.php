@@ -95,7 +95,6 @@ class OrderController extends BaseController
      */
     public function updatePayStatus(Request $request)
     {
-        halt('aaa');
         $payStatus = $request->param('pay_status',0);
         $orderId = $request->param('order_id',0);
 
@@ -336,6 +335,7 @@ class OrderController extends BaseController
      */
     public function getBackOrderInfo(Request $request)
     {
+        halt('aaaa');
         $orderId = $request->param('order_id',0);
 
         if(empty($orderId) || !is_numeric($orderId)){
