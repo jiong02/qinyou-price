@@ -335,7 +335,6 @@ class OrderController extends BaseController
      */
     public function getBackOrderInfo(Request $request)
     {
-        halt('aaaa');
         $orderId = $request->param('order_id',0);
 
         if(empty($orderId) || !is_numeric($orderId)){
