@@ -126,6 +126,8 @@ Route::domain('test', function(){
     Route::any('/Order/updateOrder','test/Order/updateOrder');
     //获取订单（联系人）
     Route::any('/Order/getOrderLinkmanInfo','test/Order/getOrderLinkmanInfo');
+    //修改订单支付状态
+    Route::any('/Order/updatePayStatus','test/Order/updatePayStatus');
     //修改联系人信息
     Route::any('/Order/updateLinkmanInfo','test/Order/updateLinkmanInfo');
     //获取客户信息
@@ -144,8 +146,7 @@ Route::domain('test', function(){
     Route::any('/Order/updateOrderPrice','test/Order/updateOrderPrice');
     //导出订单word文档
     Route::any('/OrderWord/outputOrderWord','test/OrderWord/outputOrderWord');
-    //修改订单支付状态
-    Route::any('/Order/updatePayStatuss','test/Order/updatePayStatus');
+
 
 
 
