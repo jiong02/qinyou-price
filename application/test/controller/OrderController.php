@@ -87,6 +87,46 @@ class OrderController extends BaseController
 
     }
 
+    /**
+     * @name 修改支付状态
+     * @auth Sam
+     * @param Request $request
+     * @return string
+     */
+    public function updatePayStatus(Request $request)
+    {
+        $payStatus = $request->param('pay_status',0);
+        $orderId = $request->param('order_id',0);
+
+        if(empty($payStatus) || !is_numeric($payStatus)){
+            return '数据错误';
+        }
+
+        if(empty($orderId) || !is_numeric($orderId)){
+            return '订单错误';
+        }
+
+        if($payStatus > 2 || $payStatus < 0){
+            return '状态错误';
+        }
+
+        $orderModel = new OrderModel();
+
+        $orderInfo = $orderModel->where('id',$orderId)->find();
+
+        if(empty($orderInfo)){
+            return '订单不存在';
+        }
+
+        $orderInfo->pay_status = $payStatus;
+
+        if($orderInfo->save()){
+            return '修改成功';
+        }
+
+        return '修改失败';
+    }
+
 
     /**
      * @name 获取订单（联系人）
@@ -104,7 +144,7 @@ class OrderController extends BaseController
 
         $orderModel = new OrderModel();
 
-        $orderInfo = $orderModel->field("cheeru_order.id,cheeru_order.order_name,cheeru_order.route_id,cheeru_order.trip_date,cheeru_order.room_number,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.update_total_price,cheeru_order.linkman_name,cheeru_order.linkman_phone,cheeru_order.linkman_wechat,ims_route.ims_route.image_uniqid,ims_new.ims_image.image_category,ims_new.ims_image.image_path,ims_route.route_type,order_status")->where("cheeru_order.id",$orderId)->join('ims_route.ims_route','cheeru_order.route_id = ims_route.ims_route.id','LEFT')->join('ims_new.ims_image','ims_route.ims_route.image_uniqid = ims_new.ims_image.image_uniqid','LEFT')->find();
+        $orderInfo = $orderModel->field("cheeru_order.id,cheeru_order.order_name,cheeru_order.route_id,cheeru_order.trip_date,cheeru_order.room_number,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.update_total_price,cheeru_order.linkman_name,cheeru_order.linkman_phone,cheeru_order.linkman_wechat,ims_route.ims_route.image_uniqid,ims_new.ims_image.image_category,ims_new.ims_image.image_path,ims_route.route_type,order_status,pay_status")->where("cheeru_order.id",$orderId)->join('ims_route.ims_route','cheeru_order.route_id = ims_route.ims_route.id','LEFT')->join('ims_new.ims_image','ims_route.ims_route.image_uniqid = ims_new.ims_image.image_uniqid','LEFT')->find();
 
         if(!empty($orderInfo)){
             return $orderInfo->toArray();
@@ -288,6 +328,42 @@ class OrderController extends BaseController
     }
 
     /**
+     * @name 获取我的后台订单列表
+     * @auth Sam
+     * @param Request $request
+     * @return string
+     */
+    public function getMyBackOrderList(Request $request)
+    {
+        $page = $request->param('page',0);
+        $limit = $request->param('limit',10);
+        $accountId = $request->param('account_id',0);
+
+        if(empty($accountId) || !is_numeric($accountId)){
+            return '用户信息错误';
+        }
+
+        $orderModel = new OrderModel();
+
+        $orderList = $orderModel->field('cheeru_order.id,cheeru_order.order_name,cheeru_order.create_time,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.update_total_price,cheeru_order.take_charge_people_id,cheeru_order.order_status,cheeru_order.route_id,ims_route.ims_route.route_code')->join('ims_route.ims_route','route_id = ims_route.ims_route.id ','LEFT')->where('create_order_people_id',$accountId)->limit($page,$limit)->order('id desc')->select();
+
+        $orderCount = $orderModel->field('cheeru_order.id,cheeru_order.order_name,cheeru_order.create_time,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.update_total_price,cheeru_order.take_charge_people_id,cheeru_order.order_status,cheeru_order.route_id,ims_route.ims_route.route_code')->join('ims_route.ims_route','route_id = ims_route.ims_route.id ','LEFT')->where('create_order_people_id',$accountId)->count();
+
+        $orderCount = ceil($orderCount / 10);
+
+        if(!empty($orderList)){
+            $return['total_page'] = $orderCount;
+            $return['order_list'] = $orderList->toArray();
+
+            return $return;
+        }
+
+        return '没有订单列表';
+    }
+
+
+
+    /**
      * @name 获取订单信息
      * @auth Sam
      * @param Request $request
@@ -434,6 +510,8 @@ class OrderController extends BaseController
         $excClass->export();
 
     }
+
+
 
 
     public function outputOrderWorld()
