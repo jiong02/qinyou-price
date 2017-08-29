@@ -1,8 +1,9 @@
 <?php
 namespace app\ims\model;
 use think\Model;
+use app\ims\model\BaseModel;
 
-class SupplierOrderModel extends Model
+class SupplierOrderModel extends BaseModel
 {
     protected $table = 'ims_supplier_order';
     protected $connection = 'ims_new';
