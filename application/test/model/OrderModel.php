@@ -44,8 +44,7 @@ class OrderModel extends Model
         if(empty($result)){
             throw new Exception('当前订单不存在!');
         }
-        $this->order_status = $status;
-        $result = $this->update();
+        $result = $this->where('id',$orderId)->update(['order_status'=> $status]);
         if ($result){
             return true;
         }
