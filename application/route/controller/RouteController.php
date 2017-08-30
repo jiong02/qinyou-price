@@ -725,10 +725,7 @@ class RouteController extends Controller
         if(empty($accountId)){
             return '账号不存在';
         }
-
-        if(empty($accountName)){
-            return '账号不存在';
-        }
+        
 
         $accountModel = new EmployeeAccountModel();
 
