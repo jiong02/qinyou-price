@@ -173,6 +173,18 @@ class OrderController extends BaseController
 
         $orderInfo = $orderModel->where('id',$orderId)->find();
 
+        $customerModel = new OrderCustomerModel();
+
+        $custNumber = $customerModel->where('order_id',$orderId)->count();
+
+        $tripNumber = $orderInfo->adult_number + $orderInfo->child_number;
+
+        if($tripNumber == $custNumber){
+            $orderInfo->order_status = 4;
+
+            $orderInfo->save();
+        }
+
         if(empty($orderInfo)){
             return '订单不存在';
         }
