@@ -10,4 +10,13 @@ class ContractPackageModel extends BaseModel
     {
         $query->where('ims_contract_package.status',1);
     }
+
+
+    public $baseHidden = ['create_time','modify_time'];
+
+    public function __construct($data = [])
+    {
+        $this->hidden = array_merge($this->hidden, $this->baseHidden);
+        parent::__construct($data);
+    }
 }
