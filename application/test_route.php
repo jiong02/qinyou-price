@@ -140,6 +140,8 @@ Route::domain('test', function(){
     Route::any('/Order/getBackOrderList','test/Order/getBackOrderList');
     //后台获取我的订单列表
     Route::any('/Order/getMyBackOrderList','test/Order/getMyBackOrderList');
+    //后台获取房间数量
+    Route::any('/Order/getOrderRoomNumber','test/order/getOrderRoomNumber');
     //后台获取订单信息
     Route::any('/Order/getBackOrderInfo','test/Order/getBackOrderInfo');
     //订单信息Excel文件导出

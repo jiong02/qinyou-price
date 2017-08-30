@@ -475,7 +475,49 @@ class OrderController extends BaseController
 
     }
 
+    public function getOrderRoomNumber(Request $request)
+    {
+        $orderId = $request->param('order_id',0);
+        $number = $request->param('number',0);
+        $change = '';
 
+        $orderModel = new OrderModel();
+
+        if(!empty($orderId)){
+            $orderInfo = $orderModel->where('id',$orderId)->find();
+
+            if(!empty($orderInfo)){
+                $orderInfo->order_status = $number;
+
+                if($orderInfo->save()){
+                    return '修改成功';
+                }
+            }
+
+            $change = '';
+        }
+
+        if(empty($change)){
+
+            $orderCount = $orderModel->count();
+
+            $orderRand = rand(1,$orderCount);
+
+            $numberRand = rand(1,5);
+
+            $orderInfo = $orderModel->where('id',$orderRand)->find();
+            $orderInfo->order_status = $numberRand;
+
+            if($orderInfo->save()){
+                return '修改成功';
+            }else{
+                return '修改失败';
+            }
+
+        }
+
+
+    }
 
 
     public function outputOrderWorld()
