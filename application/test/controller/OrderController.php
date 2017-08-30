@@ -189,9 +189,9 @@ class OrderController extends BaseController
             return '订单不存在';
         }
 
-        if($orderInfo['order_status'] > 3){
+/*        if($orderInfo['order_status'] > 3){
             return '流程不正确';
-        }
+        }*/
 
         $customerModel = new OrderCustomerModel();
 
