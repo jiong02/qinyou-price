@@ -20,6 +20,8 @@ use app\components\ali\alipay\AliPayQrcodePay;
 use app\components\ali\alipay\AlipayQuery;
 use app\components\wechat\wechatpay\WechatpayRefund;
 use app\components\wechat\wechatpay\WechatpayService;
+use app\test\model\OrderModel;
+use app\test\model\TestAccount;
 use Endroid\QrCode\QrCode;
 use think\Request;
 
@@ -50,12 +52,16 @@ class PayController extends BaseController
 
     public function query(Request $request)
     {
-        $outTradeNo = $request->param('out_trade_no');
-        $payType = $request->param('pay_type');
+        $customerToken = $request->param('customer_token','5a0435');
+        $customerId = $request->param('customer_id',4);
+        $outTradeNo = $request->param('out_trade_no',18);
+        $payType = $request->param('pay_type','支付宝');
         $params = [
             'out_trade_no'=>[$outTradeNo , 'require'],
             'pay_type'=>[$payType , 'require'],
         ];
+        $testAccount = new TestAccount();
+        $testAccount->checkAccountId($customerId,$customerToken);
         $this->checkAllParam($params);
         if ($payType == '支付宝'){
             $result = $this->alipayQuery($outTradeNo);
@@ -63,6 +69,10 @@ class PayController extends BaseController
             $result = $this->wechatpayQuery($outTradeNo);
         }else{
             $result = getError('支付类型错误');
+        }
+        if ($result['status'] === 1){
+            $orderModel =  new OrderModel();
+            $orderModel->updateOrderStatus($outTradeNo,$customerId,4);
         }
         return $result;
     }
@@ -113,7 +123,7 @@ class PayController extends BaseController
             return getSuccess('订单支付成功');
         }else{
             $response = $result->getResponse();
-            return getSuccess($response->msg);
+            return getError($response->msg);
         }
     }
 
@@ -142,6 +152,23 @@ class PayController extends BaseController
         }
     }
 
+    public function wechatpayRefund()
+    {
+        $outRefundNo = Data::getUniqueString();
+        $wechatpayContentBuilder = new WechatpayContentBuilder();
+        $wechatpayContentBuilder->setOutTradeNo(date('YmdHis'));
+//        $wechatpayContentBuilder->setTotalFee(99.00);
+//        $wechatpayContentBuilder->setRefundFee(50.00);
+//        $wechatpayContentBuilder->setOutRefundNo($outRefundNo);
+        $refund = new WechatpayService();
+        $result = $refund->refundQuery($wechatpayContentBuilder);
+        halt($result);
+    }
+
+    public function updateOrderStatus()
+    {
+
+    }
 //    public function wechatpayQrcodePay()
 //    {
 //        $wechatpayContentBuilder = new WechatpayContentBuilder();
@@ -159,17 +186,4 @@ class PayController extends BaseController
 //            exit;
 //        }
 //    }
-
-    public function wechatpayRefund()
-    {
-        $outRefundNo = Data::getUniqueString();
-        $wechatpayContentBuilder = new WechatpayContentBuilder();
-        $wechatpayContentBuilder->setOutTradeNo(date('YmdHis'));
-//        $wechatpayContentBuilder->setTotalFee(99.00);
-//        $wechatpayContentBuilder->setRefundFee(50.00);
-//        $wechatpayContentBuilder->setOutRefundNo($outRefundNo);
-        $refund = new WechatpayService();
-        $result = $refund->refundQuery($wechatpayContentBuilder);
-        halt($result);
-    }
 }

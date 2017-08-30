@@ -90,6 +90,7 @@ Route::domain('test', function(){
      */
     Route::any('pay/qrcodePay','test/Pay/qrcodePay');
     Route::any('pay/query','test/Pay/query');
+    Route::any('pay/updateOrderStatus','test/Pay/updateOrderStatus');
     /*
      * 测试
      */

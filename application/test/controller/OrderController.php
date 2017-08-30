@@ -218,45 +218,7 @@ class OrderController extends BaseController
         return '修改失败';
     }
 
-    /**
-     * @name 前端修改订单状态
-     * @auth Sam
-     * @param Request $request
-     * @return string
-     */
-    public function updateOrderStatus(Request $request)
-    {
-        $orderId = $request->param('order_id',0);
-        $status = $request->param('status',0);
-        $type = $request->param('type',1);
 
-        if(empty($orderId) || empty($status)){
-            return '数据不完整';
-        }
-
-        $orderModel = new OrderModel();
-
-        $orderInfo = $orderModel->where('id',$orderId)->find();
-
-        if(empty($orderInfo)){
-            return '订单不存在';
-        }
-
-        $orderInfo->order_status = $status;
-        $result = '';
-
-        if($type == 1){
-            $result = $orderInfo->save();
-        }else if($type == 2){
-            $result = $orderInfo->update();
-        }
-
-        if($result){
-            return '修改成功';
-        }
-
-        return '修改失败';
-    }
 
     /**
      * @name 获取后台订单列表
