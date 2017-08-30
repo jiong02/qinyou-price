@@ -162,7 +162,7 @@ class OrderController extends BaseController
         echo $tripNumber;
 
         var_dump($orderInfo->toArray());
-        halt('aa');
+        halt('aaa');
 
         if($tripNumber == $custNumber){
             $orderInfo->order_status = 4;
