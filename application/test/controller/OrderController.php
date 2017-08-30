@@ -371,7 +371,7 @@ class OrderController extends BaseController
 
         $orderCount = $orderModel->field('cheeru_order.id,cheeru_order.order_name,cheeru_order.create_time,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.update_total_price,cheeru_order.take_charge_people_id,cheeru_order.order_status,cheeru_order.route_id,ims_route.ims_route.route_code')->join('ims_route.ims_route','route_id = ims_route.ims_route.id ','LEFT')->where('create_order_people_id',$accountId)->where($map)->count();
 
-        $orderCount = ceil($orderCount / 10);
+        $orderCount = ceil($orderCount / $limit);
 
         if(!empty($orderList)){
             $return['total_page'] = $orderCount;
