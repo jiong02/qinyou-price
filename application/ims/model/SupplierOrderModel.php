@@ -15,13 +15,15 @@ class SupplierOrderModel extends BaseModel
         'hotel_id|酒店ID' => 'require|number',
         'room_id|房型ID' => 'require|number',
         'room_number|房间数量' => 'require|number',
-
-
-
-
     ];
 
+    public $baseHidden = ['create_time','modify_time'];
 
+    public function __construct($data = [])
+    {
+        $this->hidden = array_merge($this->hidden, $this->baseHidden);
+        parent::__construct($data);
+    }
 
 
 
