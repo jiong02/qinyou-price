@@ -857,7 +857,7 @@ class RouteController extends Controller
 /*halt('aa');*/
                         if($examineModel->save()){
 //                            echo 'aa';
-                            return $routeModel->id;
+                            return (int)$routeModel->id;
                         }else{
                             $routeModel = $routeModel->where('id',$routeId)->find();
                             $routeModel->delete();
