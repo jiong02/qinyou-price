@@ -23,6 +23,7 @@ use app\components\wechat\wechatpay\WechatpayService;
 use app\test\model\OrderModel;
 use app\test\model\TestAccount;
 use Endroid\QrCode\QrCode;
+use think\Cache;
 use think\Request;
 
 class PayController extends BaseController
@@ -79,6 +80,10 @@ class PayController extends BaseController
 
     public function alipayQrcodePay($outTradeNo, $subject, $totalAmount)
     {
+        $cachePrefix = 'alipay_code_url_';
+        if ($codeUrl = Cache::get($cachePrefix. $outTradeNo)){
+            return getSuccess($codeUrl);
+        }
         $alipayContentBuilder = new AlipayContentBuilder();
         $alipayContentBuilder->setOutTradeNo($outTradeNo);
         $alipayContentBuilder->setSubject($subject);
@@ -87,6 +92,7 @@ class PayController extends BaseController
         $result = $qrcodePay->qrcodePay($alipayContentBuilder);
         $response = $result->getResponse();
         if ($result->getTradeStatus() == 'SUCCESS'){
+            Cache::set($cachePrefix . $outTradeNo, $response->qr_code);
             return getSuccess($response->qr_code);
         }else{
             return getError($response->msg);
@@ -98,6 +104,10 @@ class PayController extends BaseController
         if (!$productId){
             $productId = Data::getUniqueString();
         }
+        $cachePrefix = 'wechatpay_code_url_';
+        if ($codeUrl = Cache::get($cachePrefix . $outTradeNo)){
+            return getSuccess($codeUrl);
+        }
         $wechatpayContentBuilder = new WechatpayContentBuilder();
         $wechatpayContentBuilder->setOutTradeNo($outTradeNo);
         $wechatpayContentBuilder->setBody($subject);
@@ -107,6 +117,7 @@ class PayController extends BaseController
         $result = $qrcodePay->qrcodePay($wechatpayContentBuilder);
         $response = $result->getResponse();
         if ($result->getTradeStatus() == 'SUCCESS'){
+            Cache::set($cachePrefix . $outTradeNo, $response['code_url']);
             return getSuccess($response['code_url']);
         }else{
             return getError($response['err_code']);
