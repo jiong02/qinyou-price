@@ -725,7 +725,7 @@ class RouteController extends Controller
         if(empty($accountId)){
             return '账号不存在';
         }
-        
+
 
         $accountModel = new EmployeeAccountModel();
 
@@ -734,14 +734,14 @@ class RouteController extends Controller
         $titleModel = new TitleModel();
 
         $accountInfo = $this->formateData($accountModel->field('id as account_id,ims_employee_account.*')->where('id',$accountId)->find());
-halt($accountInfo);
+//halt($accountInfo);
         if(empty($accountInfo)){
             return '账号不存在2';
         }
 
         unset($accountInfo['id']);
 
-        $empInfo = $this->formateData($empModel->field('ims_employee.*,id as employee_id')->where('account_id',$accountInfo['account_id'])->find());
+        $empInfo = $this->formateData($empModel->field('ims_employee.*,id as employee_id')->where('account_name',$accountInfo['account_name'])->find());
         unset($empInfo['id']);
 
         $accountInfo = array_merge($accountInfo,$empInfo);
