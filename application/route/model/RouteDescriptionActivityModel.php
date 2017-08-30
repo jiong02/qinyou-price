@@ -5,7 +5,7 @@ use think\Model;
 
 class RouteDescriptionActivityModel extends Model
 {
-    public $table = 'ims_route_description_activity';
+    public $table = 'ims_route.ims_route_description_activity';
 
     public $rule = [
         'description_id|描述' => 'require|number',
@@ -16,7 +16,13 @@ class RouteDescriptionActivityModel extends Model
 
     ];
 
+    public $baseHidden = ['create_time','modify_time'];
 
+    public function __construct($data = [])
+    {
+        $this->hidden = array_merge($this->hidden, $this->baseHidden);
+        parent::__construct($data);
+    }
 }
 
 

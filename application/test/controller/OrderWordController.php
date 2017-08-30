@@ -10,9 +10,14 @@ use app\route\model\RouteDescriptionModel;
 use app\route\model\RouteDescriptionHotelModel;
 use app\route\model\RouteVehicleModel;
 use app\ims\model\VehicleModel;
+use app\route\model\RouteDescriptionActivityModel;
+use app\route\model\RouteDescriptionVehicleModel;
 
 class OrderWordController extends BaseController
 {
+    static $basical = array(0=>"零","壹","贰","叁","肆","伍","陆","柒","捌","玖");
+    static $advanced=array(1=>"拾","佰","仟");
+
     public function outputOrderWord(Request $request)
     {
         $orderId = $request->param('order_id',0);
@@ -39,7 +44,21 @@ class OrderWordController extends BaseController
             $custList = array();
         }else{
             $custList = $custList->toArray();
+
+            $custArr = array();
+            foreach($custList as $k=>$v){
+                $custArr[$k][] = $v['customer_name'];
+                $custArr[$k][] = $v['customer_ename'];
+                $custArr[$k][] = $v['customer_passport'];
+                $custArr[$k][] = $v['validity_of_passport'];
+                $custArr[$k][] = $v['customer_nationality'];
+                $custArr[$k][] = $v['place_of_issue'];
+                $custArr[$k][] = $v['place_of_issue'];
+                $custArr[$k][] = $v['customer_wechat'];
+            }
+
         }
+
 
         //查找线路信息
         $routeModel = new RouteModel();
@@ -50,7 +69,8 @@ class OrderWordController extends BaseController
         }
 
         $routeInfo = $routeInfo->toArray();
-//halt($routeInfo);
+
+
         //查找线路描述
         $routeDescModel = new RouteDescriptionModel();
 
@@ -64,8 +84,10 @@ class OrderWordController extends BaseController
 
         $routeDescArr = array();
 
+        $routeDescActivityModel = new RouteDescriptionActivityModel();
+
         if(!empty($routeDescList)){
-            $startTime = $routeInfo['start_time'];
+            $startTime = $orderInfo['trip_date'];
             foreach($routeDescList as $k=>$v){
                 $meals = '';
                 $routeDescArr[$k][] = $v['hotel_name'];
@@ -95,8 +117,11 @@ class OrderWordController extends BaseController
                 $routeDescArr[$k][] = $meals;
 
                 $routeDescArr[$k][] = 1;
+
             }
         }
+
+//        halt($routeDescArr);
 
         //获取交通信息
         $routeVehicleModel = new RouteVehicleModel();
@@ -137,6 +162,98 @@ class OrderWordController extends BaseController
             }
         }
 
+        //查询行程预览
+        $routeDescActi = $routeDescModel->field("ims_route.ims_route_description.id,ims_route.ims_route_description.route_id,ims_route.ims_route_description.departure_place_name,ims_route.ims_route_description.package_day,ims_route.ims_route_description.package_name,ims_route.ims_route_description_activity.description_id,ims_route.ims_route_description_activity.activity_name")->where('route_id',$routeInfo['id'])->join('ims_route.ims_route_description_activity','ims_route.ims_route_description.id = ims_route.ims_route_description_activity.description_id','LEFT')->select();
+        $routeDescActi = $routeDescActi->toArray();
+//        halt($routeDescActi);
+
+        $routeDescHotelModel = new RouteDescriptionHotelModel();
+        $routeDescVehicleModel = new RouteDescriptionVehicleModel();
+        //$routeDescActivityModel
+
+        $tripArr = array();
+        $trafficInfo = array();
+        $tripStr = '';
+        $meals = '';
+
+        if(!empty($routeDescActi)){
+            $startTime = $orderInfo['trip_date'];
+            $one = 1;
+
+            foreach($routeDescActi as $k=>$v){
+                $tripArr[$k][] = '第'.$one.'天';
+
+                $tripArr[$k][] = $startTime;
+
+                $startTime = strtotime($startTime);
+                $startTime = strtotime('+ 1 day',$startTime);
+                $startTime = date('Y-m-d',$startTime);
+
+                $trafficInfo = $routeDescVehicleModel->where('description_id',$v['id'])->find();
+
+                if(!empty($trafficInfo)){
+                    $trafficInfo = $trafficInfo->toArray();
+
+                    $tripArr[$k][] = $trafficInfo['vehicle_name'];
+                    $tripStr = '1.'.$trafficInfo['vehicle_name'].' '.$trafficInfo['description_start_time'].' ';
+
+
+                }else{
+                    $tripArr[$k][] = $trafficInfo['vehicle_name'];
+                }
+
+                $hotelInfo = $routeDescHotelModel->where('description_id',$v['id'])->find();
+                if(!empty($hotelInfo)){
+                    $hotelInfo = $hotelInfo->toArray();
+
+                    $tripStr .= '
+                    2. '.$hotelInfo['hotel_name'].' ';
+
+                }
+
+                $activityInfo = $routeDescActivityModel->where('description_id',$v['id'])->select();
+
+                if(!empty($activityInfo)){
+                    $activityInfo = $activityInfo->toArray();
+                    $activityStr = '';
+
+                    foreach($activityInfo as $m=>$n){
+                        $activityStr .= $n['activity_name'].' ';
+                    }
+
+                    $tripStr .= '
+                    3. '.$activityStr.' ';
+                }
+
+                $tripArr[$k][] = $tripStr;
+
+                if($hotelInfo['hotel_breakfast'] == '早餐包含'){
+                    $meals = '含早餐 ';
+                }
+
+                if($hotelInfo['hotel_lunch'] == '午餐包含'){
+                    $meals .= '含午餐 ';
+                }
+
+                if($hotelInfo['hotel_dinner'] == '晚餐包含'){
+                    $meals .= '含晚餐 ';
+                }
+
+                $tripArr[$k][] = $meals;
+                $meals = '';
+            }
+        }
+
+        $orderPrice[0][] = 1;
+        $orderPrice[0][] = $orderInfo['order_name'];
+        $orderPrice[0][] = $orderInfo['adult_price'];
+        $orderPrice[0][] = (int)$orderInfo['adult_number'];
+        $orderPrice[0][] = $orderInfo['update_total_price'];
+        $orderPrice[1][] = 2;
+        $orderPrice[1][] = '飞猪暑期优惠';
+        $orderPrice[1][] = -500;
+        $orderPrice[1][] = 1;
+        $orderPrice[1][] = -500;
 
         require APP_PATH.'components/PHPWord_Sam/PHPWord.php';
         require APP_PATH.'components/PHPWord_Sam/PHPWord/IOFactory.php';
@@ -165,7 +282,7 @@ $wordData['customer_data']['key'][] = '国籍';
 $wordData['customer_data']['key'][] = '签发地点';
 $wordData['customer_data']['key'][] = '手机号码';
 $wordData['customer_data']['key'][] = '微信号码';
-$wordData['customer_data']['value'] = $custList;
+$wordData['customer_data']['value'] = $custArr;
 
 //酒店数据
 $wordData['hotel_data']['key'][] = '酒店或度假村名称';
@@ -175,49 +292,28 @@ $wordData['hotel_data']['key'][] = '餐型';
 $wordData['hotel_data']['key'][] = '入住日期';
 $wordData['hotel_data']['key'][] = '退房日期';
 $wordData['hotel_data']['key'][] = '晚数';
-$wordData['hotel_data']['value'][] = $routeDescArr;
+$wordData['hotel_data']['value'] = $routeDescArr;
 
 //交通信息
 $wordData['traffic_data']['key'][] = '出发地';
 $wordData['traffic_data']['key'][] = '目的地';
 $wordData['traffic_data']['key'][] = '去程时间';
-//$wordData['traffic_data']['key'][] = '回程时间';
 $wordData['traffic_data']['key'][] = '类型';
 $wordData['traffic_data']['key'][] = '数量（人）';
 $wordData['traffic_data']['value'] = $vehicleArr;
 
 //行程信息
-$wordData['route_data']['value'][0][] = '第一天';
-$wordData['route_data']['value'][0][] = '9月21日';
-$wordData['route_data']['value'][0][] = '北京-普吉岛';
-$wordData['route_data']['value'][0][] = '1.	北京-普吉 HU7929 18:05-22:50
-2.	接机前往普吉机场酒店
-3.	入住标准间
-';
-$wordData['route_data']['value'][0][] = '含早餐';
-$wordData['route_data']['value'][1][] = '第一天';
-$wordData['route_data']['value'][1][] = '9月21日';
-$wordData['route_data']['value'][1][] = '北京-普吉岛';
-$wordData['route_data']['value'][1][] = '1.	北京-普吉 HU7929 18:05-22:50
-2.	接机前往普吉机场酒店
-3.	入住标准间
-';
-$wordData['route_data']['value'][1][] = '含早餐';
+$wordData['route_data']['value'] = $tripArr;
+
 //总费用信息
 $wordData['total_price_data']['key'][] = '编号';
 $wordData['total_price_data']['key'][] = '内容';
 $wordData['total_price_data']['key'][] = '单价（RMB）';
 $wordData['total_price_data']['key'][] = '数量';
 $wordData['total_price_data']['key'][] = '总价（RMB）';
-$wordData['total_price_data']['value'][0][] = '1';
-$wordData['total_price_data']['value'][0][] = '泰国要爱岛5天4晚行程 普通成人
-2017年9月21日至2017年9月25日
-';
-$wordData['total_price_data']['value'][0][] = '3705';
-$wordData['total_price_data']['value'][0][] = '2';
-$wordData['total_price_data']['value'][0][] = '7410';
-$wordData['total_price_data']['total_price'] = 6910;
-$wordData['total_price_data']['total_price_format'] = '陆仟玖佰壹拾圆';
+$wordData['total_price_data']['value'] = $orderPrice;
+$wordData['total_price_data']['total_price'] = (int)$orderInfo['update_total_price'] - 500;
+$wordData['total_price_data']['total_price_format'] = $this->ParseNumber($wordData['total_price_data']['total_price']);
 //费用信息
 $wordData['cost_include']['value'] = '1、泰国普吉机场酒店1晚标准间住宿（含早餐）
 2、泰国要爱岛3晚豪华海景房（含早餐）
@@ -292,7 +388,7 @@ foreach($wordData['customer_data']['key'] as $k=>$v){
     $cell = $table->addCell(2000,$cellStyle);
     $cell->addText($v);
 }
-
+/*halt($wordData['customer_data']['value']);*/
 foreach($wordData['customer_data']['value'] as $k=>$v){
     $table = $section->addTable('myTable');
     $table->addRow();
@@ -324,7 +420,7 @@ foreach($wordData['hotel_data']['key'] as $k=>$v){
     $cell = $table->addCell(3000,$cellStyle);
     $cell->addText($v);
 }
-
+/*halt($wordData['hotel_data']['value']);*/
 foreach($wordData['hotel_data']['value'] as $k=>$v){
     $table = $section->addTable('myTable');
     $table->addRow();
@@ -356,11 +452,11 @@ foreach($wordData['traffic_data']['key'] as $k=>$v){
     $cell = $table->addCell(3000,$cellStyle);
     $cell->addText($v);
 }
-
+//halt($wordData['traffic_data']['value']);
 foreach($wordData['traffic_data']['value'] as $k=>$v){
     $table = $section->addTable('myTable');
     $table->addRow();
-    for($i=0;$i<6;$i++){
+    for($i=0;$i<5;$i++){
         $cell = $table->addCell(3000,$cellStyle);
         $cell->addText($v[$i]);
     }

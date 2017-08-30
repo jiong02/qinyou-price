@@ -139,6 +139,7 @@ class RouteController extends Controller
 
                 $routePasser = $accountModel->field('id,account_name')->where('id',$v['route_passer_id'])->find();
 
+
                 $routeList[$k]['route_creator'] = $routeCreator['account_name'];
                 $routeList[$k]['route_passer'] = $routePasser['account_name'];
 

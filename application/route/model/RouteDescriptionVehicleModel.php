@@ -13,7 +13,13 @@ class RouteDescriptionVehicleModel extends Model
         'vehicle_name|交通名称' => 'number|require',
         'description_start_time|开始时间' => 'dateFormat:m-d',
     ];
+    public $baseHidden = ['create_time','modify_time'];
 
+    public function __construct($data = [])
+    {
+        $this->hidden = array_merge($this->hidden, $this->baseHidden);
+        parent::__construct($data);
+    }
 
 }
 
