@@ -355,7 +355,7 @@ class OrderController extends BaseController
             break;
 
             case 2:
-                $map = 'order_status = 3';
+                $map = 'order_status in(3,4)';
             break;
 
             case 3:
