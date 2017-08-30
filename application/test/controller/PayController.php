@@ -73,7 +73,7 @@ class PayController extends BaseController
         }
         if ($result['status'] === 1){
             $orderModel =  new OrderModel();
-            $orderModel->updateOrderStatus($outTradeNo,$customerId,4);
+            $orderModel->updateOrderStatus($outTradeNo,$customerId,3);
         }
         return $result;
     }
