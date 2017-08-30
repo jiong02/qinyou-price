@@ -443,9 +443,6 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
      */
     protected function formatDateTime($time, $format, $timestamp = false)
     {
-        var_dump($time);
-        halt($format);
-
         if (false !== strpos($format, '\\')) {
             $time = new $format($time);
         } elseif (!$timestamp && false !== $format) {
