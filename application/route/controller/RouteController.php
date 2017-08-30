@@ -766,54 +766,6 @@ class RouteController extends Controller
 
         return $returnArray;
     }
-/*    public function publicSelectAccountInfo()
-    {
-        $request = $this->request;
-        $accountId = $request->param('account_id',0);
-
-        if(empty($accountId)){
-            return '账号不存在';
-        }
-
-        $accountModel = new EmployeeAccountModel();
-
-        $empModel = new EmployeeModel();
-
-        $titleModel = new TitleModel();
-
-        $accountInfo = $this->formateData($accountModel->field('id as account_id,ims_employee_account.*')->where('id',$accountId)->find());
-
-        if(empty($accountInfo)){
-            return '账号不存在2';
-        }
-
-        unset($accountInfo['id']);
-
-        $empInfo = $this->formateData($empModel->field('ims_employee.*,id as employee_id')->where('account_id',$accountInfo['account_id'])->find());
-        unset($empInfo['id']);
-
-        $accountInfo = array_merge($accountInfo,$empInfo);
-
-        $titleInfo = $this->formateData($titleModel->field('ims_title.id as title_id,ims_title.*')->where('department_id',$accountInfo['department_id'])->find());
-        unset($titleInfo['id']);
-
-        $accountInfo = array_merge($accountInfo,$titleInfo);
-
-        $departmentModel = new DepartmentModel();
-
-        $departmentInfo = $this->formateData($departmentModel->where('id',$accountInfo['department_id'])->find());
-        unset($departmentInfo['id']);
-
-        $accountInfo = array_merge($accountInfo,$departmentInfo);
-
-        $returnArray['account_name'] = $accountInfo['account_name'];
-        $returnArray['title'] = $accountInfo['title'];
-        $returnArray['department_name'] = $accountInfo['department_name'];
-        $returnArray['is_charge'] = $accountInfo['is_charge'];
-
-
-        return $returnArray;
-    }*/
 
 
     /**
@@ -902,7 +854,7 @@ class RouteController extends Controller
                         $examineModel->route_creator_id = $routeCreatorId;
                         $examineModel->route_passer_id = $passerInfo['account_id'];
                         $examineModel->route_create_time = date('Y-m-d',time());
-
+/*halt('aa');*/
                         if($examineModel->save()){
 //                            echo 'aa';
                             return $routeModel->id;
@@ -1035,14 +987,18 @@ class RouteController extends Controller
             return false;
         }
 
+        $empAccountModel = new EmployeeAccountModel();
+        $empAccountInfo = $empAccountModel->where('id',$userId)->find();
+        $empAccountInfo = $empAccountInfo->toArray();
+//        halt($empAccountInfo);
 
         $employeeModel = new EmployeeModel();
-        $exmInfo = $this->formateData($employeeModel->where('account_id',$userId)->find());
-
+        $exmInfo = $this->formateData($employeeModel->where('account_name',$empAccountInfo['account_name'])->find());
+//halt($exmInfo);
         if(empty($exmInfo)){
             return false;
         }
-//var_dump($exmInfo);
+
         //查看部门主管
         $titleModel = new TitleModel();
         $titleList = $this->formateData($titleModel->where('is_charge','是')->select());
@@ -1063,7 +1019,11 @@ class RouteController extends Controller
         if(empty($upInfo)){
             return false;
         }
-//var_dump($upInfo);
+
+        $empAccountInfo = $empAccountModel->where('account_name',$exmInfo['account_name'])->find();
+
+        $upInfo['account_id'] = $empAccountInfo->id;
+
         return $upInfo;
 
     }
