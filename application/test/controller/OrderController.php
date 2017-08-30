@@ -38,8 +38,11 @@ class OrderController extends BaseController
         $orderInfo['order_status'] = 1;
         $orderInfo['create_date'] = date('Y-m-d',time());
         $orderInfo['total_price'] = $orderInfo['update_total_price'];
-        $orderInfo['order_id'] = uniqid();
-        $orderInfo['order_pay_id'] = uniqid();
+        if(empty($orderInfo['id'])){
+            $orderInfo['order_id'] = md5(uniqid());
+        }
+
+        $orderInfo['order_pay_id'] = md5(uniqid());
 
         $result = $orderModel->save($orderInfo);
 
@@ -146,6 +149,30 @@ class OrderController extends BaseController
 
         $orderModel = new OrderModel();
 
+        $orderInfo = $orderModel->where('id',$orderId)->find();
+
+        $customerModel = new OrderCustomerModel();
+
+        $custNumber = $customerModel->where('order_id',$orderId)->count();
+
+        $tripNumber = $orderInfo->adult_number + $orderInfo->child_number;
+
+/*        echo $custNumber;
+        echo '<br>';
+        echo $tripNumber;
+
+        var_dump($orderInfo->toArray());
+        halt('aaa');*/
+
+        if($tripNumber == $custNumber){
+            $orderInfo->order_status = 4;
+
+            $orderInfo->save();
+        }
+
+
+        $orderModel = new OrderModel();
+
         $orderInfo = $orderModel->field("cheeru_order.id,cheeru_order.order_name,cheeru_order.route_id,cheeru_order.trip_date,cheeru_order.room_number,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.update_total_price,cheeru_order.linkman_name,cheeru_order.linkman_phone,cheeru_order.linkman_wechat,ims_route.ims_route.image_uniqid,ims_new.ims_image.image_category,ims_new.ims_image.image_path,ims_route.route_type,order_status,pay_status,order_id,order_pay_id")->where("cheeru_order.id",$orderId)->join('ims_route.ims_route','cheeru_order.route_id = ims_route.ims_route.id','LEFT')->join('ims_new.ims_image','ims_route.ims_route.image_uniqid = ims_new.ims_image.image_uniqid','LEFT')->find();
 
         if(!empty($orderInfo)){
@@ -173,13 +200,25 @@ class OrderController extends BaseController
 
         $orderInfo = $orderModel->where('id',$orderId)->find();
 
+        $customerModel = new OrderCustomerModel();
+
+        $custNumber = $customerModel->where('order_id',$orderId)->count();
+
+        $tripNumber = $orderInfo->adult_number + $orderInfo->child_number;
+
+        if($tripNumber == $custNumber){
+            $orderInfo->order_status = 4;
+
+            $orderInfo->save();
+        }
+
         if(empty($orderInfo)){
             return '订单不存在';
         }
 
-        if($orderInfo['order_status'] > 3){
+/*        if($orderInfo['order_status'] > 3){
             return '流程不正确';
-        }
+        }*/
 
         $customerModel = new OrderCustomerModel();
 
@@ -302,6 +341,7 @@ class OrderController extends BaseController
         $page = $request->param('page',0);
         $limit = $request->param('limit',10);
         $accountId = $request->param('account_id',0);
+        $type = $request->param('type',0);
 
         if(empty($accountId) || !is_numeric($accountId)){
             return '用户信息错误';
@@ -309,11 +349,29 @@ class OrderController extends BaseController
 
         $orderModel = new OrderModel();
 
-        $orderList = $orderModel->field('cheeru_order.id,cheeru_order.order_name,cheeru_order.create_time,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.update_total_price,cheeru_order.take_charge_people_id,cheeru_order.order_status,cheeru_order.route_id,ims_route.ims_route.route_code,trip_date')->join('ims_route.ims_route','route_id = ims_route.ims_route.id ','LEFT')->where('create_order_people_id',$accountId)->limit($page,$limit)->order('id desc')->select();
+        switch($type){
+            case 1:
+                $map = 'order_status < 3';
+            break;
 
-        $orderCount = $orderModel->field('cheeru_order.id,cheeru_order.order_name,cheeru_order.create_time,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.update_total_price,cheeru_order.take_charge_people_id,cheeru_order.order_status,cheeru_order.route_id,ims_route.ims_route.route_code')->join('ims_route.ims_route','route_id = ims_route.ims_route.id ','LEFT')->where('create_order_people_id',$accountId)->count();
+            case 2:
+                $map = 'order_status = 3';
+            break;
 
-        $orderCount = ceil($orderCount / 10);
+            case 3:
+                $map = 'order_status = 5';
+            break;
+
+            default :
+                $map = 0;
+            break;
+        }
+
+        $orderList = $orderModel->field('cheeru_order.id,cheeru_order.order_name,cheeru_order.create_time,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.update_total_price,cheeru_order.take_charge_people_id,cheeru_order.order_status,cheeru_order.route_id,ims_route.ims_route.route_code,trip_date')->join('ims_route.ims_route','route_id = ims_route.ims_route.id ','LEFT')->where('create_order_people_id',$accountId)->where($map)->limit($page,$limit)->order('id desc')->select();
+
+        $orderCount = $orderModel->field('cheeru_order.id,cheeru_order.order_name,cheeru_order.create_time,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.update_total_price,cheeru_order.take_charge_people_id,cheeru_order.order_status,cheeru_order.route_id,ims_route.ims_route.route_code')->join('ims_route.ims_route','route_id = ims_route.ims_route.id ','LEFT')->where('create_order_people_id',$accountId)->where($map)->count();
+
+        $orderCount = ceil($orderCount / $limit);
 
         if(!empty($orderList)){
             $return['total_page'] = $orderCount;
@@ -412,6 +470,7 @@ class OrderController extends BaseController
         }
 
         $orderInfo->update_total_price = $price;
+        $orderInfo->order_pay_id = md5(uniqid());
 
         if($orderInfo->save()){
             return '修改订单成功';
