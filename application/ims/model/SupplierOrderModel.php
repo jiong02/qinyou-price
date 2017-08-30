@@ -27,7 +27,7 @@ class SupplierOrderModel extends BaseModel
 
 
 
-c $baseHidden = ['create_time','modify_time'];
+ $baseHidden = ['create_time','modify_time'];
 
     public function __construct($data = [])
     {
