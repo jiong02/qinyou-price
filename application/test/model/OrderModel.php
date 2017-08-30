@@ -1,6 +1,7 @@
 <?php
 namespace app\test\model;
 use app\test\model\BaseModel;
+use think\Exception;
 use think\Model;
 
 class OrderModel extends Model
@@ -37,7 +38,22 @@ class OrderModel extends Model
         'linkman' => ['linkman_name','linkman_phone'],
     ];
 
+    public function updateOrderStatus($orderId, $customerId, $status)
+    {
+        $result = $this->where('id',$orderId)->where('create_order_people_id',$customerId)->find();
+        if(empty($result)){
+            throw new Exception('当前订单不存在!');
+        }
+        $this->order_status = $status;
+        $result = $this->update();
+        if ($result){
+            return true;
+        }
+        return false;
 
+
+
+    }
 
 
 }
