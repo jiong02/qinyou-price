@@ -157,6 +157,13 @@ class OrderController extends BaseController
 
         $tripNumber = $orderInfo->adult_number + $orderInfo->child_number;
 
+        echo $custNumber;
+        echo '<br>';
+        echo $tripNumber;
+
+        var_dump($orderInfo->toArray());
+        halt('aa');
+
         if($tripNumber == $custNumber){
             $orderInfo->order_status = 4;
 
