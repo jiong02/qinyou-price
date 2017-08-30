@@ -38,8 +38,11 @@ class OrderController extends BaseController
         $orderInfo['order_status'] = 1;
         $orderInfo['create_date'] = date('Y-m-d',time());
         $orderInfo['total_price'] = $orderInfo['update_total_price'];
-        $orderInfo['order_id'] = uniqid();
-        $orderInfo['order_pay_id'] = uniqid();
+        if(empty($orderInfo['id'])){
+            $orderInfo['order_id'] = md5(uniqid());
+        }
+
+        $orderInfo['order_pay_id'] = md5(uniqid());
 
         $result = $orderModel->save($orderInfo);
 
@@ -441,6 +444,7 @@ class OrderController extends BaseController
         }
 
         $orderInfo->update_total_price = $price;
+        $orderInfo->order_pay_id = md5(uniqid());
 
         if($orderInfo->save()){
             return '修改订单成功';
