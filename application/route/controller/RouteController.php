@@ -720,6 +720,59 @@ class RouteController extends Controller
     {
         $request = $this->request;
         $accountId = $request->param('account_id',0);
+        $accountName = $request->param('account_name','');
+
+        if(empty($accountId)){
+            return '账号不存在';
+        }
+
+        if(empty($accountName)){
+            return '账号不存在';
+        }
+
+        $accountModel = new EmployeeAccountModel();
+
+        $empModel = new EmployeeModel();
+
+        $titleModel = new TitleModel();
+
+        $accountInfo = $this->formateData($accountModel->field('id as account_id,ims_employee_account.*')->where('id',$accountId)->find());
+halt($accountInfo);
+        if(empty($accountInfo)){
+            return '账号不存在2';
+        }
+
+        unset($accountInfo['id']);
+
+        $empInfo = $this->formateData($empModel->field('ims_employee.*,id as employee_id')->where('account_id',$accountInfo['account_id'])->find());
+        unset($empInfo['id']);
+
+        $accountInfo = array_merge($accountInfo,$empInfo);
+
+        $titleInfo = $this->formateData($titleModel->field('ims_title.id as title_id,ims_title.*')->where('department_id',$accountInfo['department_id'])->find());
+        unset($titleInfo['id']);
+
+        $accountInfo = array_merge($accountInfo,$titleInfo);
+
+        $departmentModel = new DepartmentModel();
+
+        $departmentInfo = $this->formateData($departmentModel->where('id',$accountInfo['department_id'])->find());
+        unset($departmentInfo['id']);
+
+        $accountInfo = array_merge($accountInfo,$departmentInfo);
+
+        $returnArray['account_name'] = $accountInfo['account_name'];
+        $returnArray['title'] = $accountInfo['title'];
+        $returnArray['department_name'] = $accountInfo['department_name'];
+        $returnArray['is_charge'] = $accountInfo['is_charge'];
+
+
+        return $returnArray;
+    }
+/*    public function publicSelectAccountInfo()
+    {
+        $request = $this->request;
+        $accountId = $request->param('account_id',0);
 
         if(empty($accountId)){
             return '账号不存在';
@@ -763,7 +816,7 @@ class RouteController extends Controller
 
 
         return $returnArray;
-    }
+    }*/
 
 
     /**
