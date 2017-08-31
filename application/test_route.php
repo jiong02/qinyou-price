@@ -167,4 +167,75 @@ Route::domain('test', function(){
     Route::get('personalaccount',function(){
         return view('views/personalaccount');
     });
+
+
+    Route::get('casedetail',function(){
+        return view('views/casedetail');
+    });
+
+    Route::get('collect',function(){
+        return view('views/collect');
+    });
+
+    Route::get('commoninfo',function(){
+        return view('views/commoninfo');
+    });
+    Route::get('destinationIndex',function(){
+        return view('views/destinationIndex');
+    });
+
+    Route::get('homepage',function(){
+        return view('views/homepage');
+    });
+
+    Route::get('index',function(){
+        return view('views/index');
+    });
+    Route::get('messageList',function(){
+        return view('views/messageList');
+    });
+
+    Route::get('my',function(){
+        return view('views/my');
+    });
+
+    Route::get('orderinfo',function(){
+        return view('views/orderinfo');
+    });
+    Route::get('paystep',function(){
+        return view('views/paystep');
+    });
+
+    Route::get('personalaccount',function(){
+        return view('views/personalaccount');
+    });
+
+    Route::get('personalaccount',function(){
+        return view('views/personalaccount');
+    });
+    Route::get('preview',function(){
+        return view('views/preview');
+    });
+
+    Route::get('product',function(){
+        return view('views/product');
+    });
+
+    Route::get('personalaccount',function(){
+        return view('views/personalaccount');
+    });
+    Route::get('service',function(){
+        return view('views/service');
+    });
+
+    Route::get('setting',function(){
+        return view('views/setting');
+    });
+
+    Route::get('shoppingCart',function(){
+        return view('views/shoppingCart');
+    });
+    Route::get('yudao',function(){
+        return view('views/yudao');
+    });
 });
