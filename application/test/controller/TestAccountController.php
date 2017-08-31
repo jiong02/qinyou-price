@@ -556,11 +556,15 @@ class TestAccountController extends Controller
 
                 if($accountInfo->save()){
 
-                    $this->sendSMS($accountInfo->call_phone,$codeArr['rand_number']);
-                    return '短信已发送，请注意查收';
+                    $result = $this->sendSMS($accountInfo->call_phone,$codeArr['rand_number']);
+
+                    if(!empty($result)){
+                        return '短信已发送，请注意查收';
+                    }
+
                 }
 
-                return '验证码错误，发送短信失败';
+                return '验证码错误，发送短信失败,也有可能是没钱了';
 
             }
             return $result;
@@ -581,11 +585,15 @@ class TestAccountController extends Controller
             $accountModel->register_time = time();
 
             if($accountModel->save()){
-                $this->sendSMS($callPhone,$codeArr['rand_number']);
-                return '短信已发送2，请注意查收';
+                $result = $this->sendSMS($callPhone,$codeArr['rand_number']);
+
+                if(!empty($result)){
+                    return '短信已发送2，请注意查收';
+                }
+
             }
 
-            return '验证码错误2，发送短信失败';
+            return '验证码错误2，发送短信失败,也有可能是没钱了';
         }
 
     }
