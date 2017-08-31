@@ -31,16 +31,12 @@ class CustomTailorController extends BaseController
         ];
         $this->checkAllParam($params);
         $customTailorModel = new CustomTailorModel();
-        $result = $customTailorModel->where('customer_phone',  $customerPhone)->count();
-        if (!$result) {
-            $result =$customTailorModel->insert($data);
-            if ($result) {
-                $this->sendNotifyMessage($customerName);
-                return Response::Success('提交成功,我们的客服稍后会联系您');
-            }
-            return Response::Success('提交失败,请重新提交');
+        $result =$customTailorModel->insert($data);
+        if ($result) {
+            $this->sendNotifyMessage($customerName);
+            return Response::Success('提交成功,我们的客服稍后会联系您');
         }
-        return Response::Error('手机已存在,请勿重复提交!');
+        return Response::Success('提交失败,请重新提交');
     }
 
     public function sendNotifyMessage($customerName)
