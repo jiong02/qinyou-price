@@ -341,7 +341,7 @@ class TestAccountController extends Controller
         $req->setSmsParam("{\"code\":\"".$content."\",\"product\":\"沁游假期\"}");
         $req->setRecNum($mobile);
         $req->setSmsTemplateCode("SMS_8970078");
-//        $resp = $c->execute($req);
+        $resp = $c->execute($req);
 
         return true;
 
