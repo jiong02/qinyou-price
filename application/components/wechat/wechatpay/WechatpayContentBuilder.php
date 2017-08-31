@@ -96,9 +96,12 @@ class WechatpayContentBuilder
      */
     public function setTotalFee($totalFee)
     {
-        $totalFee = 100 * (int)$totalFee;
+        $totalFee = 100 * $totalFee;
+        if ($totalFee == 0){
+            throw new Exception('订单价格不能0');
+        }
         $this->totalFee = $totalFee;
-        $this->bizContent['total_fee'] = (int)$totalFee;
+        $this->bizContent['total_fee'] = $totalFee;
     }
 
     /**

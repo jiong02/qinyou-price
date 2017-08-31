@@ -45,7 +45,7 @@ class RouteFareController extends BasePricingController
         parent::__construct($request);
     }
 
-    public function pricingStandardQuantityOfRoom()
+    public function pricingInputQuantityOfRoom()
     {
         $standardLogic = $this->standardLogic;
         $standardQuantityOfAdult = $this->standardQuantityOfAdult;
@@ -54,10 +54,9 @@ class RouteFareController extends BasePricingController
         $inputQuantityOfAdult = $this->inputQuantityOfAdult;
         $inputQuantityOfChild = $this->inputQuantityOfChild;
         $inputQuantityOfRoom = $this->inputQuantityOfRoom;
-        $inputQuantityOfPassengers = $this->inputQuantityOfAdult + $this->inputQuantityOfChild;
+        $inputQuantityOfPassengers = $inputQuantityOfAdult + $inputQuantityOfChild;
+        $this->standardQuantityOfRoom = ceil($inputQuantityOfPassengers / $standardQuantityOfAdult + $standardQuantityOfChild);
         $roomArrangementList = [];
-        $haveBalanceForRoomCharge = 0;
-        $haveExtraAdult = 0;
         $maxQuantityOfRoom = $this->maxPassengers / $this->standardQuantityOfAdult;
 
         if ($inputQuantityOfAdult <= 1) {
@@ -84,6 +83,17 @@ class RouteFareController extends BasePricingController
             $this->error = '要求房间数量大于最大房间数量';
             return '要求房间数量大于最大房间数量';
         }
+        $standardQuantityOfRoom = $this->standardQuantityOfRoom;
+        $standardLogic = $this->standardLogic;
+        $standardQuantityOfAdult = $this->standardQuantityOfAdult;
+        $standardQuantityOfChild = $this->standardQuantityOfChild;
+        $standardQuantityOfExtraAdult = $this->standardQuantityOfExtraAdult;
+        $inputQuantityOfAdult = $this->inputQuantityOfAdult;
+        $inputQuantityOfChild = $this->inputQuantityOfChild;
+        $inputQuantityOfRoom = $this->inputQuantityOfRoom;
+        $inputQuantityOfPassengers = $this->inputQuantityOfAdult + $this->inputQuantityOfChild;
+        $haveBalanceForRoomCharge = 0;
+        $haveExtraAdult = 0;
         while ($inputQuantityOfPassengers > 0) {
             if ($inputQuantityOfAdult == 0 && $inputQuantityOfChild >= $standardQuantityOfAdult) {
                 $roomArrangement['standard_quantity_of_adult'] = $standardQuantityOfAdult;
@@ -147,24 +157,6 @@ class RouteFareController extends BasePricingController
 
             }
         }
-        $this->standardQuantityOfRoom = count($roomArrangementList);
-        return $roomArrangementList;
-    }
-
-    public function pricingInputQuantityOfRoom()
-    {
-        $standardRoomArrangementList = $this->pricingStandardQuantityOfRoom();
-        halt($standardRoomArrangementList);
-        $standardQuantityOfRoom = $this->standardQuantityOfRoom;
-        $standardLogic = $this->standardLogic;
-        $standardQuantityOfAdult = $this->standardQuantityOfAdult;
-        $standardQuantityOfChild = $this->standardQuantityOfChild;
-        $standardQuantityOfExtraAdult = $this->standardQuantityOfExtraAdult;
-        $inputQuantityOfAdult = $this->inputQuantityOfAdult;
-        $inputQuantityOfChild = $this->inputQuantityOfChild;
-        $inputQuantityOfRoom = $this->inputQuantityOfRoom;
-        $inputQuantityOfPassengers = $this->inputQuantityOfAdult + $this->inputQuantityOfChild;
-        $roomArrangementList = [];
         if ($inputQuantityOfRoom > $standardQuantityOfRoom) {
 
 //            for ($i = 0; $i < $inputQuantityOfRoom ; $i++) {
