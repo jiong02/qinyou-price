@@ -38,13 +38,13 @@ class OrderModel extends Model
         'linkman' => ['linkman_name','linkman_phone'],
     ];
 
-    public function updateOrderStatus($orderId, $customerId, $status)
+    public function updateOrderStatus($orderPayId, $customerId, $status)
     {
-        $result = $this->where('order_pay_id',$orderId)->where('create_order_people_id',$customerId)->find();
+        $result = $this->where('order_pay_id',$orderPayId)->where('create_order_people_id',$customerId)->find();
         if(empty($result)){
             throw new Exception('当前订单不存在!');
         }
-        $result = $this->where('id',$orderId)->update(['order_status'=> $status]);
+        $result = $this->where('order_pay_id',$orderPayId)->update(['order_status'=> $status]);
         if ($result){
             return true;
         }
