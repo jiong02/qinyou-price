@@ -40,7 +40,7 @@ class OrderModel extends Model
 
     public function updateOrderStatus($orderId, $customerId, $status)
     {
-        $result = $this->where('id',$orderId)->where('create_order_people_id',$customerId)->find();
+        $result = $this->where('order_pay_id',$orderId)->where('create_order_people_id',$customerId)->find();
         if(empty($result)){
             throw new Exception('当前订单不存在!');
         }
