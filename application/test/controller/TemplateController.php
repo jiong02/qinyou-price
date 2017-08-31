@@ -291,8 +291,8 @@ class TemplateController extends BaseController
         foreach($tempInfo as $k=>$v){
             $tempRouteModel = new TemplateRouteModel();
 
-            $tempRouteList = $tempRouteModel->field('id as temp_route_id,temp_id,place_id,place_name,route_id,route_name,is_carousel_banner')->where('temp_id',$v['id'])->order('sort desc')->select();
-//            $tempRouteList = $tempRouteList->toArray();
+            $tempRouteList = $tempRouteModel->field('id as temp_route_id,temp_id,place_id,place_name,route_id,route_name,is_carousel_banner,sort')->where('temp_id',$v['id'])->order('sort asc')->select();
+            $tempRouteList = $tempRouteList->toArray();
 //halt($tempRouteList);
             foreach($tempRouteList as $m=>$n){
 /*                $return = array();
