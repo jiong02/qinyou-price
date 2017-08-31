@@ -336,6 +336,7 @@ class TestAccountController extends Controller
         $c->appkey = "23358963";
         $c->secretKey = "d60915fd89faed62bb1a0dea8af438a8";
         $req = new \AlibabaAliqinFcSmsNumSendRequest();
+        halt($req);
         $req->setSmsType("normal");
         $req->setSmsFreeSignName("身份验证");
         $req->setSmsParam("{\"code\":\"".$content."\",\"product\":\"沁游假期\"}");
