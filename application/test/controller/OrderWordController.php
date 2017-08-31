@@ -4,14 +4,14 @@ use app\test\controller\BaseController;
 use think\Controller;
 use app\test\model\OrderModel;
 use app\test\model\OrderCustomerModel;
-use think\Request;
-use app\route\model\RouteModel;
-use app\route\model\RouteDescriptionModel;
-use app\route\model\RouteDescriptionHotelModel;
-use app\route\model\RouteVehicleModel;
+use think\nequest;
+use app\noute\model\nouteModel;
+use app\noute\model\nouteDescriptionModel;
+use app\noute\model\nouteDescriptionHotelModel;
+use app\noute\model\nouteVehicleModel;
 use app\ims\model\VehicleModel;
-use app\route\model\RouteDescriptionActivityModel;
-use app\route\model\RouteDescriptionVehicleModel;
+use app\noute\model\nouteDescriptionActivityModel;
+use app\noute\model\nouteDescriptionVehicleModel;
 
 class OrderWordController extends BaseController
 {
@@ -366,14 +366,14 @@ $str1 = "本服务协议共10页（含本页）
 1、甲方需要仔细核对旅客的姓名与证件号，乙方将按照以下信息为甲方预定，若因信息有误造成甲方损失，所产生损失由甲方自行承担。甲方最迟不得迟于2017年8月18日（含当天）提供所有客人的资料（包括但不限于护照号码、姓名、证件有效期、出生日期、性别、国籍），以方便乙方落实预定，并且保证提供的所有信息的真实性，乙方不承担因甲方提供的信息错误而造成的任何后果或损失。
 ";
 
-$str = explode("\r",$str);
+$str = explode("\n",$str);
 
 foreach($str as $k=>$v){
     $section->addText($v,array('bold'=>true,'size'=>9));
 }
 
 
-$str1 = explode("\r",$str1);
+$str1 = explode("\n",$str1);
 
 foreach($str1 as $k=>$v){
     $section->addText($v,array(),array('spacing'=>115));
@@ -408,7 +408,7 @@ $str2 = "第二条 服务范围
 （1）预定酒店或度假村        
 ";
 
-$str2 = explode("\r",$str2);
+$str2 = explode("\n",$str2);
 foreach($str2 as $k=>$v){
     $section->addText($v,array(),array('spacing'=>115));
 }
@@ -439,7 +439,7 @@ $str3 = "说明：
 （2）预订交通（不含航班）：
 ";
 
-$str3 = explode("\r",$str3);
+$str3 = explode("\n",$str3);
 
 foreach($str3 as $k=>$v){
     $section->addText($v);
@@ -491,7 +491,7 @@ $str4 = "（5）备注：
 （6）行程概览
 ";
 
-$str4 = explode("\r",$str4);
+$str4 = explode("\n",$str4);
 
 foreach($str4 as $k=>$v){
     $section->addText($v,array(),array('spacing'=>115));
@@ -724,7 +724,7 @@ $str5 = "（2）以上费用以人民币作为结算币种，在签订本协议�
 第十六条 其他补充事项未尽事宜，经甲方和乙方双方协商一致，可以列入补充条款。
 ";
 
-$str5 = explode("\r",$str5);
+$str5 = explode("\n",$str5);
 
 foreach($str5 as $k=>$v){
     $section->addText($v,array(),array('spacing'=>115));
@@ -750,7 +750,7 @@ $str6 = "轻声说，慢慢行；拘小节，遵法纪；
 
 ";
 
-$str6 = explode("\r",$str6);
+$str6 = explode("\n",$str6);
 
 foreach($str6 as $k=>$v){
     $section->addText($v,array('size'=>'18','bold'=>true),array('align'=>'center','spacing'=>115));
@@ -767,7 +767,7 @@ $str7 = "1.	轻声说，慢慢行：不大声喧哗，不随意插队，上下�
 8.	善相待，光中华:  尊重他人，以礼待人。发扬中华礼仪之邦本色。
 ";
 
-$str7 = explode("\r",$str7);
+$str7 = explode("\n",$str7);
 
 foreach($str7 as $k=>$v){
     $section->addText($v,array('bold'=>true),array('align'=>'left','spacing'=>115));
