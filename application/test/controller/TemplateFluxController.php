@@ -517,9 +517,9 @@ class TemplateFluxController extends BaseController
         $startTime = $request->param('start_time','');
         $endTime = $request->param('end_time',date('Y-m-d',time()));
 
-        if(empty($search)){
+/*        if(empty($search)){
             return '查询数据为空';
-        }
+        }*/
 
         $tempRouteModel = new TemplateRouteModel();
 
