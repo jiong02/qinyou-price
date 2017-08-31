@@ -558,7 +558,7 @@ return $resp;
                 if($accountInfo->save()){
 
                     $result = $this->sendSMS($accountInfo->call_phone,$codeArr['rand_number']);
-//                    return $result;
+                    return $result;
                     if(!empty($result)){
                         return '短信已发送，请注意查收';
                     }
@@ -587,7 +587,7 @@ return $resp;
 
             if($accountModel->save()){
                 $result = $this->sendSMS($callPhone,$codeArr['rand_number']);
-//                return $result;
+                return $result;
                 if(!empty($result)){
                     return '短信已发送2，请注意查收';
                 }
