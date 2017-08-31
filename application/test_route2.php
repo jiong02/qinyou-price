@@ -100,7 +100,7 @@ Route::domain('test', function(){
      Route::any('wechatpayQrcodePay','test/Pay/wechatpayQrcodePay');
      Route::any('wechatpayQuery','test/Pay/wechatpayQuery');
      Route::any('wechatpayRefund','test/Pay/wechatpayRefund');
-     Route::any('pricingInputQuantityOfRoom','ims/Pricing/pricingInputQuantityOfRoom');
+     Route::any('pricingInputQuantityOfRoom','route/RouteFare/pricingInputQuantityOfRoom');
 });
 
 

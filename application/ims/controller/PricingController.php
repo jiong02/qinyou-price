@@ -389,7 +389,7 @@ class PricingController extends BasePricingController
     {
         $standardRoomArrangementList = $this->pricingStandardQuantityOfRoom();
         $standardQuantityOfRoom = $this->standardQuantityOfRoom;
-        $standardLogic = $this->standardLogic = '或';
+        $standardLogic = $this->standardLogic;
         $standardQuantityOfAdult = $this->standardQuantityOfAdult;
         $standardQuantityOfChild = $this->standardQuantityOfChild;
         $standardQuantityOfExtraAdult = $this->standardQuantityOfExtraAdult;

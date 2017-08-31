@@ -53,7 +53,7 @@ class PayController extends BaseController
 
     public function query(Request $request)
     {
-        $customerToken = $request->param('customer_token','5a0435');
+        $customerToken = $request->param('customer_token','37fef2');
         $customerId = $request->param('customer_id',4);
         $outTradeNo = $request->param('out_trade_no',18);
         $payType = $request->param('pay_type','支付宝');
@@ -126,16 +126,16 @@ class PayController extends BaseController
 
     public function alipayQuery($outTradeNo)
     {
-//        $alipayQueryBuilder = new AlipayContentBuilder();
-//        $alipayQueryBuilder->setOutTradeNo($outTradeNo);
-//        $query = new AlipayService();
-//        $result = $query->loopQueryResult($alipayQueryBuilder);
-//        if ($result->getTradeStatus() == 'SUCCESS'){
-//            return getSuccess('订单支付成功');
-//        }else{
-//            $response = $result->getResponse();
-//            return getError($response->msg);
-//        }
+        $alipayQueryBuilder = new AlipayContentBuilder();
+        $alipayQueryBuilder->setOutTradeNo($outTradeNo);
+        $query = new AlipayService();
+        $result = $query->loopQueryResult($alipayQueryBuilder);
+        if ($result->getTradeStatus() == 'SUCCESS'){
+            return getSuccess('订单支付成功');
+        }else{
+            $response = $result->getResponse();
+            return getError($response->trade_status);
+        }
     }
 
     public function alipayRefundQuery()
