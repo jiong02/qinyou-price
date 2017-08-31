@@ -92,7 +92,7 @@ class PayController extends BaseController
         $result = $qrcodePay->qrcodePay($alipayContentBuilder);
         $response = $result->getResponse();
         if ($result->getTradeStatus() == 'SUCCESS'){
-            Cache::set($cachePrefix . $outTradeNo, $response->qr_code);
+            Cache::set($cachePrefix . $outTradeNo, $response->qr_code ,7200);
             return getSuccess($response->qr_code);
         }else{
             return getError($response->msg);
@@ -117,7 +117,7 @@ class PayController extends BaseController
         $result = $qrcodePay->qrcodePay($wechatpayContentBuilder);
         $response = $result->getResponse();
         if ($result->getTradeStatus() == 'SUCCESS'){
-            Cache::set($cachePrefix . $outTradeNo, $response['code_url']);
+            Cache::set($cachePrefix . $outTradeNo, $response['code_url'], 7200);
             return getSuccess($response['code_url']);
         }else{
             return getError($response['err_code']);
