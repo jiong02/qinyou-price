@@ -26,6 +26,7 @@ class WechatpayService
     private $sslKeyPath;
     //接收微信支付异步通知回调地址。
     private $notifyUrl;
+    private $timeoutExpress;
     private $maxQueryRetry;
     private $queryDuration;
 
@@ -57,6 +58,9 @@ class WechatpayService
         if (!array_key_exists('notify_url', $config) || checkEmpty($config['notify_url'])){
             throw new Exception('缺少notify_url');
         }
+        if (!array_key_exists('timeout_express', $config) || checkEmpty($config['timeout_express'])){
+            throw new Exception('缺少timeout_express');
+        }
         if (!array_key_exists('max_query_retry', $config) || checkEmpty($config['max_query_retry'])){
             throw new Exception('缺少max_query_retry');
         }
@@ -74,6 +78,7 @@ class WechatpayService
         $this->merchantId = $config['merchant_id'];
         $this->key = $config['key'];
         $this->notifyUrl = $config['notify_url'];
+        $this->timeoutExpress = $config['timeout_express'];
         $this->maxQueryRetry = $config['max_query_retry'];
         $this->queryDuration = $config['query_duration'];
         $this->sslCertPath = $config['ssl_cert_path'];
@@ -83,6 +88,9 @@ class WechatpayService
     public function qrcodePay($contentBuilder)
     {
         $wechatpayRequest = new WechatpayRequest();
+        $startTime = date('YmdHis');
+        $contentBuilder->setTimeStart($startTime);
+        $contentBuilder->setTimeExpire($startTime + $this->timeoutExpress);
         $contentBuilder->setSpbillCreateIp($_SERVER['REMOTE_ADDR']);
         $contentBuilder->setNotifyUrl($this->notifyUrl);
         $contentBuilder->setTradeType($wechatpayRequest::TRADE_TYPE_NATIVE);

@@ -126,27 +126,31 @@ class PayController extends BaseController
 
     public function alipayQuery($outTradeNo)
     {
-        $alipayQueryBuilder = new AlipayContentBuilder();
-        $alipayQueryBuilder->setOutTradeNo($outTradeNo);
-        $query = new AlipayService();
-        $result = $query->loopQueryResult($alipayQueryBuilder);
-        if ($result->getTradeStatus() == 'SUCCESS'){
-            return getSuccess('订单支付成功');
-        }else{
-            $response = $result->getResponse();
-            return getError($response->msg);
-        }
+//        $alipayQueryBuilder = new AlipayContentBuilder();
+//        $alipayQueryBuilder->setOutTradeNo($outTradeNo);
+//        $query = new AlipayService();
+//        $result = $query->loopQueryResult($alipayQueryBuilder);
+//        if ($result->getTradeStatus() == 'SUCCESS'){
+//            return getSuccess('订单支付成功');
+//        }else{
+//            $response = $result->getResponse();
+//            return getError($response->msg);
+//        }
     }
 
-    public function alipayRefund()
+    public function alipayRefundQuery()
     {
-        $outRequestNo = Data::getUniqueString();
+//        $outRequestNo = Data::getUniqueString();
         $alipayRefundBuilder = new AlipayContentBuilder();
-        $alipayRefundBuilder->setOutTradeNo(1503545268);
-        $alipayRefundBuilder->setOutRequestNo($outRequestNo);
+        $alipayRefundBuilder->setOutTradeNo(18);
+        $alipayRefundBuilder->setRefundAmount(0.01);
         $refund = new AlipayService();
-        $result = $refund->refundQuery($alipayRefundBuilder);
-        $refund->refundQuery($alipayRefundBuilder);
+        $result = $refund->refund($alipayRefundBuilder);
+        if ($result->getTradeStatus() == 'SUCCESS'){
+            return getSuccess('退款成功');
+        }
+        return getError('退款失败');
+
     }
 
     public function wechatpayQuery($outTradeNo)

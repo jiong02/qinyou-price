@@ -27,6 +27,8 @@ class AlipayService
     private $gatewayUrl;
     //异步通知地址,只有扫码支付预下单可用
     private $notifyUrl;
+    //订单失效时长
+    private $timeoutExpress;
     //签名算法类型
     private $signType;
     //编码格式
@@ -65,6 +67,9 @@ class AlipayService
         if (!array_key_exists('notify_url', $config) || checkEmpty($config['notify_url'])){
             throw new Exception('缺少notify_url');
         }
+        if (!array_key_exists('timeout_express', $config) || checkEmpty($config['timeout_express'])){
+            throw new Exception('缺少timeout_express');
+        }
         if (!array_key_exists('gateway_url', $config) || checkEmpty($config['gateway_url'])){
             throw new Exception('缺少gateway_url');
         }
@@ -90,6 +95,7 @@ class AlipayService
         $this->merchantPrivateKey = $config['merchant_private_key'];
         $this->alipayPublicKey = $config['alipay_public_key'];
         $this->notifyUrl = $config['notify_url'];
+        $this->timeoutExpress = $config['timeout_express'];
         $this->gatewayUrl = $config['gateway_url'];
         $this->signType = $config['sign_type'];
         $this->charset = $config['charset'];
@@ -101,6 +107,7 @@ class AlipayService
 
     public function qrcodePay($contentBuilder)
     {
+        $contentBuilder->setTimeoutExpress($this->timeoutExpress);
         $bizContent = $contentBuilder->getBizContent();
         $qrcodePayRequest = new AlipayRequest();
         $qrcodePayRequest->setMethod($qrcodePayRequest::METHOD_PRECREATE);

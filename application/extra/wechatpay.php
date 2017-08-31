@@ -20,6 +20,8 @@ return [
     'ssl_key_path' => '/data/wwwroot/price.cheeruislands.com/application/components/cert/apiclient_key.pem',
     //回调通知接口
     'notify_url' => 'www.baidu.com',
+    //订单失效时长(单位:秒)
+    'timeout_express' => 7200,
     //最大查询重试次数
     'max_query_retry' => "10",
     //查询间隔

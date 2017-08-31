@@ -42,4 +42,7 @@ return [
 
     //查询间隔
     'query_duration' => "2",
+
+    //订单失效时长
+    'timeout_express' => '2h',
 ];

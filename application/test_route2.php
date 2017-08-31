@@ -94,12 +94,12 @@ Route::domain('test', function(){
     /*
      * 测试
      */
-    // Route::any('alipayQrcodePay','ims/Index/alipayQrcodePay');
-    // Route::any('alipayQuery','ims/Index/alipayQuery');
-    // Route::any('alipayRefund','ims/Index/alipayRefund');
-    // Route::any('wechatpayQrcodePay','ims/Index/wechatpayQrcodePay');
-    // Route::any('wechatpayQuery','ims/Index/wechatpayQuery');
-    // Route::any('wechatpayRefund','ims/Index/wechatpayRefund');
+     Route::any('alipayQrcodePay','test/Pay/alipayQrcodePay');
+     Route::any('alipayQuery','test/Pay/alipayQuery');
+     Route::any('alipayRefund','test/Pay/alipayRefund');
+     Route::any('wechatpayQrcodePay','test/Pay/wechatpayQrcodePay');
+     Route::any('wechatpayQuery','test/Pay/wechatpayQuery');
+     Route::any('wechatpayRefund','test/Pay/wechatpayRefund');
 });
 
 
