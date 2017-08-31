@@ -292,20 +292,20 @@ class TemplateController extends BaseController
             $tempRouteModel = new TemplateRouteModel();
 
             $tempRouteList = $tempRouteModel->field('id as temp_route_id,temp_id,place_id,place_name,route_id,route_name,is_carousel_banner')->where('temp_id',$v['id'])->order('sort desc')->select();
-            $tempRouteList = $tempRouteList->toArray();
+//            $tempRouteList = $tempRouteList->toArray();
 //halt($tempRouteList);
             foreach($tempRouteList as $m=>$n){
 /*                $return = array();
                 $arr = array();*/
 
                 $routeInfo = $routeRouteModel->field('route_describe,image_uniqid')->where('id',$n['route_id'])->find();
-                $routeInfo = $routeInfo->toArray();
+//                $routeInfo = $routeInfo->toArray();
 
                 $routeFareInfo = $routeRouteFareModel->field('IFNULL(adult_fare,0) as adult_fare,IFNULL(child_fare,0) as child_fare,expired_date')->where("is_enable = 1 AND route_id = $n[route_id]")->find();
-                $routeFareInfo = $routeFareInfo->toArray();
+//                $routeFareInfo = $routeFareInfo->toArray();
 
                 $imageInfo = $imageModel->field('image_uniqid,image_category,image_path')->where('image_uniqid',$routeInfo['image_uniqid'])->find();
-                $imageInfo = $imageInfo->toArray();
+//                $imageInfo = $imageInfo->toArray();
 
                 $return['route_describe'] = $routeInfo['route_describe'];
                 $return['image_uniqid'] = $routeInfo['image_uniqid'];
