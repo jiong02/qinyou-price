@@ -151,7 +151,7 @@ Route::domain('test', function(){
     //导出订单word文档
     Route::any('/OrderWord/outputOrderWord','test/OrderWord/outputOrderWord');
     //修改订单支付ID
-    Route::any('/OrderWord/updateOrderPay','test/OrderWord/updateOrderPay');
+    Route::any('/Order/updateOrderPay','test/Order/updateOrderPay');
 
 
 
