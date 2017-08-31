@@ -336,14 +336,13 @@ class TestAccountController extends Controller
         $c->appkey = "23358963";
         $c->secretKey = "d60915fd89faed62bb1a0dea8af438a8";
         $req = new \AlibabaAliqinFcSmsNumSendRequest();
-        halt($req);
         $req->setSmsType("normal");
         $req->setSmsFreeSignName("身份验证");
         $req->setSmsParam("{\"code\":\"".$content."\",\"product\":\"沁游假期\"}");
         $req->setRecNum($mobile);
         $req->setSmsTemplateCode("SMS_8970078");
         $resp = $c->execute($req);
-
+return $resp;
 //        return true;
 
         if($resp->result->success)
@@ -559,7 +558,7 @@ class TestAccountController extends Controller
                 if($accountInfo->save()){
 
                     $result = $this->sendSMS($accountInfo->call_phone,$codeArr['rand_number']);
-
+                    return $result;
                     if(!empty($result)){
                         return '短信已发送，请注意查收';
                     }
@@ -588,7 +587,7 @@ class TestAccountController extends Controller
 
             if($accountModel->save()){
                 $result = $this->sendSMS($callPhone,$codeArr['rand_number']);
-
+                return $result;
                 if(!empty($result)){
                     return '短信已发送2，请注意查收';
                 }
