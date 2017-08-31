@@ -55,10 +55,10 @@ class RouteFareController extends BasePricingController
         $inputQuantityOfChild = $this->inputQuantityOfChild;
         $inputQuantityOfRoom = $this->inputQuantityOfRoom;
         $inputQuantityOfPassengers = $inputQuantityOfAdult + $inputQuantityOfChild;
-        $this->standardQuantityOfRoom = ceil($inputQuantityOfPassengers / $standardQuantityOfAdult + $standardQuantityOfChild);
+        $this->standardQuantityOfRoom = ceil($inputQuantityOfPassengers / ($standardQuantityOfAdult + $standardQuantityOfChild));
         $roomArrangementList = [];
-        $maxQuantityOfRoom = $this->maxPassengers / $this->standardQuantityOfAdult;
-
+        $haveBalanceForRoomCharge = 0;
+        $haveExtraAdult = 0;
         if ($inputQuantityOfAdult <= 1) {
             $this->error = '最少要有一个成人出行';
             return '最少要有一个成人出行';
@@ -79,30 +79,31 @@ class RouteFareController extends BasePricingController
             $this->error = '出行人数小于最小值';
             return '出行人数小于最小值';
         }
-        if ($inputQuantityOfRoom > $maxQuantityOfRoom) {
-            $this->error = '要求房间数量大于最大房间数量';
-            return '要求房间数量大于最大房间数量';
-        }
-        $standardQuantityOfRoom = $this->standardQuantityOfRoom;
-        $standardLogic = $this->standardLogic;
-        $standardQuantityOfAdult = $this->standardQuantityOfAdult;
-        $standardQuantityOfChild = $this->standardQuantityOfChild;
-        $standardQuantityOfExtraAdult = $this->standardQuantityOfExtraAdult;
-        $inputQuantityOfAdult = $this->inputQuantityOfAdult;
-        $inputQuantityOfChild = $this->inputQuantityOfChild;
-        $inputQuantityOfRoom = $this->inputQuantityOfRoom;
-        $inputQuantityOfPassengers = $this->inputQuantityOfAdult + $this->inputQuantityOfChild;
-        $haveBalanceForRoomCharge = 0;
-        $haveExtraAdult = 0;
         while ($inputQuantityOfPassengers > 0) {
-            if ($inputQuantityOfAdult == 0 && $inputQuantityOfChild >= $standardQuantityOfAdult) {
-                $roomArrangement['standard_quantity_of_adult'] = $standardQuantityOfAdult;
-                $inputQuantityOfChild -= $standardQuantityOfChild;
-            }
+//            if ($inputQuantityOfAdult == 0 && $inputQuantityOfChild >= $standardQuantityOfAdult) {
+//                $roomArrangement['standard_quantity_of_adult'] = $standardQuantityOfAdult;
+//                $inputQuantityOfChild -= $standardQuantityOfChild;
+//            }
             if ($inputQuantityOfAdult >= $standardQuantityOfAdult) {
                 $roomArrangement['standard_quantity_of_adult'] = $standardQuantityOfAdult;
                 $inputQuantityOfAdult -= $standardQuantityOfAdult;
+                if ($inputQuantityOfChild >= $standardQuantityOfChild) {
+                    $roomArrangement['standard_quantity_of_child'] = $standardQuantityOfChild;
+                    $inputQuantityOfChild -= $standardQuantityOfChild;
+                }else{
+                    $roomArrangement['standard_quantity_of_child'] = $inputQuantityOfChild;
+                    $inputQuantityOfChild = 0;
+                }
             }else{
+                //标准人数减去剩余人数即为需要减去的儿童数量
+                $cutInputQuantityOfChild = $standardQuantityOfAdult - $inputQuantityOfAdult;
+                if ($inputQuantityOfChild >= $cutInputQuantityOfChild) {
+                    $inputQuantityOfAdult += $cutInputQuantityOfChild;
+                    $inputQuantityOfChild -= $cutInputQuantityOfChild;
+                }else{
+                    $roomArrangement['standard_quantity_of_child'] = $inputQuantityOfChild;
+                    $inputQuantityOfChild = 0;
+                }
                 $roomArrangement['standard_quantity_of_adult'] = $inputQuantityOfAdult;
                 if ($inputQuantityOfAdult < $standardQuantityOfAdult) {
                     $haveBalanceForRoomCharge += 1;
@@ -110,16 +111,15 @@ class RouteFareController extends BasePricingController
                 $inputQuantityOfPassengers -= $inputQuantityOfAdult;
                 $inputQuantityOfAdult = 0;
             }
-            if ($standardLogic == '且'){
-                if ($inputQuantityOfAdult > $standardQuantityOfExtraAdult) {
-                    $roomArrangement['standard_quantity_of_extra_adult'] = $standardQuantityOfExtraAdult;
-                    $inputQuantityOfAdult -= $standardQuantityOfExtraAdult;
-                }else{
-                    $haveExtraAdult += 1;
-                    $roomArrangement['standard_quantity_of_extra_adult'] = 0;
-                }
-            }
-
+//            if ($standardLogic == '且'){
+//                if ($inputQuantityOfAdult > $standardQuantityOfExtraAdult) {
+//                    $roomArrangement['standard_quantity_of_extra_adult'] = $standardQuantityOfExtraAdult;
+//                    $inputQuantityOfAdult -= $standardQuantityOfExtraAdult;
+//                }else{
+//                    $haveExtraAdult += 1;
+//                    $roomArrangement['standard_quantity_of_extra_adult'] = 0;
+//                }
+//            }
             if ($standardLogic == '或') {
                 $roomArrangement['standard_quantity_of_extra_adult'] = 0;
                 if ($inputQuantityOfAdult >= $standardQuantityOfExtraAdult && $inputQuantityOfChild == 0) {
@@ -127,13 +127,6 @@ class RouteFareController extends BasePricingController
                     $inputQuantityOfAdult -= $standardQuantityOfExtraAdult;
                     $haveExtraAdult += 1;
                 }
-            }
-            if ($inputQuantityOfChild >= $standardQuantityOfChild) {
-                $roomArrangement['standard_quantity_of_child'] = $standardQuantityOfChild;
-                $inputQuantityOfChild -= $standardQuantityOfChild;
-            }else{
-                $roomArrangement['standard_quantity_of_child'] = $inputQuantityOfChild;
-                $inputQuantityOfChild = 0;
             }
             if ($inputQuantityOfAdult == 0 && $inputQuantityOfChild == 0) {
                 $inputQuantityOfPassengers = 0;

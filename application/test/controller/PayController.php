@@ -30,10 +30,10 @@ class PayController extends BaseController
 {
     public function qrcodePay(Request $request)
     {
-        $outTradeNo = $request->param('out_trade_no');
-        $subject = $request->param('subject');
-        $totalAmount = $request->param('total_amount');
-        $payType = $request->param('pay_type');
+        $outTradeNo = $request->param('out_trade_no',502221);
+        $subject = $request->param('subject','呵呵哒');
+        $totalAmount = $request->param('total_amount',0.01);
+        $payType = $request->param('pay_type','微信');
         $params = [
             'out_trade_no'=>[$outTradeNo , 'require'],
             'subject'=>[$subject , 'require'],
@@ -133,8 +133,7 @@ class PayController extends BaseController
         if ($result->getTradeStatus() == 'SUCCESS'){
             return getSuccess('订单支付成功');
         }else{
-            $response = $result->getResponse();
-            return getError($response->trade_status);
+            return getError('订单未支付或已关闭');
         }
     }
 

@@ -88,7 +88,7 @@ class WechatpayService
     public function qrcodePay($contentBuilder)
     {
         $wechatpayRequest = new WechatpayRequest();
-        $startTime = date('YmdHis');
+        $startTime = (int)date('YmdHis');
         $contentBuilder->setTimeStart($startTime);
         $contentBuilder->setTimeExpire($startTime + $this->timeoutExpress);
         $contentBuilder->setSpbillCreateIp($_SERVER['REMOTE_ADDR']);
