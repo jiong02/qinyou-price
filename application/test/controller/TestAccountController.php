@@ -351,6 +351,7 @@ class TestAccountController extends Controller
         }
         else
         {
+            return $resp->result;
             return false;
         }
     }
