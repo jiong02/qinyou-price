@@ -150,7 +150,7 @@ class TemplateFluxController extends BaseController
         $tmpRouteModel = new TemplateRouteModel();
 
         $tmpRouteList = $tmpRouteModel->where('temp_id',$tempId)->select();
-
+//        halt($tmpRouteList->toArray());
         if(!empty($tmpRouteList)){
             $tmpRouteList = $tmpRouteList->toArray();
         }else{
@@ -454,46 +454,53 @@ class TemplateFluxController extends BaseController
     {
         $orderModel = new OrderModel();
 
-        foreach($tempRouteList as $k=>$v){
-            $return[$k]['route_name'] = $v['route_name'];
+        if(!empty($tempRouteList)){
+            foreach($tempRouteList as $k=>$v){
+                $return[$k]['route_name'] = $v['route_name'];
 
-            //线路点击量
-            $routeClick = $model->field('count(*) as count')->where("template_route_id = $v[id] AND click_time BETWEEN '$startTime' AND '$endTime'")->find();
+                //线路点击量
+                $routeClick = $model->field('count(*) as count')->where("template_route_id = $v[id] AND click_time BETWEEN '$startTime' AND '$endTime'")->find();
 
-            $return[$k]['route_click'] = $routeClick['count'];
+                $return[$k]['route_click'] = $routeClick['count'];
 
-            //订单量
-            $orderCount = $orderModel->field('count(*) as count')->where("id = $v[id] AND create_time BETWEEN '$startTime' AND '$endTime'")->find();
+                //订单量
+                $orderCount = $orderModel->field('count(*) as count')->where("id = $v[id] AND create_time BETWEEN '$startTime' AND '$endTime'")->find();
 
-            $return[$k]['order_count'] = $orderCount['count'];
+                $return[$k]['order_count'] = $orderCount['count'];
 
-            //支付数
-            $orderPay = $orderModel->field('count(*) as count')->where("id = $v[id] AND create_time BETWEEN '$startTime' AND '$endTime' AND order_status >= 3")->find();
+                //支付数
+                $orderPay = $orderModel->field('count(*) as count')->where("id = $v[id] AND create_time BETWEEN '$startTime' AND '$endTime' AND order_status >= 3")->find();
 
-            $return[$k]['order_pay'] = $orderPay['count'];
+                $return[$k]['order_pay'] = $orderPay['count'];
 
-            //转化量
-            if(empty($orderPay['count']) && empty($routeClick['count'])){
-                $change = 0;
-            }else{
-                if(empty($routeClick['count'])){
-                    $routeClick['count'] = 1;
-                }
-
-                if(empty($orderPay['count'])){
+                //转化量
+                if(empty($orderPay['count']) && empty($routeClick['count'])){
                     $change = 0;
                 }else{
-                    $change = round(($orderPay['count'] / $routeClick['count']) * 100);
+                    if(empty($routeClick['count'])){
+                        $routeClick['count'] = 1;
+                    }
+
+                    if(empty($orderPay['count'])){
+                        $change = 0;
+                    }else{
+                        $change = round(($orderPay['count'] / $routeClick['count']) * 100);
+                    }
                 }
+
+                $return[$k]['change'] = $change;
+
+                $routeClick['count'] = 0;
+                $orderCount['count'] = 0;
+                $orderPay['count'] = 0;
+                $change = 0;
             }
-
-            $return[$k]['change'] = $change;
-
-            $routeClick['count'] = 0;
-            $orderCount['count'] = 0;
-            $orderPay['count'] = 0;
-            $change = 0;
+        }else{
+            $return = array();
         }
+
+
+
 
         return $return;
     }
