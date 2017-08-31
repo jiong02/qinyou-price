@@ -91,7 +91,6 @@ class WechatpayClient
             $curl->setSslCertPath($request->getSslCertPath());
             $curl->setSslKeyPath($request->getSslKeyPath());
         }
-        dump($request->getUrl());
         $result = $curl->post($request->getUrl(),$xmlApiParams, $useCert);
         $result = Data::formatXmlToArray($result);
         if (array_key_exists('sign',$result)){
