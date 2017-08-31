@@ -341,9 +341,9 @@ class TestAccountController extends Controller
         $req->setSmsParam("{\"code\":\"".$content."\",\"product\":\"沁游假期\"}");
         $req->setRecNum($mobile);
         $req->setSmsTemplateCode("SMS_8970078");
-//        $resp = $c->execute($req);
-
-        return true;
+        $resp = $c->execute($req);
+//return $resp;
+//        return true;
 
         if($resp->result->success)
         {
@@ -351,6 +351,7 @@ class TestAccountController extends Controller
         }
         else
         {
+            return $resp;
             return false;
         }
     }
@@ -556,11 +557,15 @@ class TestAccountController extends Controller
 
                 if($accountInfo->save()){
 
-                    $this->sendSMS($accountInfo->call_phone,$codeArr['rand_number']);
-                    return '短信已发送，请注意查收';
+                    $result = $this->sendSMS($accountInfo->call_phone,$codeArr['rand_number']);
+//                    return $result;
+                    if(!empty($result)){
+                        return '短信已发送，请注意查收';
+                    }
+
                 }
 
-                return '验证码错误，发送短信失败';
+                return '验证码错误，发送短信失败,也有可能是没钱了';
 
             }
             return $result;
@@ -581,11 +586,16 @@ class TestAccountController extends Controller
             $accountModel->register_time = time();
 
             if($accountModel->save()){
-                $this->sendSMS($callPhone,$codeArr['rand_number']);
-                return '短信已发送2，请注意查收';
+                $result = $this->sendSMS($callPhone,$codeArr['rand_number']);
+//                return $result;
+                if(!empty($result)){
+                    return '短信已发送2，请注意查收';
+                }
+
+//                return $result;
             }
 
-            return '验证码错误2，发送短信失败';
+            return '验证码错误2，发送短信失败,也有可能是没钱了';
         }
 
     }
@@ -660,8 +670,8 @@ class TestAccountController extends Controller
      */
     public function getTime()
     {
-//        $randNumber = rand(100000,999999);
-        $randNumber = 667788;
+        $randNumber = rand(100000,999999);
+//        $randNumber = 667788;
         $returnArr = array();
         $codeTime01 = time();
         $codeTime02 = strtotime('+30 minute',time());

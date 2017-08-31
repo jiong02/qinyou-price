@@ -30,7 +30,9 @@ class PlaceController extends PrivilegeController
 
         $placeList = $placeModel->field('id,country_id,place_name')->where('status',1)->select();
 
-        $placeList = $placeList->toArray();
+        $placeList = $this->formatData($placeList);
+
+//        $placeList = $placeList->toArray();
 
         return getSucc($placeList);
 
