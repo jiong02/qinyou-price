@@ -4,14 +4,14 @@ use app\test\controller\BaseController;
 use think\Controller;
 use app\test\model\OrderModel;
 use app\test\model\OrderCustomerModel;
-use think\nequest;
-use app\noute\model\nouteModel;
-use app\noute\model\nouteDescriptionModel;
-use app\noute\model\nouteDescriptionHotelModel;
-use app\noute\model\nouteVehicleModel;
+use think\Request;
+use app\route\model\RouteModel;
+use app\route\model\RouteDescriptionModel;
+use app\route\model\RouteDescriptionHotelModel;
+use app\route\model\RouteVehicleModel;
 use app\ims\model\VehicleModel;
-use app\noute\model\nouteDescriptionActivityModel;
-use app\noute\model\nouteDescriptionVehicleModel;
+use app\route\model\RouteDescriptionActivityModel;
+use app\route\model\RouteDescriptionVehicleModel;
 
 class OrderWordController extends BaseController
 {
