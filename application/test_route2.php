@@ -43,6 +43,9 @@ Route::domain('test', function(){
     Route::get('shoppingCart',function(){
         return view('views/shoppingCart');
     });
+
+
+
     Route::any('case/addCaseData','test/Case/addCaseData');
     Route::any('case/modifyCaseData','test/Case/modifyCaseData');
     Route::any('case/modifyCaseOrder','test/Case/modifyCaseOrder');

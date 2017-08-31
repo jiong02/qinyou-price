@@ -155,5 +155,16 @@ Route::domain('test', function(){
 
 
 
+    //HTML 访问模块
+    Route::get('product',function(){
+        return view('views/product');
+    });
 
+    Route::get('group',function(){
+        return view('views/group');
+    });
+
+    Route::get('personalaccount',function(){
+        return view('views/personalaccount');
+    });
 });
