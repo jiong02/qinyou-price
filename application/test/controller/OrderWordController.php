@@ -20,7 +20,7 @@ class OrderWordController extends BaseController
 
     public function outputOrderWord(Request $request)
     {
-        $orderId = $request->param('order_id',0);
+/*        $orderId = $request->param('order_id',0);
         if(empty($orderId) || !is_numeric($orderId)){
             return '订单不存在';
         }
@@ -253,13 +253,13 @@ class OrderWordController extends BaseController
         $orderPrice[1][] = '飞猪暑期优惠';
         $orderPrice[1][] = -500;
         $orderPrice[1][] = 1;
-        $orderPrice[1][] = -500;
+        $orderPrice[1][] = -500;*/
 
         require APP_PATH.'components/PHPWord_Sam/PHPWord.php';
         require APP_PATH.'components/PHPWord_Sam/PHPWord/IOFactory.php';
 
 $PHPWord = new \PHPWord();
-halt($PHPWord);
+//halt($PHPWord);
 /*$section = $PHPWord->createSection();
 
 //添加标题
