@@ -592,6 +592,7 @@ class TestAccountController extends Controller
                     return '短信已发送2，请注意查收';
                 }
 
+                return $result;
             }
 
             return '验证码错误2，发送短信失败,也有可能是没钱了';
