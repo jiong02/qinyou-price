@@ -343,7 +343,7 @@ class TestAccountController extends Controller
         $req->setSmsTemplateCode("SMS_8970078");
         $resp = $c->execute($req);
 
-        return true;
+//        return true;
 
         if($resp->result->success)
         {
@@ -660,8 +660,8 @@ class TestAccountController extends Controller
      */
     public function getTime()
     {
-//        $randNumber = rand(100000,999999);
-        $randNumber = 667788;
+        $randNumber = rand(100000,999999);
+//        $randNumber = 667788;
         $returnArr = array();
         $codeTime01 = time();
         $codeTime02 = strtotime('+30 minute',time());
