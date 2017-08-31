@@ -444,6 +444,36 @@ class OrderController extends BaseController
     }
 
     /**
+     * @auth Sam
+     * @name 修改支付订单ID
+     * @param Request $request
+     * @return string
+     */
+    public function updateOrderPay(Request $request)
+    {
+        $orderId = $request->param('order_id',0);
+
+        $orderModel = new OrderModel();
+
+        $orderInfo = $orderModel->where('id',$orderId)->find();
+
+        if(empty($orderInfo)){
+            return '订单不存在';
+        }
+
+        $payOrder = md5(uniqid());
+
+        $orderInfo->order_pay_id = $payOrder;
+
+        if($orderInfo->save()){
+            return $payOrder;
+        }
+
+        return '订单修改失败';
+    }
+
+
+    /**
      * @name 修改后台订单
      * @auth Sam
      * @param Request $request
