@@ -274,6 +274,75 @@ class TemplateController extends BaseController
     public function webTempRoute()
     {
         $tempModel = new TemplateModel();
+        $routeRouteModel = new \app\route\model\RouteModel();
+        $routeRouteFareModel = new \app\route\model\RouteFareModel();
+        $imageModel = new \app\ims\model\ImageModel();
+
+        $tempInfo = $tempModel->order('template_sort asc')->select();
+
+        if(empty($tempInfo)){
+            return '没有板块信息';
+        }
+
+        $tempInfo = $this->formateData($tempInfo);
+//halt($tempInfo);
+        $ymdDate = date('Y-m-d',time());
+
+        foreach($tempInfo as $k=>$v){
+            $tempRouteModel = new TemplateRouteModel();
+
+            $tempRouteList = $tempRouteModel->field('id as temp_route_id,temp_id,place_id,place_name,route_id,route_name,is_carousel_banner')->where('temp_id',$v['id'])->order('sort desc')->select();
+            $tempRouteList = $tempRouteList->toArray();
+//halt($tempRouteList);
+            foreach($tempRouteList as $m=>$n){
+/*                $return = array();
+                $arr = array();*/
+
+                $routeInfo = $routeRouteModel->field('route_describe,image_uniqid')->where('id',$n['route_id'])->find();
+                $routeInfo = $routeInfo->toArray();
+
+                $routeFareInfo = $routeRouteFareModel->field('IFNULL(adult_fare,0) as adult_fare,IFNULL(child_fare,0) as child_fare,expired_date')->where("is_enable = 1 AND route_id = $n[route_id]")->find();
+                $routeFareInfo = $routeFareInfo->toArray();
+
+                $imageInfo = $imageModel->field('image_uniqid,image_category,image_path')->where('image_uniqid',$routeInfo['image_uniqid'])->find();
+                $imageInfo = $imageInfo->toArray();
+
+                $return['route_describe'] = $routeInfo['route_describe'];
+                $return['image_uniqid'] = $routeInfo['image_uniqid'];
+                $return['temp_route_id'] = $n['temp_route_id'];
+                $return['temp_id'] = $n['temp_id'];
+                $return['place_id'] = $n['place_id'];
+                $return['place_name'] = $n['place_name'];
+                $return['route_id'] = $n['route_id'];
+                $return['route_name'] = $n['route_name'];
+                $return['is_carousel_banner'] = $n['is_carousel_banner'];
+                $return['adult_fare'] = $routeFareInfo['adult_fare'];
+                $return['child_fare'] = $routeFareInfo['child_fare'];
+                $return['image_category'] = $imageInfo['image_category'];
+                $return['image_path'] = $imageInfo['image_path'];
+
+                $arr[$m] = $return;
+            }
+
+
+            if(!empty($arr)){
+                $tempInfo[$k]['route_list'] = $arr;
+            }else{
+                $tempInfo[$k]['route_list'] = array();
+            }
+
+            $return = array();
+            $arr = array();
+
+        }
+
+        return $tempInfo;
+
+    }
+
+/*    public function webTempRoute()
+    {
+        $tempModel = new TemplateModel();
 
         $tempInfo = $tempModel->order('template_sort asc')->select();
 
@@ -300,9 +369,7 @@ class TemplateController extends BaseController
 
         return $tempInfo;
 
-    }
-
-
+    }*/
 
 }
 

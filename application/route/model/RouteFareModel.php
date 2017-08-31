@@ -5,7 +5,7 @@ use app\ims\model\BaseModel;
 
 class RouteFareModel extends BaseModel
 {
-    public $table = 'ims_route_fare';
+    public $table = 'ims_route.ims_route_fare';
 }
 
 ?>
