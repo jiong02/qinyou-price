@@ -66,6 +66,8 @@ class PayController extends BaseController
         $this->checkAllParam($params);
         if ($payType == '支付宝'){
             $result = $this->alipayQuery($outTradeNo);
+//            send_pay_date
+//            total_amount
         }elseif($payType == '微信'){
             $result = $this->wechatpayQuery($outTradeNo);
         }else{
@@ -131,7 +133,6 @@ class PayController extends BaseController
         $query = new AlipayService();
         $result = $query->loopQueryResult($alipayQueryBuilder);
         $response = $result->getResponse();
-        halt($response);
         if ($result->getTradeStatus() == 'SUCCESS'){
             return getSuccess('订单支付成功');
         }else{

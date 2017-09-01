@@ -61,14 +61,17 @@ class RouteFareController extends BasePricingController
             if (isset($data['adult_fare'])){
                 $totalFare += $data['adult_fare'];
                 $adultFare = $data['adult_fare'];
+                $farDetail['adult_fare'] = $adultFare;
             }
             if (isset($data['child_fare'])){
                 $totalFare += $data['child_fare'];
                 $childFare = $data['child_fare'];
+                $farDetail['child_fare'] = $childFare;
             }
             if (isset($data['extra_adult_fare'])){
                 $totalFare += $data['extra_adult_fare'];
                 $extraFare = $data['extra_adult_fare'];
+                $farDetail['extra_adult_fare'] = $extraFare;
             }
         }
 
