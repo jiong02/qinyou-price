@@ -254,7 +254,7 @@ class OrderWordController extends BaseController
         $orderPrice[1][] = -500;
         $orderPrice[1][] = 1;
         $orderPrice[1][] = -500;
-
+        ob_end_clean();
         require APP_PATH.'components/PHPWord_Sam/PHPWord.php';
         require APP_PATH.'components/PHPWord_Sam/PHPWord/IOFactory.php';
 
@@ -795,7 +795,7 @@ $footer->addText('E-mail: info@cheeruislands.com',array('align'=>'left'));
 $footer->addText('网站： www.cheeruislands.com',array('align'=>'left','color'=>'#66CDAA'));
 $footer->addImage(APP_PATH.'components/PHPWord_Sam/'.'2.jpg',array('_width'=>80,'_height'=>80,'align'=>'right'));
 
-
+        ob_end_clean();
 $fileName = "行程确认单";
 header("Content-type: application/vnd.ms-word");
 header("Content-Disposition:attachment;filename=".$fileName.".docx");
