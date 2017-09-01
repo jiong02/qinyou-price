@@ -6,6 +6,7 @@ use think\Request;
 use think\Validate;
 use app\test\model\TemplateRouteModel;
 
+
 class TemplateController extends BaseController
 {
     /**

@@ -12,6 +12,7 @@ use app\route\model\RouteVehicleModel;
 use app\ims\model\VehicleModel;
 use app\route\model\RouteDescriptionActivityModel;
 use app\route\model\RouteDescriptionVehicleModel;
+use think\Config;
 
 class OrderWordController extends BaseController
 {
@@ -795,10 +796,13 @@ $footer->addText('Tel: 010-82515311',array('align'=>'left'));
 $footer->addText('E-mail: info@cheeruislands.com',array('align'=>'left'));
 $footer->addText('网站： www.cheeruislands.com',array('align'=>'left','color'=>'#66CDAA'));
 $footer->addImage(APP_PATH.'components/PHPWord_Sam/'.'2.jpg',array('_width'=>80,'_height'=>80,'align'=>'right'));
-        ob_clean();
+
+Config('app_debug',false);
+Config('app_trace',false);
+
 $fileName = "行程确认单";
 header("Content-type: application/vnd.ms-word");
-header("Content-Disposition:attachment;filename=".$fileName.".doc");
+header("Content-Disposition:attachment;filename=".$fileName.".docx");
 header('Cache-Control: max-age=0');
 header("Pragma: no-cache");
 $objWriter = \PHPWord_IOFactory::createWriter($PHPWord, 'Word2007');
