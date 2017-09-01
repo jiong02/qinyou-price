@@ -100,6 +100,7 @@ class PHPWord_IOFactory {
 	 * @return PHPWord_Writer_IWriter
 	 */
 	public static function createWriter(PHPWord $PHPWord, $writerType = '') {
+	    @ob_end_clean();
 		$searchType = 'IWriter';
 		
 		foreach (self::$_searchLocations as $searchLocation) {
