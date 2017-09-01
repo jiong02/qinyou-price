@@ -72,6 +72,7 @@ class RouteFareController extends BasePricingController
         }
 
         $farDetail['total_fare'] = $totalFare;
+        $farDetail['quantity_of_Room'] = $this->quantityOfRoom;
         if ($this->haveBalanceForRoomCharge != 0 ){
             $farDetail['room_charge'] = $this->haveBalanceForRoomCharge * $adultFare;
         }elseif($this->haveExtraAdult !=0){
@@ -122,6 +123,7 @@ class RouteFareController extends BasePricingController
             return '出行人数小于最小值';
         }
         if ($inputQuantityOfRoom <= $this->standardQuantityOfRoom){
+            $this->quantityOfRoom = $this->standardQuantityOfRoom;
             while ($inputQuantityOfPassengers > 0) {
                 $roomArrangement = [];
                 $roomArrangement['standard_quantity_of_adult'] = 0;
@@ -193,6 +195,7 @@ class RouteFareController extends BasePricingController
                 $roomArrangementList[] = $roomArrangement;
             }
         }else{
+            $this->quantityOfRoom = $this->inputQuantityOfRoom;
             $standardQuantityOfAdult = $this->standardQuantityOfAdult;
             $standardQuantityOfChild = $this->standardQuantityOfChild;
             $standardQuantityOfExtraAdult = $this->standardQuantityOfExtraAdult;
