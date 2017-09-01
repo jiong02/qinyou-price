@@ -44,7 +44,7 @@ class RouteFareController extends BasePricingController
         $request->childFare = $request->param('child_fare');
         $request->isEnable = $request->param('allow');
         $this->inputQuantityOfAdult = $request->param('quantity_Of_Adult', 8);
-        $this->inputQuantityOfChild = $request->param('quantity_Of_Child', 2);
+        $this->inputQuantityOfChild = $request->param('quantity_Of_Child', 9);
         $this->inputQuantityOfRoom = $request->param('quantity_of_Room',4);
         parent::__construct($request);
     }
@@ -52,7 +52,8 @@ class RouteFareController extends BasePricingController
     public function pricingRouteFare()
     {
         $totalFare = 0;
-        if (!$roomArrangementList = $this->pricingInputQuantityOfRoom()){
+        $roomArrangementList = $this->pricingInputQuantityOfRoom();
+        if (!$roomArrangementList){
             return getError($this->error);
         }
         foreach ($roomArrangementList as $item) {
@@ -100,27 +101,27 @@ class RouteFareController extends BasePricingController
         $this->childToAdult = 0;
         if ($inputQuantityOfAdult <= 1) {
             $this->error = '最少要有一个成人出行';
-            return '最少要有一个成人出行';
+            return false;
         }
         if ($inputQuantityOfChild > $inputQuantityOfAdult) {
             $this->error = '成人数量必须大于儿童数量';
-            return '成人数量必须大于儿童数量';
+            return false;
         }
         if ($inputQuantityOfRoom > $inputQuantityOfAdult){
             $this->error = '请确保一间房最少一名大人';
-            return '请确保一间房最少一名大人';
+            return false;
         }
         if ($inputQuantityOfChild > 0 && $standardQuantityOfChild <= 0){
             $this->error = '该房型不适合儿童入住';
-            return '该房型不适合儿童入住';
+            return false;
         }
         if ($inputQuantityOfPassengers > $this->maxPassengers){
             $this->error = '出行人数大于最大值';
-            return '出行人数大于最大值';
+            return false;
         }
         if ($inputQuantityOfPassengers < $this->minPassengers){
             $this->error = '出行人数小于最小值';
-            return '出行人数小于最小值';
+            return false;
         }
         if ($inputQuantityOfRoom <= $this->standardQuantityOfRoom){
             $this->quantityOfRoom = $this->standardQuantityOfRoom;
