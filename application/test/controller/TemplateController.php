@@ -298,7 +298,7 @@ class TemplateController extends BaseController
 /*                $return = array();
                 $arr = array();*/
 
-                $routeInfo = $routeRouteModel->field('route_describe,image_uniqid')->where('id',$n['route_id'])->find();
+                $routeInfo = $routeRouteModel->field('route_describe,image_uniqid,min_fare')->where('id',$n['route_id'])->find();
 //                $routeInfo = $routeInfo->toArray();
 
                 $routeFareInfo = $routeRouteFareModel->field('IFNULL(adult_fare,0) as adult_fare,IFNULL(child_fare,0) as child_fare,expired_date')->where("is_enable = 1 AND route_id = $n[route_id]")->find();
@@ -320,6 +320,7 @@ class TemplateController extends BaseController
                 $return['child_fare'] = $routeFareInfo['child_fare'];
                 $return['image_category'] = $imageInfo['image_category'];
                 $return['image_path'] = $imageInfo['image_path'];
+                $return['min_fare'] = $routeInfo['min_fare'];
 
                 $arr[$m] = $return;
             }
