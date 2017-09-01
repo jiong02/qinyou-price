@@ -800,6 +800,7 @@ $fileName = "行程确认单";
 header("Content-type: application/vnd.ms-word");
 header("Content-Disposition:attachment;filename=".$fileName.".docx");
 header('Cache-Control: max-age=0');
+header("Pragma: no-cache");
 $objWriter = \PHPWord_IOFactory::createWriter($PHPWord, 'Word2007');
 $objWriter->save('php://output');
 
