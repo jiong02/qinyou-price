@@ -20,6 +20,7 @@ class OrderWordController extends BaseController
 
     public function outputOrderWord(Request $request)
     {
+        ob_end_clean();
         $orderId = $request->param('order_id',0);
         if(empty($orderId) || !is_numeric($orderId)){
             return '订单不存在';
@@ -794,7 +795,7 @@ $footer->addText('Tel: 010-82515311',array('align'=>'left'));
 $footer->addText('E-mail: info@cheeruislands.com',array('align'=>'left'));
 $footer->addText('网站： www.cheeruislands.com',array('align'=>'left','color'=>'#66CDAA'));
 $footer->addImage(APP_PATH.'components/PHPWord_Sam/'.'2.jpg',array('_width'=>80,'_height'=>80,'align'=>'right'));
-        
+        ob_end_clean();
 $fileName = "行程确认单";
 header("Content-type: application/vnd.ms-word");
 header("Content-Disposition:attachment;filename=".$fileName.".docx");
