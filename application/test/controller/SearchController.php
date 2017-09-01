@@ -148,7 +148,7 @@ class SearchController extends BaseController
 
         $imsRouteModel = new ImsRouteModel();
 
-        $routeList  = $imsRouteModel->field("ims_route.id as route_id,route_name,route_code,image_uniqid")->where($map)->limit($page,$limit)->select();
+        $routeList  = $imsRouteModel->field("ims_route.id as route_id,route_name,route_code,image_uniqid,min_fare")->where($map)->limit($page,$limit)->select();
 
         if(empty($routeList)){
             return false;
@@ -220,7 +220,7 @@ class SearchController extends BaseController
 
 
 
-        $routeList = $routeModel->field('ims_route.id as route_id,route_name,route_code,ims_route.image_uniqid')->where($map)->limit($page,$limit)->select();
+        $routeList = $routeModel->field('ims_route.id as route_id,route_name,route_code,ims_route.image_uniqid,min_fare')->where($map)->limit($page,$limit)->select();
 
         if(empty($routeList)){
             return false;
