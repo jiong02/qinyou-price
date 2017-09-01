@@ -359,8 +359,10 @@ class RouteFareController extends BasePricingController
     {
         $param['start_date'] = [$request->startDate,'require|date'];
         $param['end_date'] = [$request->endDate,'require|date'];
+        $param['min_fare'] = [$request->endDate,'require'];
         $this->checkAllRouteParam($param);
         $this->routeData->start_time = $request->startDate;
+        $this->routeData->min_fare = $request->min_fare;
         $this->routeData->end_time = $request->endDate;
         if ($this->routeData->save() === false){
             abortError('日期保存失败');
@@ -420,12 +422,13 @@ class RouteFareController extends BasePricingController
         if (!$routeRoomData){
             return getError('没有选择房型或线路不存在');
         }
-        $totalFare = [];
+        $totalFare = $minTotalFareList = [];
         foreach ($dateSet as $date) {
             $allow = true;
             $this->checkInDate = $date;
             if (isset($forceFareData[$date])){
                 $totalFare = $forceFareData[$date]['adult_fare'];
+                $minTotalFareList[] = $totalFare;
                 $allow = (boolean)$forceFareData[$date]['is_enable'];
             }else{
                 $this->initRouteRoomData($routeRoomData);
@@ -437,12 +440,14 @@ class RouteFareController extends BasePricingController
                     $vehicleFare = $this->pricingRouteVehicleFare('标准成人');
                     $itemFare = $this->pricingItemFare();
                     $totalFare = $this->getAdultTotalFare($adultRoomFare,$vehicleFare, $itemFare);
+                    $minTotalFareList[] = $totalFare;
                 }
             }
             $result[$date]['fare'] = $totalFare;
             $result[$date]['allow'] = $allow;
         }
         $result = [$result];
+        $result['min_fare'] = min($minTotalFareList);
         $result['start_date'] = $routeData->start_time;
         $result['end_date'] = $routeData->end_time;
         return getSuccess($result);
