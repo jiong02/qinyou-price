@@ -104,6 +104,7 @@ Route::domain('test', function(){
      Route::any('wechatpayQuery','test/Pay/wechatpayQuery');
      Route::any('wechatpayRefund','test/Pay/wechatpayRefund');
      Route::any('pricingInputQuantityOfRoom','route/RouteFare/pricingInputQuantityOfRoom');
+     Route::any('pricingRouteFare','route/RouteFare/pricingRouteFare');
 });
 
 
