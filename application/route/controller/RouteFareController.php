@@ -43,9 +43,9 @@ class RouteFareController extends BasePricingController
         $request->adultFare = $request->param('adult_fare');
         $request->childFare = $request->param('child_fare');
         $request->isEnable = $request->param('allow');
-        $this->inputQuantityOfAdult = $request->param('quantity_Of_Adult', 8);
-        $this->inputQuantityOfChild = $request->param('quantity_Of_Child', 9);
-        $this->inputQuantityOfRoom = $request->param('quantity_of_Room',4);
+        $this->inputQuantityOfAdult = $request->param('quantity_Of_Adult', 2);
+        $this->inputQuantityOfChild = $request->param('quantity_Of_Child', 1);
+        $this->inputQuantityOfRoom = $request->param('quantity_of_Room',2);
         parent::__construct($request);
     }
 
@@ -124,7 +124,7 @@ class RouteFareController extends BasePricingController
             return false;
         }
         if ($inputQuantityOfRoom <= $this->standardQuantityOfRoom){
-            $this->quantityOfRoom = $this->standardQuantityOfRoom;
+            $this->quantityOfRoom = (int)$this->standardQuantityOfRoom;
             while ($inputQuantityOfPassengers > 0) {
                 $roomArrangement = [];
                 $roomArrangement['standard_quantity_of_adult'] = 0;
@@ -196,7 +196,7 @@ class RouteFareController extends BasePricingController
                 $roomArrangementList[] = $roomArrangement;
             }
         }else{
-            $this->quantityOfRoom = $this->inputQuantityOfRoom;
+            $this->quantityOfRoom = (int)$this->inputQuantityOfRoom;
             $standardQuantityOfAdult = $this->standardQuantityOfAdult;
             $standardQuantityOfChild = $this->standardQuantityOfChild;
             $standardQuantityOfExtraAdult = $this->standardQuantityOfExtraAdult;
@@ -215,7 +215,9 @@ class RouteFareController extends BasePricingController
                 $this->haveBalanceForRoomCharge = $inputQuantityOfRoom - $quantityOfRemainRoom;
                 $this->childToAdult = $inputQuantityOfChild;
                 for ($i=0; $i < $inputQuantityOfRoom ; $i++) {
-                    $this->haveBalanceForRoomCharge = $this->haveBalanceForRoomCharge - 1;
+                    if ($this->haveBalanceForRoomCharge != 0){
+                        $this->haveBalanceForRoomCharge = $this->haveBalanceForRoomCharge - 1;
+                    }
                     $roomArrangement['standard_quantity_of_adult'] = 2;
                     $roomArrangement['standard_quantity_of_child'] = 0;
                     $roomArrangement['standard_quantity_of_extra_adult'] = 0;
