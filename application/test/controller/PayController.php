@@ -28,6 +28,9 @@ use think\Request;
 
 class PayController extends BaseController
 {
+    public $payTime;
+    public $payPrice;
+
     public function qrcodePay(Request $request)
     {
         $outTradeNo = $request->param('out_trade_no',502221);
@@ -66,8 +69,6 @@ class PayController extends BaseController
         $this->checkAllParam($params);
         if ($payType == '支付宝'){
             $result = $this->alipayQuery($outTradeNo);
-//            send_pay_date
-//            total_amount
         }elseif($payType == '微信'){
             $result = $this->wechatpayQuery($outTradeNo);
         }else{
@@ -75,7 +76,7 @@ class PayController extends BaseController
         }
         if ($result['status'] === 1){
             $orderModel = new OrderModel();
-            $orderModel->updateOrderStatus($outTradeNo,$customerId,3);
+            $orderModel->updateOrderStatus($outTradeNo,$customerId,3,$this->payTime,$this->payPrice);
         }
         return $result;
     }
@@ -134,6 +135,8 @@ class PayController extends BaseController
         $result = $query->loopQueryResult($alipayQueryBuilder);
         $response = $result->getResponse();
         if ($result->getTradeStatus() == 'SUCCESS'){
+            $this->payTime = $response->send_pay_date;
+            $this->payPrice = $response->total_amount;
             return getSuccess('订单支付成功');
         }else{
             return getError('订单未支付或已关闭');
@@ -161,10 +164,12 @@ class PayController extends BaseController
         $wechatpayContentBuilder->setOutTradeNo($outTradeNo);
         $wechatpayQuery = new WechatpayService();
         $result = $wechatpayQuery->loopQueryResult($wechatpayContentBuilder);
+        $response = $result->getResponse();
         if ($result->getTradeStatus() == 'SUCCESS'){
+            $this->payTime = $response['total_fee'];
+            $this->payPrice = date('Y-m-d H:i:s',strtotime($response['time_end']));
             return getSuccess('订单支付成功');
         }else{
-            $response = $result->getResponse();
             return getError($response['trade_state_desc']);
         }
     }
