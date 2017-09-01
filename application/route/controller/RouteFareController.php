@@ -447,7 +447,14 @@ class RouteFareController extends BasePricingController
             $result[$date]['allow'] = $allow;
         }
         $result = [$result];
-        $result['min_fare'] = min($minTotalFareList);
+        $minFare = min($minTotalFareList);
+        $routeModel = RouteModel::get($this->routeId);
+        $routeModel->min_fare;
+        if ($routeModel->min_fare == 0.00){
+            $routeModel->min_fare = $minFare;
+            $routeModel->isUpdate()->save();
+        }
+        $result['min_fare'] = $minFare;
         $result['start_date'] = $routeData->start_time;
         $result['end_date'] = $routeData->end_time;
         return getSuccess($result);
