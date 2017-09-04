@@ -50,20 +50,18 @@ class RouteController extends Controller
         }
 
         $routeList = $this->formateData($routeList->select());
-//        halt($routeList);
-//        $routeList = $routeList->toArray();
 
         if(!empty($routeList)){
             $accountModel = new EmployeeAccountModel();
             $routeCreator = '';
             $routePasser = '';
             foreach($routeList as $k=>$v){
-                $routeCreator = $accountModel->field('id,account_name')->where('id',$v['route_creator_id'])->find();
+                $routeCreator = $accountModel->field('ims_employee_account.id,ims_employee_account.account_name,employee_name')->where('ims_employee_account.id',$v['route_creator_id'])->join('ims_employee','ims_employee_account.account_name = ims_employee.account_name')->find();
 
-                $routePasser = $accountModel->field('id,account_name')->where('id',$v['route_passer_id'])->find();
+//                $routePasser = $accountModel->field('id,account_name')->where('id',$v['route_passer_id'])->find();
 
-                $routeList[$k]['route_creator'] = $routeCreator['account_name'];
-                $routeList[$k]['route_passer'] = $routePasser['account_name'];
+                $routeList[$k]['route_creator'] = $routeCreator['employee_name'];
+                $routeList[$k]['route_passer'] = $routeCreator['account_name'];
 
                 $routeCreator = '';
                 $routePasser = '';
@@ -381,7 +379,7 @@ class RouteController extends Controller
 
         if(empty($routeInfo)){
             return '线路不存在';
-        }        
+        }
 
         if($action == 'down' && $routeInfo->route_status == 4){
             $routeInfo->route_status = 3;
