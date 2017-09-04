@@ -454,7 +454,7 @@ foreach($wordData['traffic_data']['key'] as $k=>$v){
     $cell = $table->addCell(3000,$cellStyle);
     $cell->addText($v);
 }
-
+halt($wordData['traffic_data']);
 foreach($wordData['traffic_data']['value'] as $k=>$v){
     $table = $section->addTable('myTable');
     $table->addRow();
