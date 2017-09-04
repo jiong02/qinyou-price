@@ -26,7 +26,7 @@ class RouteFareController extends BasePricingController
     public $inputQuantityOfChild;
     public $inputQuantityOfRoom;
     public $maxPassengers = 20;
-    public $minPassengers = 2;
+    public $minPassengers = 1;
     public $error;
 
     public $haveBalanceForRoomCharge = 0;
@@ -59,7 +59,7 @@ class RouteFareController extends BasePricingController
         foreach ($roomArrangementList as $item) {
             $data = $this->getRouteFareByCheckInDate($item);
             if (isset($data['adult_fare'])){
-                $totalFare += $data['adult_fare'];
+                $totalFare += $data['adult_fare'] * 2;
                 $adultFare = $data['adult_fare'];
                 $farDetail['adult_fare'] = $adultFare;
             }
@@ -102,7 +102,7 @@ class RouteFareController extends BasePricingController
         $this->haveBalanceForRoomCharge = 0;
         $this->haveExtraAdult = 0;
         $this->childToAdult = 0;
-        if ($inputQuantityOfAdult <= 1) {
+        if ($inputQuantityOfAdult < 1) {
             $this->error = '最少要有一个成人出行';
             return false;
         }
