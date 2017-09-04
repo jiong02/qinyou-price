@@ -381,7 +381,7 @@ class RouteController extends Controller
 
         if(empty($routeInfo)){
             return '线路不存在';
-        }
+        }        
 
         if($action == 'down' && $routeInfo->route_status == 4){
             $routeInfo->route_status = 3;
