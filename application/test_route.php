@@ -152,6 +152,8 @@ Route::domain('test', function(){
     Route::any('/OrderWord/outputOrderWord','test/OrderWord/outputOrderWord');
     //修改订单支付ID
     Route::any('/Order/updateOrderPay','test/Order/updateOrderPay');
+    //获取部门员工列表
+    Route::any('/Order/getDepartList','test/Order/getDepartList');
 
 
 
