@@ -80,7 +80,7 @@ class RouteFareController extends BasePricingController
         if ($this->haveBalanceForRoomCharge != 0 ){
             $farDetail['room_charge'] = $this->haveBalanceForRoomCharge * $adultFare;
         }elseif($this->haveExtraAdult !=0){
-            $farDetail['extra_adult'] = $this->haveExtraAdult;
+            $farDetail['extra_adult'] = $this->haveExtraAdult * $extraFare;
         }elseif($this->childToAdult){
             $farDetail['child_to_adult'] = $this->childToAdult * $adultFare;
         }
