@@ -118,7 +118,7 @@ class WechatpayContentBuilder
      */
     public function setTimeStart($timeStart)
     {
-        $this->timeStart = $timeStart;
+        $this->timeStart = (string)$timeStart;
         $this->bizContent['time_start'] = $timeStart;
     }
 
@@ -127,7 +127,7 @@ class WechatpayContentBuilder
      */
     public function setTimeExpire($timeExpire)
     {
-        $this->timeExpire = $timeExpire;
+        $this->timeExpire = (string)$timeExpire;
         $this->bizContent['time_expire'] = $timeExpire;
     }
 
