@@ -83,10 +83,6 @@ class OrderController extends BaseController
 
         $empInfo = $empModel->field('ims_employee.id,account_name,title_id,is_charge')->where('ims_employee.department_id',$deparInfo['id'])->where('is_charge','是')->where('account_name',$accountName)->join('ims_title','ims_employee.title_id = ims_title.id')->find();
 
-        echo $empModel->field('ims_employee.id,account_name,title_id,is_charge')->where('ims_employee.department_id',$deparInfo['id'])->where('is_charge','是')->where('account_name',$accountName)->join('ims_title','ims_employee.title_id = ims_title.id')->buildSql();
-
-        halt($empInfo);
-
         if(empty($empInfo)){
             return '该员工不是主管';
         }
