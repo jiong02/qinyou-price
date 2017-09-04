@@ -108,9 +108,7 @@ class OrderController extends BaseController
             return '订单不存在';
         }
 
-        if(empty($takeName)){
-            return '被分配人不存在';
-        }
+
 
 
 
@@ -434,9 +432,9 @@ class OrderController extends BaseController
             break;
         }
 
-        $orderList = $orderModel->field('cheeru_order.id,cheeru_order.order_name,cheeru_order.create_time,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.update_total_price,cheeru_order.take_charge_people_id,cheeru_order.order_status,cheeru_order.route_id,ims_route.ims_route.route_code,trip_date')->join('ims_route.ims_route','route_id = ims_route.ims_route.id ','LEFT')->where('create_order_people_id',$accountId)->where($map)->limit($page,$limit)->order('id desc')->select();
+        $orderList = $orderModel->field('cheeru_order.id,cheeru_order.order_name,cheeru_order.create_time,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.update_total_price,cheeru_order.take_charge_people_name,cheeru_order.order_status,cheeru_order.route_id,ims_route.ims_route.route_code,trip_date')->join('ims_route.ims_route','route_id = ims_route.ims_route.id ','LEFT')->where('create_order_people_id',$accountId)->where($map)->limit($page,$limit)->order('id desc')->select();
 
-        $orderCount = $orderModel->field('cheeru_order.id,cheeru_order.order_name,cheeru_order.create_time,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.update_total_price,cheeru_order.take_charge_people_id,cheeru_order.order_status,cheeru_order.route_id,ims_route.ims_route.route_code')->join('ims_route.ims_route','route_id = ims_route.ims_route.id ','LEFT')->where('create_order_people_id',$accountId)->where($map)->count();
+        $orderCount = $orderModel->field('cheeru_order.id,cheeru_order.order_name,cheeru_order.create_time,cheeru_order.adult_number,cheeru_order.child_number,cheeru_order.update_total_price,cheeru_order.take_charge_people_name,cheeru_order.order_status,cheeru_order.route_id,ims_route.ims_route.route_code')->join('ims_route.ims_route','route_id = ims_route.ims_route.id ','LEFT')->where('create_order_people_id',$accountId)->where($map)->count();
 
         $orderCount = ceil($orderCount / $limit);
 
