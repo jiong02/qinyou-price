@@ -145,11 +145,9 @@ class SearchController extends BaseController
             $map['package_name'] = ['like',"$day%"];
         }
 
-        $map['order_status'] = 3;
-
         $imsRouteModel = new ImsRouteModel();
 
-        $routeList  = $imsRouteModel->field("ims_route.id as route_id,route_name,route_code,image_uniqid,min_fare")->where($map)->limit($page,$limit)->select();
+        $routeList  = $imsRouteModel->field("ims_route.id as route_id,route_name,route_code,image_uniqid,min_fare")->where($map)->where('ims_route.ims_route.route_status',3)->limit($page,$limit)->select();
 
         if(empty($routeList)){
             return false;
@@ -217,11 +215,11 @@ class SearchController extends BaseController
             $map['package_name'] = ['like',"$day%"];
         }
 
-        $map['order_status'] = 3;
+//        $map['order_status'] = 3;
 
         $routeModel = new ImsRouteModel();
 
-        $routeList = $routeModel->field('ims_route.id as route_id,route_name,route_code,ims_route.image_uniqid,min_fare')->where($map)->limit($page,$limit)->select();
+        $routeList = $routeModel->field('ims_route.id as route_id,route_name,route_code,ims_route.image_uniqid,min_fare')->where($map)->where('ims_route.ims_route.route_status',3)->limit($page,$limit)->select();
 
         if(empty($routeList)){
             return false;
