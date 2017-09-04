@@ -14,7 +14,7 @@ use think\Route;
  */
 Route::domain('test', function(){
     Route::get('/',function(){
-        return view('views/homepage');
+        return view('views/product');
     });
     Route::get('homepage',function(){
        return view('views/homepage');
