@@ -93,7 +93,7 @@ class EmployeeController extends PrivilegeController
         $employeeModel = new EmployeeModel();
         $result = $employeeModel->view('ims_employee','id,employee_name,employee_cellphone')
             ->view('ims_title','title','ims_title.id = ims_employee.title_id')
-            ->view('ims_employeeAccount','account_name','ims_employeeAccount.id = ims_employee.account_id')
+            ->view('ims_employee_account','account_name','ims_employee_acount.id = ims_employee.account_id')
             ->view('ims_department','department_name','ims_department.id = ims_employee.department_id')
             ->where('Employee.id',$employeeId)
             ->find();
