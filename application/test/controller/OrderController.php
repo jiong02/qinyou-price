@@ -70,7 +70,7 @@ class OrderController extends BaseController
         //部门模型
         $deparModel = new \app\ims\model\DepartmentModel();
 
-        $deparInfo = $deparModel->where('department_name','服务管理部')->find();
+        $deparInfo = $deparModel->where('department_name','服务管理')->find();
 
         if(empty($deparInfo)){
             return '部门不存在';
@@ -108,7 +108,9 @@ class OrderController extends BaseController
             return '订单不存在';
         }
 
+        if(empty($takeName)){
 
+        }
 
 
 
