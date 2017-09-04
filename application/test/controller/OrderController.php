@@ -54,6 +54,71 @@ class OrderController extends BaseController
     }
 
     /**
+     * @name 获取员工列表
+     * @auth Sam
+     * @param Request $request
+     * @return array|false|\PDOStatement|string|\think\Collection
+     */
+    public function getDepartList(Request $request)
+    {
+        $accountName = $request->param('account_name','');
+
+        if(empty($accountName)){
+            return '账号不存在';
+        }
+
+        //部门模型
+        $deparModel = new \app\ims\model\DepartmentModel();
+
+        $deparInfo = $deparModel->where('department_name','服务管理部')->find();
+
+        if(empty($deparInfo)){
+            return '部门不存在';
+        }
+
+        $deparInfo = $deparInfo->toArray();
+
+        //员工模型
+        $empModel = new \app\ims\model\EmployeeModel();
+
+        $empInfo = $empModel->field('ims_employee.id,account_name,title_id,is_charge')->where('ims_employee.department_id',$deparInfo['id'])->where('is_charge','是')->where('account_name',$accountName)->join('ims_title','ims_employee.title_id = ims_title.id')->find();
+
+        if(empty($empInfo)){
+            return '该员工不是主管';
+        }
+
+        $empAllInfo = $empModel->field('ims_employee.id,account_name,title_id')->where('ims_employee.department_id',$deparInfo['id'])->select();
+
+        if(empty($empAllInfo)){
+            return '该部门没有员工列表';
+        }
+
+        $empAllInfo = $empAllInfo->toArray();
+
+        return $empAllInfo;
+
+    }
+
+    public function updateOrderTakeId(Request $request)
+    {
+        $orderId = $request->param('order_id',0);
+        $takeName = $request->param('take_name','');
+
+        if(empty($orderId)){
+            return '订单不存在';
+        }
+
+        if(empty($takeName)){
+            return ''
+        }
+
+
+
+    }
+
+
+
+    /**
      * @name 修改联系人信息
      * @auth Sam
      * @param Request $request
