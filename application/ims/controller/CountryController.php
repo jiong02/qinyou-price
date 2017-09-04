@@ -67,8 +67,9 @@ class CountryController extends PrivilegeController
                 ->select());
 
 
-            $placeDB = Db::connect('mysql://test:CWcwtWv6V7uqO1Sq@120.24.189.240:3306/ims_new#utf8');
-                $destList2 = $placeDB->query("select place_name as name,place_ename as eng_name,ims_place.id,image_uniqid,ims_place.status from ims_place where ims_place.country_id = $countryInfo[id] AND place_type = '目的地' AND ims_place.status = 0");
+//            $placeDB = Db::connect('mysql://test:CWcwtWv6V7uqO1Sq@120.24.189.240:3306/ims_new#utf8');
+            // $placeDB = Db::connect('mysql://cheeru:%@r87naw9Sfhv%FL@rm-wz9p64l93868isk1d.mysql.rds.aliyuncs.com:3306/ims_new#utf8');
+                $destList2 = Db::query("select place_name as name,place_ename as eng_name,ims_place.id,image_uniqid,ims_place.status from ims_place where ims_place.country_id = $countryInfo[id] AND place_type = '目的地' AND ims_place.status = 0");
 
                 if(!empty($destList2) && is_array($destList2)){
                     $destList = array_merge($destList,$destList2);
