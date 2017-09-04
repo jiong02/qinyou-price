@@ -701,7 +701,7 @@ class RouteController extends Controller
 
         $accountInfo = array_merge($accountInfo,$empInfo);
 
-        $titleInfo = $this->formateData($titleModel->field('ims_title.id as title_id,ims_title.*')->where('department_id',$accountInfo['department_id'])->find());
+        $titleInfo = $this->formateData($titleModel->field('ims_title.id as title_id,ims_title.*')->where('id',$accountInfo['title_id'])->find());
         unset($titleInfo['id']);
 
         $accountInfo = array_merge($accountInfo,$titleInfo);
