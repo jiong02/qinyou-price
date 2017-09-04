@@ -171,7 +171,7 @@ class SearchController extends BaseController
         }
 
 
-        $routeCount = $imsRouteModel->field('ims_route.id as route_id,route_name,route_code')->where($map)->count();
+        $routeCount = $imsRouteModel->field('ims_route.id as route_id,route_name,route_code')->where($map)->where('ims_route.ims_route.route_status',3)->count();
 
         $returnArr['route_list'] = $routeList;
         $returnArr['route_count_ceil'] = ceil($routeCount / 5);
@@ -242,7 +242,7 @@ class SearchController extends BaseController
 
         }
 
-        $routeCount = $routeModel->field('ims_route.id as route_id,route_name,route_code')->where($map)->count();
+        $routeCount = $routeModel->field('ims_route.id as route_id,route_name,route_code')->where($map)->where('ims_route.ims_route.route_status',3)->count();
 
         $returnArr['route_list'] = $routeList;
         $returnArr['route_count_ceil'] = ceil($routeCount / 5);
