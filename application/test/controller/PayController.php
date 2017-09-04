@@ -109,6 +109,7 @@ class PayController extends BaseController
         }
         $cachePrefix = 'wechatpay_code_url_';
         if ($codeUrl = Cache::get($cachePrefix . $outTradeNo)){
+//            Data::createQrCode($codeUrl);
             return getSuccess($codeUrl);
         }
         $wechatpayContentBuilder = new WechatpayContentBuilder();
@@ -121,6 +122,7 @@ class PayController extends BaseController
         $response = $result->getResponse();
         if ($result->getTradeStatus() == 'SUCCESS'){
             Cache::set($cachePrefix . $outTradeNo, $response['code_url'], 7200);
+//            Data::createQrCode($response['code_url']);
             return getSuccess($response['code_url']);
         }else{
             return getError($response['err_code']);
