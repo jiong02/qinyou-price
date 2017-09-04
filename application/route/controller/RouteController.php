@@ -696,7 +696,7 @@ class RouteController extends Controller
 
         unset($accountInfo['id']);
 
-        $empInfo = $this->formateData($empModel->field('ims_employee.*,id as employee_id')->where('account_id',$accountInfo['account_id'])->find());
+        $empInfo = $this->formateData($empModel->field('ims_employee.*,id as employee_id')->where('account_name',$accountInfo['account_name'])->find());
         unset($empInfo['id']);
 
         $accountInfo = array_merge($accountInfo,$empInfo);

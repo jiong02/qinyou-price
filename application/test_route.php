@@ -154,6 +154,8 @@ Route::domain('test', function(){
     Route::any('/Order/updateOrderPay','test/Order/updateOrderPay');
     //获取部门员工列表
     Route::any('/Order/getDepartList','test/Order/getDepartList');
+    //修改跟单人
+    Route::any('/Order/updateOrderTakeId','test/Order/updateOrderTakeId');
 
 
 

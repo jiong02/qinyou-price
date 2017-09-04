@@ -99,6 +99,12 @@ class OrderController extends BaseController
 
     }
 
+    /**
+     * @name 修改跟单人
+     * @auth Sam
+     * @param Request $request
+     * @return string
+     */
     public function updateOrderTakeId(Request $request)
     {
         $orderId = $request->param('order_id',0);
@@ -109,10 +115,24 @@ class OrderController extends BaseController
         }
 
         if(empty($takeName)){
-
+            return '分配名称不存在';
         }
 
+        $orderModel = new OrderModel();
 
+        $orderInfo = $orderModel->where('id',$orderId)->find();
+
+        if(empty($orderInfo)){
+            return '订单不存在';
+        }
+
+        $orderInfo->take_charge_people_name = $takeName;
+
+        if($orderInfo->save()){
+            return '修改成功';
+        }
+
+        return '修改失败';
 
     }
 
