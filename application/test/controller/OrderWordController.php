@@ -157,9 +157,9 @@ class OrderWordController extends BaseController
                     $vehicleArr[$k][] = $vehicleInfo['vehicle_name'];
                     $vehicleArr[$k][] = 1;
 
-                }else{
+                }/*else{
                     $vehicleArr[$k][] = array();
-                }
+                }*/
 
             }
         }

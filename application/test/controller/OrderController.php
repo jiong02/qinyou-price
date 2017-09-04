@@ -67,6 +67,10 @@ class OrderController extends BaseController
             return '账号不存在';
         }
 
+        if($accountName !== 'Monica80015'){
+            return '你不是Monica';
+        }
+
         //部门模型
         $deparModel = new \app\ims\model\DepartmentModel();
 
@@ -78,14 +82,16 @@ class OrderController extends BaseController
 
         $deparInfo = $deparInfo->toArray();
 
-        //员工模型
+/*        //员工模型
         $empModel = new \app\ims\model\EmployeeModel();
 
         $empInfo = $empModel->field('ims_employee.id,account_name,title_id,is_charge')->where('ims_employee.department_id',$deparInfo['id'])->where('is_charge','是')->where('account_name',$accountName)->join('ims_title','ims_employee.title_id = ims_title.id')->find();
 
         if(empty($empInfo)){
             return '该员工不是主管';
-        }
+        }*/
+
+        $empModel = new \app\ims\model\EmployeeModel();
 
         $empAllInfo = $empModel->field('ims_employee.id,account_name,title_id')->where('ims_employee.department_id',$deparInfo['id'])->select();
 
