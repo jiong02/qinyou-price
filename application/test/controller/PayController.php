@@ -168,8 +168,8 @@ class PayController extends BaseController
         $result = $wechatpayQuery->loopQueryResult($wechatpayContentBuilder);
         $response = $result->getResponse();
         if ($result->getTradeStatus() == 'SUCCESS'){
-            $this->payTime = $response['total_fee'];
-            $this->payPrice = date('Y-m-d H:i:s',strtotime($response['time_end']));
+            $this->payTime = date('Y-m-d H:i:s',strtotime($response['time_end']));
+            $this->payPrice = $response['total_fee'];
             return getSuccess('订单支付成功');
         }else{
             return getError($response['trade_state_desc']);
