@@ -432,7 +432,7 @@ class TemplateFluxController extends BaseController
             $uvInfo['x'][] = $dateTimeEnd;
 
         }
-
+        exit;
         $returnData['pv_data'] = $pvInfo;
         $returnData['uv_data'] = $uvInfo;
 
@@ -453,7 +453,7 @@ class TemplateFluxController extends BaseController
     public function getPvUvRouteInfo($model,$tempRouteList,$startTime,$endTime)
     {
         $orderModel = new OrderModel();
-
+halt($tempRouteList);
         if(!empty($tempRouteList)){
             foreach($tempRouteList as $k=>$v){
                 $return[$k]['route_name'] = $v['route_name'];
@@ -465,7 +465,7 @@ class TemplateFluxController extends BaseController
 
                 //订单量
                 $orderCount = $orderModel->field('count(*) as count')->where("id = $v[id] AND create_time BETWEEN '$startTime' AND '$endTime'")->find();
-
+echo $orderModel->field('count(*) as count')->where("id = $v[id] AND create_time BETWEEN '$startTime' AND '$endTime'")->buildSql();exit;
                 $return[$k]['order_count'] = $orderCount['count'];
 
                 //支付数
