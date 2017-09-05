@@ -432,7 +432,7 @@ class TemplateFluxController extends BaseController
             $uvInfo['x'][] = $dateTimeEnd;
 
         }
-        exit;
+
         $returnData['pv_data'] = $pvInfo;
         $returnData['uv_data'] = $uvInfo;
 
