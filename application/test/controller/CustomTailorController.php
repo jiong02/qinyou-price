@@ -11,7 +11,7 @@ namespace app\test\controller;
 use app\components\Response;
 use app\components\wechat\WechatEnterprise\WechatEnterpriseSendMessage;
 use app\ims\model\EmployeeModel;
-use app\test\model\CustomTailorAssignModel;
+use app\test\model\DutyAssignModel;
 use app\ims\model\CustomTailorModel;
 use think\Request;
 
@@ -41,8 +41,8 @@ class CustomTailorController extends BaseController
 
     public function sendNotifyMessage($customerName)
     {
-        $customTailorAssignModel = new CustomTailorAssignModel();
-        $accountNameSet = $customTailorAssignModel->where('permissions',10)->column('employee_account_name');
+        $customTailorAssignModel = new DutyAssignModel();
+        $accountNameSet = $customTailorAssignModel->where('permissions',10)->where('duty','custom_tailor')->column('employee_account_name');
         $sendMessage = new WechatEnterpriseSendMessage();
         $textContent = '客户'.$customerName.'已提交定制表，请尽快登录后台处理。';
         $sendMessage->sendTextMessage($accountNameSet,$textContent);
@@ -65,8 +65,8 @@ class CustomTailorController extends BaseController
         $result = $employeeModel->checkExist($employeeId, $employeeToken);
         $employeeModel = $employeeModel->get($employeeId);
         if ($result){
-            $customTailorAssignModel = new CustomTailorAssignModel();
-            $employeeCount = $customTailorAssignModel->where('employee_account_name', $employeeModel->account_name)->where('permissions',10)->count();
+            $customTailorAssignModel = new DutyAssignModel();
+            $employeeCount = $customTailorAssignModel->where('duty','custom_tailor')->where('employee_account_name', $employeeModel->account_name)->where('permissions',10)->count();
             if ($employeeCount > 0){
                 $customerModel = new CustomTailorModel();
                 $customerData = $customerModel->limit($offset, $length)->field('id, follow_up_employee_id as follow_up_employee_name,customer_name as name, customer_gender as sex, customer_phone as phone')->select();
@@ -141,8 +141,8 @@ class CustomTailorController extends BaseController
         $result = $employeeModel->checkExist($employeeId, $employeeToken);
         if ($result){
             $assignEmployeeModel = $employeeModel->get($employeeId);
-            $customTailorAssignModel = new CustomTailorAssignModel();
-            $employeeCount = $customTailorAssignModel->where('employee_account_name', $assignEmployeeModel->account_name)->where('permissions',10)->count();
+            $customTailorAssignModel = new DutyAssignModel();
+            $employeeCount = $customTailorAssignModel->where('duty','custom_tailor')->where('employee_account_name', $assignEmployeeModel->account_name)->where('permissions',10)->count();
             if ($employeeCount > 0){
                 $customTailorModel = CustomTailorModel::get($customerId);
                 if ($customTailorModel){
