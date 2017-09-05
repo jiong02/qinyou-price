@@ -468,6 +468,7 @@ class TemplateFluxController extends BaseController
 //echo $orderModel->field('count(*) as count')->where("id = $v[id] AND create_time BETWEEN '$startTime' AND '$endTime'")->buildSql();exit;
                 $return[$k]['order_count'] = $orderCount['count'];
 
+                
                 //支付数
                 $orderPay = $orderModel->field('count(*) as count')->where("temp_route_id = $v[id] AND create_time BETWEEN '$startTime' AND '$endTime' AND order_status >= 3")->find();
 
