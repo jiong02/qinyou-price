@@ -402,7 +402,7 @@ class TemplateFluxController extends BaseController
 
             $pvInfo['change'][] = $change;
 
-            $pvInfo['temp_route_list'][] = $this->getPvUvRouteInfo($pvModel,$tmpRouteList,$ymdTimeEnd,$ymdTimeStart);
+            $pvInfo['temp_route_list'][] = $this->getPvUvRouteInfo($pvModel,$tmpRouteList,$ymdTimeStart,$ymdTimeEnd);
 
             $pvInfo['x'][] = $dateTimeEnd;
 
@@ -465,10 +465,11 @@ class TemplateFluxController extends BaseController
 
                 //订单量
                 $orderCount = $orderModel->field('count(*) as count')->where("temp_route_id = $v[id] AND create_time BETWEEN '$startTime' AND '$endTime'")->find();
-//echo $orderModel->field('count(*) as count')->where("id = $v[id] AND create_time BETWEEN '$startTime' AND '$endTime'")->buildSql();exit;
+//                var_dump($orderCount['count']);
+//echo $orderModel->field('count(*) as count')->where("temp_route_id = $v[id] AND create_time BETWEEN '$startTime' AND '$endTime'")->buildSql();
                 $return[$k]['order_count'] = $orderCount['count'];
 
-                
+
                 //支付数
                 $orderPay = $orderModel->field('count(*) as count')->where("temp_route_id = $v[id] AND create_time BETWEEN '$startTime' AND '$endTime' AND order_status >= 3")->find();
 
