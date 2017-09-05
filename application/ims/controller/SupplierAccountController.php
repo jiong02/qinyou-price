@@ -120,7 +120,7 @@ class SupplierAccountController extends BaseController
     {
         $empAccountModel = new EmployeeAccountModel();
 
-        $empAccountInfo = $empAccountModel->field('ims_employee_account.id,account_name,employee_name')->join('ims_employee','ims_employee_account.id = ims_employee.account_id','LEFT')->select();
+        $empAccountInfo = $empAccountModel->field('ims_employee_account.id,ims_employee.account_name,employee_name')->join('ims_employee','ims_employee_account.account_name = ims_employee.account_name','LEFT')->select();
 
         return getSucc($empAccountInfo);
 
@@ -284,10 +284,19 @@ class SupplierAccountController extends BaseController
 
         $accountInfo = $accountModel->field('ims_supplier_account.id,user_name,password,company_name,representative,travel_code,mobile_phone,email,address,fix_phone,grade,ims_supplier_account.employee_id')->where('ims_supplier_account.id',$accId)->join('ims_supplier_account_data','ims_supplier_account.id = account_id')->find();
 
+//halt($accountInfo->toArray());
         if(!empty($accountInfo)){
             $empModel = new EmployeeModel();
+            $empAccModel = new EmployeeAccountModel();
 
-            $empInfo = $this->formateData($empModel->where('account_id',$accountInfo->employee_id)->find());
+            $empAccInfo = $empAccModel->where('id',$accountInfo->employee_id)->find();
+
+            if(empty($empAccInfo)){
+                return '没有用户信息';
+            }
+//halt($empAccInfo->toArray());
+
+            $empInfo = $this->formateData($empModel->where('account_name',$empAccInfo->account_name)->find());
 
             if(empty($empInfo)){
                 $accountInfo['employee_name'] = '';
