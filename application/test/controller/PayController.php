@@ -145,12 +145,13 @@ class PayController extends BaseController
         }
     }
 
-    public function alipayRefundQuery()
+    public function alipayRefund($outTradeNo, $outRequestNo, $refundAmount)
     {
-//        $outRequestNo = Data::getUniqueString();
+        $outRequestNo = Data::getUniqueString();
         $alipayRefundBuilder = new AlipayContentBuilder();
-        $alipayRefundBuilder->setOutTradeNo(18);
-        $alipayRefundBuilder->setRefundAmount(0.01);
+        $alipayRefundBuilder->setOutTradeNo($outTradeNo);
+        $alipayRefundBuilder->setOutRequestNo($outRequestNo);
+        $alipayRefundBuilder->setRefundAmount($refundAmount);
         $refund = new AlipayService();
         $result = $refund->refund($alipayRefundBuilder);
         if ($result->getTradeStatus() == 'SUCCESS'){
@@ -176,22 +177,20 @@ class PayController extends BaseController
         }
     }
 
-    public function wechatpayRefund()
+    public function wechatpayRefund($outTradeNo, $outRefundNo, $totalFee, $refundFee)
     {
-        $outRefundNo = Data::getUniqueString();
         $wechatpayContentBuilder = new WechatpayContentBuilder();
-        $wechatpayContentBuilder->setOutTradeNo(date('YmdHis'));
-//        $wechatpayContentBuilder->setTotalFee(99.00);
-//        $wechatpayContentBuilder->setRefundFee(50.00);
-//        $wechatpayContentBuilder->setOutRefundNo($outRefundNo);
+        $wechatpayContentBuilder->setOutTradeNo($outTradeNo);
+        $wechatpayContentBuilder->setTotalFee($totalFee);
+        $wechatpayContentBuilder->setRefundFee($refundFee);
+        $wechatpayContentBuilder->setOutRefundNo($outRefundNo);
         $refund = new WechatpayService();
-        $result = $refund->refundQuery($wechatpayContentBuilder);
-        halt($result);
-    }
-
-    public function updateOrderStatus()
-    {
-
+        $response = $refund->refund($wechatpayContentBuilder);
+        if ($response->getTradeStatus() == 'SUCCESS'){
+            return getSuccess('订单退款成功');
+        }else{
+            return getError('订单退款失败');
+        }
     }
 //    public function wechatpayQrcodePay()
 //    {

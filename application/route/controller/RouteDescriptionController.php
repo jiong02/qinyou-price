@@ -161,6 +161,22 @@ class RouteDescriptionController extends Controller
             return '请填写完整数据';
         }
 
+        $routeHotelRoomModel = new RouteHotelRoomModel();
+
+        $routeHotelRoomInfo = $routeHotelRoomModel->where(['route_id'=>$descInfo['route_id'],'hotel_id'=>$descInfo['desc_room_info'][0]['hotel_id'],'room_id'=>$descInfo['desc_room_info'][0]['room_id']])->find();
+
+        if(!empty($routeHotelRoomInfo)){
+            $num = $routeHotelRoomInfo->check_in_night_amount - 1;
+
+            if($num <= 0){
+                $num = 0;
+            }
+
+            $routeHotelRoomInfo->check_in_night_amount = $num;
+
+            $routeHotelRoomInfo->save();
+        }
+
         $descModel = new RouteDescriptionModel();
         $descActivityModel = new RouteDescriptionActivityModel();
         $descHotelModel = new RouteDescriptionHotelModel();

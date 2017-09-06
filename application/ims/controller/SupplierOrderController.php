@@ -563,6 +563,14 @@ halt($defVehicleInfo);*/
 
             }
 
+            if(empty($priceList['child_fare'])){
+                $priceList['child_fare'] = 0;
+            }
+
+            if(empty($priceList['adult_fare'])){
+                $priceList['adult_fare'] = 0;
+            }
+
             if(!empty($priceList)){
                 $pricingInfo['adult_price'][] = $priceList['adult_fare'];
                 $pricingInfo['child_price'][] = $priceList['child_fare'];

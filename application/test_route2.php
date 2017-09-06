@@ -94,6 +94,16 @@ Route::domain('test', function(){
     Route::any('pay/qrcodePay','test/Pay/qrcodePay');
     Route::any('pay/query','test/Pay/query');
     Route::any('pay/updateOrderStatus','test/Pay/updateOrderStatus');
+
+    /**
+     * 退款功能
+     */
+    Route::any('refund/addOrderRefund','test/OrderRefund/addOrderRefund');
+    Route::any('refund/modifyRefundStatus','test/OrderRefund/modifyRefundStatus');
+    Route::any('refund/refund','test/OrderRefund/refund');
+    Route::any('refund/getOrderRefundByOrderId','test/OrderRefund/getOrderRefundByOrderId');
+    Route::any('refund/modifyRefundOrderStatus','test/OrderRefund/modifyRefundOrderStatus');
+
     /*
      * 测试
      */

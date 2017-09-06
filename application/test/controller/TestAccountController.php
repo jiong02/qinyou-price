@@ -338,7 +338,7 @@ class TestAccountController extends Controller
         $req = new \AlibabaAliqinFcSmsNumSendRequest();
         $req->setSmsType("normal");
         $req->setSmsFreeSignName("身份验证");
-        $req->setSmsParam("{\"code\":\"".$content."\",\"product\":\"沁游假期\"}");
+        $req->setSmsParam("{\"code\":\"".$content."\",\"product\":\"遇·岛\"}");
         $req->setRecNum($mobile);
         $req->setSmsTemplateCode("SMS_8970078");
         $resp = $c->execute($req);

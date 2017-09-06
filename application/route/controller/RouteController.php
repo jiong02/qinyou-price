@@ -827,34 +827,35 @@ class RouteController extends Controller
         if(empty($routeModel)){
             $routeModel = new RouteModel();
         }
-//halt('bb');
+
         //线路添加成功后，新增审核信息
         if($routeModel->save($routeInfo)){
-//            return $routeModel->id;
+
                         $routeId = $routeModel->id;
                         $examineModel = new RouteExamineModel();
 
                         $examineModel = $examineModel->where('route_id',$routeId)->find();
 
                         if(!empty($examineModel)){
+                            return (int)$routeModel->id;
                             return '修改成功';
                         }else{
                             $examineModel = new RouteExamineModel();
                         }
 
                         $passerInfo = $this->getSuperiorInfo($routeCreatorId);
-
+//var_dump($passerInfo);
                         if(empty($passerInfo)){
                             return '没有上级信息';
                         }
 
                         $examineModel->route_id = $routeId;
                         $examineModel->route_creator_id = $routeCreatorId;
-                        $examineModel->route_passer_id = $passerInfo['account_id'];
+                        $examineModel->route_passer_id = $passerInfo['id'];
                         $examineModel->route_create_time = date('Y-m-d',time());
-/*halt('aa');*/
+//halt($examineModel);
                         if($examineModel->save()){
-//                            echo 'aa';
+
                             return (int)$routeModel->id;
                         }else{
                             $routeModel = $routeModel->where('id',$routeId)->find();

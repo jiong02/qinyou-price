@@ -117,7 +117,14 @@ class WechatpayService
         $wechatpayRequest->setSslCertPath($this->sslCertPath);
         $wechatpayRequest->setSslKeyPath($this->sslKeyPath);
         $response = $this->clientExecute($wechatpayRequest,true);
-        return $response;
+        $wechatpayResult = new WechatResult($response);
+        $wechatpayResult->setTradeStatus('FAILD');
+        if ($response['return_code'] == 'SUCCESS' && $response['return_msg'] == 'OK'){
+            if ($response['result_code'] == 'SUCCESS'){
+                $wechatpayResult->setTradeStatus('SUCCESS');
+            }
+        }
+        return $wechatpayResult;
     }
 
     public function refundQuery($contentBuilder)
