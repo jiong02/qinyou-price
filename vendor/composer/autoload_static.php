@@ -43,6 +43,7 @@ class ComposerStaticInit353fbe45a7200958b497e0e373359394
         'think\\' => 
         array (
             0 => __DIR__ . '/../..' . '/thinkphp/library/think',
+            1 => __DIR__ . '/..' . '/topthink/think-image/src',
         ),
         'Symfony\\Polyfill\\Php70\\' => 
         array (

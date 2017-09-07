@@ -187,7 +187,7 @@ class BasePricingController extends BaseController
                     $fixedPackageDataList[] = $this->packageData;
                     $fixedPackageRoomFareDetail[] = $this->roomFareDetail;
                 }
-                if ($packageType == '额外儿童' && is_null($this->isFixedPackage)){
+                if (($packageType == '额外儿童' || $packageType == '额外成人') && is_null($this->isFixedPackage)){
                     $this->isFixedPackage = false;
                 }
 
@@ -264,7 +264,6 @@ class BasePricingController extends BaseController
                         }
                     }
                 }
-
             }else{
                 $roomFare = $this->packageRoomData->$type;
                 $roomFare = json_decode($roomFare, true);

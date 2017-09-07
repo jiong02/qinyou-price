@@ -14,6 +14,10 @@ Route::domain('price', function(){
     Route::get('/',function(){
         return view('views2/index');
     });
+    Route::get('/ueditor',function(){
+        return view('ueditor');
+    });
+    Route::any('image/ueditor','ims/Image/ueditor');
     //房型功能路由组
     Route::post('room/query','ims/Room/query');
     Route::get('room/exportExcel/:roomId/:year','ims/Room/exportExcel');

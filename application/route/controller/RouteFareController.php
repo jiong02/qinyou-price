@@ -43,9 +43,9 @@ class RouteFareController extends BasePricingController
         $request->adultFare = $request->param('adult_fare');
         $request->childFare = $request->param('child_fare');
         $request->isEnable = $request->param('allow');
-        $this->inputQuantityOfAdult = $request->param('quantity_Of_Adult', 2);
-        $this->inputQuantityOfChild = $request->param('quantity_Of_Child', 1);
-        $this->inputQuantityOfRoom = $request->param('quantity_of_Room',2);
+        $this->inputQuantityOfAdult = $request->param('quantity_Of_Adult', 17);
+        $this->inputQuantityOfChild = $request->param('quantity_Of_Child', 0);
+        $this->inputQuantityOfRoom = $request->param('quantity_of_Room',7);
         parent::__construct($request);
     }
 
@@ -79,7 +79,7 @@ class RouteFareController extends BasePricingController
         $farDetail['quantity_of_Room'] = $this->quantityOfRoom;
         if ($this->haveBalanceForRoomCharge != 0 ){
             $farDetail['room_charge'] = $this->haveBalanceForRoomCharge * $adultFare;
-        }elseif($this->haveExtraAdult !=0){
+        }elseif($this->haveExtraAdult !=0 ){
             $farDetail['extra_adult'] = $this->haveExtraAdult * $extraFare;
         }elseif($this->childToAdult){
             $farDetail['child_to_adult'] = $this->childToAdult * $adultFare;
@@ -133,22 +133,23 @@ class RouteFareController extends BasePricingController
                 $roomArrangement['standard_quantity_of_adult'] = 0;
                 $roomArrangement['standard_quantity_of_child'] = 0;
                 $roomArrangement['standard_quantity_of_extra_adult'] = 0;
+//                dump($inputQuantityOfAdult >= $standardQuantityOfAdult);
                 if ($inputQuantityOfAdult >= $standardQuantityOfAdult) {
-                    $roomArrangement['standard_quantity_of_adult'] = $standardQuantityOfAdult;
+                    $roomArrangement['standard_quantity_of_adult'] = (int)$standardQuantityOfAdult;
                     $inputQuantityOfAdult -= $standardQuantityOfAdult;
                     $inputQuantityOfPassengers -= $standardQuantityOfAdult;
                     if ($inputQuantityOfAdult != 0 && $inputQuantityOfChild == 0) {
-                        $roomArrangement['standard_quantity_of_extra_adult'] = $standardQuantityOfExtraAdult;
+                        $roomArrangement['standard_quantity_of_extra_adult'] = (int)$standardQuantityOfExtraAdult;
                         $inputQuantityOfAdult -= $standardQuantityOfExtraAdult;
                         $inputQuantityOfPassengers -= $standardQuantityOfExtraAdult;
                         $this->haveExtraAdult += 1;
                     }
                     if ($inputQuantityOfChild >= $standardQuantityOfChild) {
-                        $roomArrangement['standard_quantity_of_child'] = $standardQuantityOfChild;
+                        $roomArrangement['standard_quantity_of_child'] = (int)$standardQuantityOfChild;
                         $inputQuantityOfChild -= $standardQuantityOfChild;
                         $inputQuantityOfPassengers -= $standardQuantityOfChild;
                     }else{
-                        $roomArrangement['standard_quantity_of_child'] = $inputQuantityOfChild;
+                        $roomArrangement['standard_quantity_of_child'] = (int)$inputQuantityOfChild;
                         $inputQuantityOfPassengers -= $inputQuantityOfChild;
                         $inputQuantityOfChild = 0;
                     }
@@ -166,28 +167,34 @@ class RouteFareController extends BasePricingController
                         $inputQuantityOfChild = 0;
                     }
                     if ($inputQuantityOfAdult >= $standardQuantityOfAdult) {
-                        $roomArrangement['standard_quantity_of_adult'] = $standardQuantityOfAdult;//2 -5 -3 -1 0
+                        $roomArrangement['standard_quantity_of_adult'] = (int)$standardQuantityOfAdult;//2 -5 -3 -1 0
                         $inputQuantityOfAdult -= $standardQuantityOfAdult;
                         $inputQuantityOfPassengers -= $standardQuantityOfAdult;
                         if ($inputQuantityOfChild >= $standardQuantityOfChild) {
-                            $roomArrangement['standard_quantity_of_child'] = $standardQuantityOfChild; //1 -4 -3 -2 0
+                            $roomArrangement['standard_quantity_of_child'] = (int)$standardQuantityOfChild; //1 -4 -3 -2 0
                             $inputQuantityOfChild -= $standardQuantityOfChild;
                             $inputQuantityOfPassengers -= $standardQuantityOfChild;
                         }else{
-                            $roomArrangement['standard_quantity_of_child'] = $inputQuantityOfChild;
+                            $roomArrangement['standard_quantity_of_child'] = (int)$inputQuantityOfChild;
                             $inputQuantityOfPassengers -= $inputQuantityOfChild;
                             $inputQuantityOfChild = 0;
                         }
                         if ($inputQuantityOfAdult >= $standardQuantityOfExtraAdult && $inputQuantityOfChild == 0) {
-                            $roomArrangement['standard_quantity_of_extra_adult'] = $standardQuantityOfExtraAdult;
+                            $roomArrangement['standard_quantity_of_extra_adult'] = (int)$standardQuantityOfExtraAdult;
                             $inputQuantityOfAdult -= $standardQuantityOfExtraAdult;
                             $inputQuantityOfPassengers -= $standardQuantityOfExtraAdult;
                             $this->haveExtraAdult += 1;
                         }
                     }else{
-                        $roomArrangement['standard_quantity_of_adult'] = $inputQuantityOfAdult;
+                        $roomArrangement['standard_quantity_of_adult'] = (int)$inputQuantityOfAdult;
                         if ($inputQuantityOfAdult < $standardQuantityOfAdult) {
-                            $this->haveBalanceForRoomCharge += 1;
+                            if ($this->haveExtraAdult >= 1){
+                                $roomArrangementList[count($roomArrangementList) - 1]['standard_quantity_of_extra_adult'] -= 1;
+                                $roomArrangement['standard_quantity_of_adult'] += 1;
+                                $this->haveExtraAdult -= 1;
+                            }else{
+                                $this->haveBalanceForRoomCharge += 1;
+                            }
                         }
                         $inputQuantityOfPassengers -= $inputQuantityOfAdult;
                         $inputQuantityOfAdult = 0;
@@ -215,22 +222,31 @@ class RouteFareController extends BasePricingController
             $passengerOfEveryRoom = floor($inputQuantityOfPassengers / $inputQuantityOfRoom);
             $quantityOfRemainRoom = $inputQuantityOfPassengers % $inputQuantityOfRoom;
             if ($passengerOfEveryRoom == 1){
-                $this->haveBalanceForRoomCharge = $inputQuantityOfRoom - $quantityOfRemainRoom;
+                $haveBalanceForRoomCharge = $inputQuantityOfRoom - $quantityOfRemainRoom;
+                $this->haveBalanceForRoomCharge = $haveBalanceForRoomCharge;
                 $this->childToAdult = $inputQuantityOfChild;
                 for ($i=0; $i < $inputQuantityOfRoom ; $i++) {
-                    if ($this->haveBalanceForRoomCharge != 0){
-                        $this->haveBalanceForRoomCharge = $this->haveBalanceForRoomCharge - 1;
-                    }
                     $roomArrangement['standard_quantity_of_adult'] = 2;
                     $roomArrangement['standard_quantity_of_child'] = 0;
                     $roomArrangement['standard_quantity_of_extra_adult'] = 0;
-                    if ($this->haveBalanceForRoomCharge == 0){
-                        $roomArrangement['standard_quantity_of_adult'] = 1;
-                    }
                     $roomArrangementList[] = $roomArrangement;
                 }
             }elseif($passengerOfEveryRoom == 2){
-                if($quantityOfRemainRoom < $inputQuantityOfChild){
+                if ($inputQuantityOfChild == 0){
+                    $this->haveExtraAdult = $quantityOfRemainRoom;
+                    for ($i=0; $i < $inputQuantityOfRoom ; $i++) {
+                        if ($quantityOfRemainRoom == 0){
+                            $roomArrangement['standard_quantity_of_extra_adult'] = 0;
+                        }
+                        $roomArrangement['standard_quantity_of_adult'] = 2;
+                        $roomArrangement['standard_quantity_of_child'] = 0;
+                        if ($quantityOfRemainRoom != 0){
+                            $quantityOfRemainRoom = $quantityOfRemainRoom - 1;
+                            $roomArrangement['standard_quantity_of_extra_adult'] = 1;
+                        }
+                        $roomArrangementList[] = $roomArrangement;
+                    }
+                }elseif($quantityOfRemainRoom < $inputQuantityOfChild){
                     $this->childToAdult = $inputQuantityOfChild - $quantityOfRemainRoom;
                     $inputQuantityOfChild = $inputQuantityOfChild - $this->childToAdult;
                     for ($i=0; $i < $inputQuantityOfRoom ; $i++) {
@@ -496,12 +512,12 @@ class RouteFareController extends BasePricingController
                 $this->totalFare['adult_fare_detail']['vehicle_detail'][] = $this->vehicleFareDetail;
                 $this->totalFare['adult_fare'] = $this->getAdultTotalFare($adultRoomFare,$adultVehicleFare, $itemFare);
                 if ($this->quantityOfExtraAdult >=1){
-                    $childRoomFare = $this->pricingRoomFare('额外成人');
+                    $extraAdultRoomFare = $this->pricingRoomFare('额外成人');
                     $itemFare = $this->pricingItemFare();
                     $this->totalFare['extra_adult_fare_detail']['room_detail'][] = $this->roomFareDetail;
-                    $childVehicleFare = $this->pricingRouteVehicleFare('额外成人');
+                    $extraAdultVehicleFare = $this->pricingRouteVehicleFare('额外成人');
                     $this->totalFare['extra_adult_fare_detail']['vehicle_detail'][] = $this->vehicleFareDetail;
-                    $this->totalFare['extra_adult_fare'] = $this->getChildTotalFare($childRoomFare,$childVehicleFare, $itemFare);
+                    $this->totalFare['extra_adult_fare'] = $this->getChildTotalFare($extraAdultRoomFare,$extraAdultVehicleFare, $itemFare);
                 }
                 if ($this->quantityOfChild >=1){
                     $childRoomFare = $this->pricingRoomFare('额外儿童');

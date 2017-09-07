@@ -1,11 +1,18 @@
 <?php
 namespace app\ims\controller;
 
+use app\components\Ueditor;
 use app\ims\model\ImageModel;
 use think\Request;
 
 class ImageController extends BaseController
 {
+    public function ueditor(Request $request)
+    {
+        $ueditor = new Ueditor();
+        return $ueditor->index($request);
+    }
+
     public function fileUpload(Request $request)
     {
         $file = $request->file('file');
