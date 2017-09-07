@@ -40,14 +40,16 @@ class PHPWord_Section_Settings {
 	 * 
 	 * @var int
 	 */
-	private $_defaultPageSizeW = 11906;
+	// private $_defaultPageSizeW = 11906;
+	private $_defaultPageSizeW = 11907;
 	
 	/**
 	 * Default Page Size Height
 	 * 
 	 * @var int
 	 */
-	private $_defaultPageSizeH = 16838;
+	// private $_defaultPageSizeH = 16838;
+	private $_defaultPageSizeH = 16443;
 	
 	/**
 	 * Page Orientation
